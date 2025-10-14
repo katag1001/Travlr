@@ -1,5 +1,3 @@
-// App.js
-
 import * as React from 'react';
 import { BottomNavigation, Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -15,10 +13,10 @@ import MyTrips from './screens/MyTrips'
 export default function App() {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: 'trips', title: 'My trips', focusedIcon: 'suitcase', unfocusedIcon: 'suitcase-outline' },
-    { key: 'packing', title: 'Packing', focusedIcon: 'suitcase', unfocusedIcon: 'suitcase-outline' },
+    { key: 'trips', title: 'My trips', focusedIcon: 'palm-tree', unfocusedIcon: 'palm-tree' },
+    { key: 'packing', title: 'Packing', focusedIcon: 'bag-suitcase', unfocusedIcon: 'bag-suitcase-outline' },
     { key: 'budget', title: 'Budget', focusedIcon: 'cash', unfocusedIcon: 'cash' },
-    { key: 'hotels', title: 'Hotels', focusedIcon: 'hotel', unfocusedIcon: 'hotel' },
+    { key: 'hotels', title: 'Hotels', focusedIcon: 'office-building', unfocusedIcon: 'office-building-outline' },
     { key: 'itinerary', title: 'Itinerary', focusedIcon: 'calendar', unfocusedIcon: 'calendar-outline' },
   ]);
 

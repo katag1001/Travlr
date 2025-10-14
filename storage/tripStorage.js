@@ -1,5 +1,7 @@
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { addItineraryEntries } from './itineraryStorage';
+import { addItineraryEntries, getItineraries, updateItineraryEntry } from './itineraryStorage';
+import { getPackingLists, updatePackingList } from './packingStorage';
 import { v4 as uuidv4 } from 'uuid';
 
 const STORAGE_KEY = 'TRIPS';
@@ -33,6 +35,17 @@ export const deleteTrip = async (tripId) => {
   const trips = await getTrips();
   const filtered = trips.filter(t => t.id !== tripId);
   await saveTrips(filtered);
+
+  // Delete associated itineraries
+  const allItineraries = await getItineraries();
+  const toDeleteItineraryIds = allItineraries.filter(e => e.tripId === tripId).map(e => e.id);
+  const remainingItineraries = allItineraries.filter(e => e.tripId !== tripId);
+  await AsyncStorage.setItem('ITINERARIES', JSON.stringify(remainingItineraries));
+
+  // Delete associated packing lists and their items
+  const allPacking = await getPackingLists();
+  const remainingPacking = allPacking.filter(pl => pl.tripId !== tripId);
+  await AsyncStorage.setItem('PACKING_LISTS', JSON.stringify(remainingPacking));
 };
 
 // Helper: generate itinerary between two dates

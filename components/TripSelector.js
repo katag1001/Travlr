@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { View, Keyboard } from 'react-native';
 import { Menu, Button } from 'react-native-paper';
 import { getTrips } from '../storage/tripStorage';
@@ -7,25 +8,24 @@ export default function TripSelector({ selectedTripId, onSelectTrip }) {
   const [trips, setTrips] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const anchorRef = useRef(null);
-
+  // Always reload trips when menu is opened or when selectedTripId changes
   useEffect(() => {
     const loadTrips = async () => {
       const tr = await getTrips();
       setTrips(tr);
     };
     loadTrips();
-  }, []);
+  }, [selectedTripId, menuVisible]);
 
   const selectedTrip = trips.find(t => t.id === selectedTripId);
 
   const openMenu = () => {
-    Keyboard.dismiss();  
+    Keyboard.dismiss();
     setMenuVisible(true);
   };
 
   return (
-    <View ref={anchorRef}>
+    <View>
       <Menu
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}

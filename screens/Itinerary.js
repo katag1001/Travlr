@@ -7,6 +7,7 @@ import TripSelector from '../components/TripSelector';
 export default function Itinerary() {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [entries, setEntries] = useState([]);
+  const [localEdits, setLocalEdits] = useState({});
 
   useEffect(() => {
     if (selectedTripId) {
@@ -19,17 +20,38 @@ export default function Itinerary() {
   const loadEntries = async (tripId) => {
     const arr = await getItineraryForTrip(tripId);
     setEntries(arr);
+
+    // Initialize local edit state
+    const initialEdits = {};
+    arr.forEach((entry) => {
+      initialEdits[entry.id] = {
+        day: entry.day || '',
+        night: entry.night || '',
+      };
+    });
+    setLocalEdits(initialEdits);
   };
 
   const handleUpdateEntry = async (entryId, field, value) => {
-    const entry = entries.find(e => e.id === entryId);
+    const entry = entries.find((e) => e.id === entryId);
     if (!entry) return;
+
     const updated = { ...entry, [field]: value };
     await updateItineraryEntry(updated);
 
     setEntries((prev) =>
-      prev.map(e => (e.id === entryId ? updated : e))
+      prev.map((e) => (e.id === entryId ? updated : e))
     );
+  };
+
+  const handleLocalChange = (entryId, field, value) => {
+    setLocalEdits((prev) => ({
+      ...prev,
+      [entryId]: {
+        ...prev[entryId],
+        [field]: value,
+      },
+    }));
   };
 
   const renderEntry = ({ item }) => {
@@ -39,23 +61,37 @@ export default function Itinerary() {
     const year = dateObj.getFullYear();
     const displayDate = `${dayNum}/${monthNum}/${year}`;
 
+    const local = localEdits[item.id] || { day: '', night: '' };
+
     return (
       <Card style={styles.entryCard}>
         <View style={styles.row}>
           <View style={styles.dateBox}>
             <Text>{displayDate}</Text>
           </View>
+
           <TextInput
             style={styles.textBox}
             placeholder="Day plan"
-            value={item.day}
-            onChangeText={(text) => handleUpdateEntry(item.id, 'day', text)}
+            value={local.day}
+            onChangeText={(text) =>
+              handleLocalChange(item.id, 'day', text)
+            }
+            onBlur={() =>
+              handleUpdateEntry(item.id, 'day', local.day)
+            }
           />
+
           <TextInput
             style={styles.textBox}
             placeholder="Night plan"
-            value={item.night}
-            onChangeText={(text) => handleUpdateEntry(item.id, 'night', text)}
+            value={local.night}
+            onChangeText={(text) =>
+              handleLocalChange(item.id, 'night', text)
+            }
+            onBlur={() =>
+              handleUpdateEntry(item.id, 'night', local.night)
+            }
           />
         </View>
       </Card>
@@ -86,7 +122,9 @@ export default function Itinerary() {
               keyboardShouldPersistTaps="handled"
             />
           ) : (
-            <Text style={{ marginTop: 20 }}>Select a trip to view itinerary</Text>
+            <Text style={{ marginTop: 20 }}>
+              Select a trip to view itinerary
+            </Text>
           )}
         </View>
       </KeyboardAvoidingView>
