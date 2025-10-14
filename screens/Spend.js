@@ -1,25 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import {
-  Text,
-  Card,
-  Button,
-  TextInput,
-  Dialog,
-  Portal,
-  FAB,
-} from 'react-native-paper';
+import { Text, Card, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 
-import {
-  getSpendsForBudget,
-  addSpend,
-  updateSpend,
-  deleteSpend,
-  createSpend, 
-} from '../storage/budgetStorage';
+import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend } from '../storage/budgetStorage';
 
 export default function SpendScreen({ route, navigation }) {
-  const { budgetId, budgetName } = route.params;
+  const { budgetId, budgetName, tripId } = route.params;
 
   const [spends, setSpends] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -27,7 +13,7 @@ export default function SpendScreen({ route, navigation }) {
 
   const [spendName, setSpendName] = useState('');
   const [spendAmount, setSpendAmount] = useState('');
-  const [spendDate, setSpendDate] = useState(''); // You could use a date picker
+  const [spendDate, setSpendDate] = useState('');
 
   const loadSpends = async () => {
     const loaded = await getSpendsForBudget(budgetId);
@@ -65,7 +51,6 @@ export default function SpendScreen({ route, navigation }) {
     const dateValue = spendDate;
 
     if (editingSpend) {
-      // ✅ Update existing spend
       const updated = {
         ...editingSpend,
         spendName,
@@ -74,8 +59,7 @@ export default function SpendScreen({ route, navigation }) {
       };
       await updateSpend(updated);
     } else {
-      // ✅ Create new spend using createSpend helper
-      const newSpend = createSpend(budgetId, spendName, dateValue, amount);
+      const newSpend = createSpend(tripId, budgetId, spendName, dateValue, amount);
       await addSpend(newSpend);
     }
 
@@ -106,9 +90,7 @@ export default function SpendScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>
-        Spends for "{budgetName}"
-      </Text>
+      <Text style={styles.header}>Spends for "{budgetName}"</Text>
 
       <FlatList
         data={spends}
@@ -117,18 +99,11 @@ export default function SpendScreen({ route, navigation }) {
         ListEmptyComponent={<Text>No spends added yet.</Text>}
       />
 
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => showDialog()}
-        label="Add Spend"
-      />
+      <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
 
       <Portal>
         <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>
-            {editingSpend ? 'Edit Spend' : 'New Spend'}
-          </Dialog.Title>
+          <Dialog.Title>{editingSpend ? 'Edit Spend' : 'New Spend'}</Dialog.Title>
           <Dialog.Content>
             <TextInput
               label="Spend Name"

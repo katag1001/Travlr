@@ -1,26 +1,25 @@
-// budgetStorage.js
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
 
-// Keys for AsyncStorage
 const BUDGETS_KEY = 'budgets';
 const SPENDS_KEY = 'spends';
 
-// Budget model (frontend version)
-export const createBudget = (budgetName, total) => {
+// MODELS ------------------------------------------------------------------------------------------------------
+
+export const createBudget = (budgetName, total, tripId) => {
   return {
-  id: UUID.v4(),
+    id: UUID.v4(),
+    tripId, // ✅ Add tripId to budget
     budgetName,
     total: total || 0,
     spent: 0,
   };
 };
 
-// Spend model (frontend version)
-export const createSpend = (budgetId, spendName, date, spend) => {
+export const createSpend = (budgetId, spendName, date, spend, tripId) => {
   return {
-  id: UUID.v4(),
+    id: UUID.v4(),
+    tripId, // ✅ Add tripId to spend
     budgetId,
     spendName,
     date: date instanceof Date ? date.toISOString() : date,
@@ -28,7 +27,8 @@ export const createSpend = (budgetId, spendName, date, spend) => {
   };
 };
 
-// ——— Budget functions ———
+
+// BUDGET FUNCTIONS -----------------------------------------------------------------------------------------
 
 export const getBudgets = async () => {
   const data = await AsyncStorage.getItem(BUDGETS_KEY);
@@ -40,7 +40,6 @@ export const saveBudgets = async (budgets) => {
 };
 
 export const deleteBudget = async (budgetId) => {
-  // Remove the budget
   const budgets = await getBudgets();
   const updatedBudgets = budgets.filter(b => b.id !== budgetId);
   await saveBudgets(updatedBudgets);
@@ -51,7 +50,7 @@ export const deleteBudget = async (budgetId) => {
   await saveSpends(updatedSpends);
 };
 
-// ——— Spend functions ———
+// SPEND FUNCTIONS --------------------------------------------------------------------------------------------
 
 export const getSpends = async () => {
   const data = await AsyncStorage.getItem(SPENDS_KEY);
@@ -77,10 +76,7 @@ export const addSpend = async (newSpend) => {
   const idx = budgets.findIndex(b => b.id === newSpend.budgetId);
   if (idx !== -1) {
     budgets[idx].spent = (budgets[idx].spent || 0) + newSpend.spend;
-    console.log('Budget updated after spend:', budgets[idx]);
     await saveBudgets(budgets);
-  } else {
-    console.log('Budget not found for spend:', newSpend);
   }
 };
 
@@ -92,41 +88,30 @@ export const updateSpend = async (updatedSpend) => {
   const old = spends[idx];
   const diff = updatedSpend.spend - old.spend;
 
-  // Replace it
   spends[idx] = updatedSpend;
   await saveSpends(spends);
 
-  // Update budget spent
+  // Update related budget
   const budgets = await getBudgets();
   const bidx = budgets.findIndex(b => b.id === updatedSpend.budgetId);
   if (bidx !== -1) {
     budgets[bidx].spent = (budgets[bidx].spent || 0) + diff;
-    console.log('Budget updated after spend update:', budgets[bidx]);
     await saveBudgets(budgets);
-  } else {
-    console.log('Budget not found for spend update:', updatedSpend);
   }
 };
 
 export const deleteSpend = async (spendId) => {
   const spends = await getSpends();
   const spend = spends.find(s => s.id === spendId);
-  if (!spend) {
-    // nothing to delete
-    return;
-  }
+  if (!spend) return;
 
   const updatedSpends = spends.filter(s => s.id !== spendId);
   await saveSpends(updatedSpends);
 
-  // Subtract from the budget's spent
   const budgets = await getBudgets();
   const bidx = budgets.findIndex(b => b.id === spend.budgetId);
   if (bidx !== -1) {
     budgets[bidx].spent = (budgets[bidx].spent || 0) - spend.spend;
-    console.log('Budget updated after spend delete:', budgets[bidx]);
     await saveBudgets(budgets);
-  } else {
-    console.log('Budget not found for spend delete:', spend);
   }
 };

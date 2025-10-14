@@ -1,25 +1,10 @@
-// Budget.js
-
 import React, { useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { View, StyleSheet, FlatList } from 'react-native';
-import {
-  Text,
-  Card,
-  Button,
-  TextInput,
-  Dialog,
-  Portal,
-  FAB,
-} from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { Text, Card, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 
-import {
-  getBudgets,
-  createBudget,
-  saveBudgets,
-  deleteBudget as removeBudget,
-} from '../storage/budgetStorage';
+import TripSelector from '../components/TripSelector';
+import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
 
 export default function Budget() {
   const navigation = useNavigation();
@@ -30,20 +15,26 @@ export default function Budget() {
   const [budgetTotal, setBudgetTotal] = useState('');
   const [editingBudget, setEditingBudget] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [selectedTripId, setSelectedTripId] = useState(null);
 
   const loadBudgets = async () => {
-    const loaded = await getBudgets();
-    setBudgets(loaded);
+    const all = await getBudgets();
+    const filtered = selectedTripId ? all.filter(b => b.tripId === selectedTripId) : [];
+    setBudgets(filtered);
   };
 
   useEffect(() => {
-    loadBudgets();
-  }, []);
+    if (selectedTripId) {
+      loadBudgets();
+    }
+  }, [selectedTripId]);
 
   useFocusEffect(
     React.useCallback(() => {
-      loadBudgets();
-    }, [])
+      if (selectedTripId) {
+        loadBudgets();
+      }
+    }, [selectedTripId])
   );
 
   const showDialog = (budget = null) => {
@@ -68,40 +59,31 @@ export default function Budget() {
   };
 
   const handleSaveBudget = async () => {
-    console.log('Save button pressed');
     try {
       const total = parseFloat(budgetTotal);
       if (!budgetName.trim()) {
-        console.log('Validation failed: empty budget name');
         setErrorMsg('Budget name is required.');
         return;
       }
       if (isNaN(total) || total <= 0) {
-        console.log('Validation failed: invalid total');
         setErrorMsg('Total amount must be a positive number.');
         return;
       }
+
       if (editingBudget) {
-        // update
         const updated = budgets.map(b =>
-          b.id === editingBudget.id
-            ? { ...b, budgetName, total }
-            : b
+          b.id === editingBudget.id ? { ...b, budgetName, total } : b
         );
         await saveBudgets(updated);
-        console.log('Updated budgets:', updated);
       } else {
-        // create new
-        const newBudget = createBudget(budgetName, total);
+        const newBudget = createBudget(selectedTripId, budgetName, total);
         const updated = [...budgets, newBudget];
         await saveBudgets(updated);
-        console.log('New budget added:', newBudget);
-        console.log('Budgets after add:', updated);
       }
+
       hideDialog();
       loadBudgets();
     } catch (err) {
-      console.log('Error in handleSaveBudget:', err);
       setErrorMsg('An error occurred while saving.');
     }
   };
@@ -118,6 +100,7 @@ export default function Budget() {
         navigation.navigate('Spends', {
           budgetId: item.id,
           budgetName: item.budgetName,
+          tripId: selectedTripId,
         })
       }
     >
@@ -137,7 +120,12 @@ export default function Budget() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Budgets</Text>
+      <View style={styles.headerRow}>
+        <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} />
+        <Button mode="contained" onPress={() => showDialog()} disabled={!selectedTripId}>
+          Add Budget
+        </Button>
+      </View>
 
       <FlatList
         data={budgets}
@@ -146,18 +134,9 @@ export default function Budget() {
         ListEmptyComponent={<Text>No budgets found.</Text>}
       />
 
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => showDialog()}
-        label="Add Budget"
-      />
-
       <Portal>
         <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>
-            {editingBudget ? 'Edit Budget' : 'New Budget'}
-          </Dialog.Title>
+          <Dialog.Title>{editingBudget ? 'Edit Budget' : 'New Budget'}</Dialog.Title>
           <Dialog.Content>
             <TextInput
               label="Budget Name"
@@ -192,17 +171,14 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
   },
-  header: {
-    fontSize: 24,
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
   card: {
     marginBottom: 15,
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
   },
   input: {
     marginBottom: 10,

@@ -20,7 +20,7 @@ export const addTrip = async (trip) => {
   const updatedTrips = [...trips, trip];
   await saveTrips(updatedTrips);
 
-  // 🆕 Generate and save itinerary entries
+
   const itineraryEntries = generateItinerary(trip);
   await addItineraryEntries(itineraryEntries);
 };

@@ -8,7 +8,6 @@ export default function TripSelector({ selectedTripId, onSelectTrip }) {
   const [trips, setTrips] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
 
-  // Always reload trips when menu is opened or when selectedTripId changes
   useEffect(() => {
     const loadTrips = async () => {
       const tr = await getTrips();
