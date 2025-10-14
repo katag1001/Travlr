@@ -1,41 +1,36 @@
-import * as React from 'react';
-import { BottomNavigation, Provider as PaperProvider } from 'react-native-paper';
+// App.js
+
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import 'react-native-get-random-values';
+import { Provider as PaperProvider } from 'react-native-paper';
 
+import MainTabs from './MainTabs';
+import SpendScreen from './screens/Spend';
 
-import Packing from './screens/Packing';
-import Budget from './screens/Budget';
-import Hotels from './screens/Hotels';
-import Itinerary from './screens/Itinerary';
-import MyTrips from './screens/MyTrips'
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'trips', title: 'My trips', focusedIcon: 'palm-tree', unfocusedIcon: 'palm-tree' },
-    { key: 'packing', title: 'Packing', focusedIcon: 'bag-suitcase', unfocusedIcon: 'bag-suitcase-outline' },
-    { key: 'budget', title: 'Budget', focusedIcon: 'cash', unfocusedIcon: 'cash' },
-    { key: 'hotels', title: 'Hotels', focusedIcon: 'office-building', unfocusedIcon: 'office-building-outline' },
-    { key: 'itinerary', title: 'Itinerary', focusedIcon: 'calendar', unfocusedIcon: 'calendar-outline' },
-  ]);
-
-  const renderScene = BottomNavigation.SceneMap({
-    packing: Packing,
-    budget: Budget,
-    hotels: Hotels,
-    itinerary: Itinerary,
-    trips: MyTrips,
-  });
-
   return (
     <SafeAreaProvider>
       <PaperProvider>
-        <BottomNavigation
-          navigationState={{ index, routes }}
-          onIndexChange={setIndex}
-          renderScene={renderScene}
-        />
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="MainTabs"
+              component={MainTabs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Spends"
+              component={SpendScreen}
+              options={({ route }) => ({
+                title: `Spends for ${route.params?.budgetName || ''}`,
+              })}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
       </PaperProvider>
     </SafeAreaProvider>
   );
