@@ -76,7 +76,7 @@ export default function Budget() {
         );
         await saveBudgets(updated);
       } else {
-        const newBudget = createBudget(selectedTripId, budgetName, total);
+        const newBudget = createBudget(budgetName, total, selectedTripId);
         const updated = [...budgets, newBudget];
         await saveBudgets(updated);
       }

@@ -9,7 +9,7 @@ const SPENDS_KEY = 'spends';
 export const createBudget = (budgetName, total, tripId) => {
   return {
     id: UUID.v4(),
-    tripId, // ✅ Add tripId to budget
+    tripId,
     budgetName,
     total: total || 0,
     spent: 0,
