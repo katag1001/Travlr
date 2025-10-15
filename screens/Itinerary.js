@@ -21,7 +21,6 @@ export default function Itinerary() {
     const arr = await getItineraryForTrip(tripId);
     setEntries(arr);
 
-    // Initialize local edit state
     const initialEdits = {};
     arr.forEach((entry) => {
       initialEdits[entry.id] = {

@@ -56,31 +56,37 @@ export const deleteTrip = async (tripId) => {
   const allPacking = await getPackingLists();
   const remainingPacking = allPacking.filter(pl => pl.tripId !== tripId);
   await AsyncStorage.setItem('PACKING_LISTS', JSON.stringify(remainingPacking));
+  console.log("packing lists deleted")
 
   // Delete associated itineraries
   const allItineraries = await getItineraries();
   const remainingItineraries = allItineraries.filter(e => e.tripId !== tripId);
   await AsyncStorage.setItem('ITINERARIES', JSON.stringify(remainingItineraries));
+  console.log("itineraries deleted")
 
   // Delete associated hotels
   const allHotels = await getHotels();
   const remainingHotels = allHotels.filter(h => h.tripId !== tripId);
   await AsyncStorage.setItem('HOTELS', JSON.stringify(remainingHotels));
+  console.log("hotels deleted")
 
   // Delete associated flights
   const allFlights = await getHotels();
   const remainingFlights = allFlights.filter(f => f.tripId !== tripId);
   await AsyncStorage.setItem('FLIGHTS', JSON.stringify(remainingFlights));
+  console.log("fligths deleted")
 
   // Delete associated BUDGET
   const allBudgets = await getBudgets();
   const remainingBudgets = allBudgets.filter(b => b.tripId !== tripId);
   await AsyncStorage.setItem('BUDGETS', JSON.stringify(remainingBudgets));
+  console.log("budget deleted")
 
   // Delete associated BUDGET
   const allSpend = await getSpends();
   const remainingSpend = allSpend.filter(s => s.tripId !== tripId);
   await AsyncStorage.setItem('SPEND', JSON.stringify(remainingSpend));
+  console.log("spend deleted")
 
 };
 
