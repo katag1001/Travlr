@@ -20,7 +20,6 @@ const fixDate = (ddmmyyyy) => {
     const parsed = parse(ddmmyyyy, 'dd/MM/yyyy', new Date());
     return parsed.toISOString();
   } catch (e) {
-    console.error('❌ Failed to parse date:', ddmmyyyy, e);
     return new Date().toISOString(); // fallback
   }
 };
@@ -34,10 +33,8 @@ export const addHotel = async (Hotel) => {
 
     // Try to find the Accomodation budget
     const budgetId = await getBudgetIdByName('Accomodation', Hotel.tripId);
-    console.log(`📌 Found budget id: ${budgetId}`);
 
     if (!budgetId) {
-      console.warn('⚠️ No "Accomodation" budget found, skipping spend creation.');
       return;
     }
 

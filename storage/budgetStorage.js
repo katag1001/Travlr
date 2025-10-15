@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
 
-const BUDGETS_KEY = 'budgets';
-const SPENDS_KEY = 'spends';
+const BUDGETS_KEY = 'BUDGETS';
+const SPENDS_KEY = 'SPENDS';
 
 // MODELS ------------------------------------------------------------------------------------------------------
 

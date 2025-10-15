@@ -20,7 +20,7 @@ export const addTrip = async (trip) => {
   const itineraryEntries = generateItinerary(trip);
   await addItineraryEntries(itineraryEntries);
 
-  // ADDING BUDGETS HERE
+  // ADDING AUTOMATIC BUDGETS HERE
   const existingBudgets = await getBudgets();
 
   const newBudgets = [
@@ -52,20 +52,36 @@ export const deleteTrip = async (tripId) => {
   const filtered = trips.filter(t => t.id !== tripId);
   await saveTrips(filtered);
 
+    // Delete associated packing lists
+  const allPacking = await getPackingLists();
+  const remainingPacking = allPacking.filter(pl => pl.tripId !== tripId);
+  await AsyncStorage.setItem('PACKING_LISTS', JSON.stringify(remainingPacking));
+
   // Delete associated itineraries
   const allItineraries = await getItineraries();
   const remainingItineraries = allItineraries.filter(e => e.tripId !== tripId);
   await AsyncStorage.setItem('ITINERARIES', JSON.stringify(remainingItineraries));
 
-  // Delete associated packing lists
-  const allPacking = await getPackingLists();
-  const remainingPacking = allPacking.filter(pl => pl.tripId !== tripId);
-  await AsyncStorage.setItem('PACKING_LISTS', JSON.stringify(remainingPacking));
-
   // Delete associated hotels
   const allHotels = await getHotels();
   const remainingHotels = allHotels.filter(h => h.tripId !== tripId);
   await AsyncStorage.setItem('HOTELS', JSON.stringify(remainingHotels));
+
+  // Delete associated flights
+  const allFlights = await getHotels();
+  const remainingFlights = allFlights.filter(f => f.tripId !== tripId);
+  await AsyncStorage.setItem('FLIGHTS', JSON.stringify(remainingFlights));
+
+  // Delete associated BUDGET
+  const allBudgets = await getBudgets();
+  const remainingBudgets = allBudgets.filter(b => b.tripId !== tripId);
+  await AsyncStorage.setItem('BUDGETS', JSON.stringify(remainingBudgets));
+
+  // Delete associated BUDGET
+  const allSpend = await getSpends();
+  const remainingSpend = allSpend.filter(s => s.tripId !== tripId);
+  await AsyncStorage.setItem('SPEND', JSON.stringify(remainingSpend));
+
 };
 
 
