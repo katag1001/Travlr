@@ -5,24 +5,23 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import TripSelector from '../components/TripSelector';
 import { getTrips } from '../storage/tripStorage';
-import {getHotelsForTrip,addHotel,updateHotel,deleteHotel} from '../storage/hotelStorage';
+import {getFlightsForTrip,addFlight,updateFlight,deleteFlight} from '../storage/flightStorage';
 
 
-export default function Hotels() {
+export default function Flights() {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [trips, setTrips] = useState([]);
-  const [hotels, setHotels] = useState([]);
+  const [Flights, setFlights] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     id: null,
-    hotelName: '',
-    hotelPlace: '',
-    hotelAddress: '',
+    flightFrom: '',
+    flightTo: '',
+    FlightAddress: '',
     cost: '',
-    startDate: '',
-    endDate: '',
+    flightDate: '',
   });
 
   const [showStartPicker, setShowStartPicker] = useState(false);
@@ -41,27 +40,26 @@ export default function Hotels() {
 
   useEffect(() => {
     if (selectedTripId) {
-      loadHotels();
+      loadFlights();
     }
   }, [selectedTripId]);
 
-  const loadHotels = async () => {
-    const h = await getHotelsForTrip(selectedTripId);
+  const loadFlights = async () => {
+    const h = await getFlightsForTrip(selectedTripId);
     const sorted = h.sort((a, b) => {
-      return new Date(parseDate(a.startDate)) - new Date(parseDate(b.startDate));
+      return new Date(parseDate(a.flightDate)) - new Date(parseDate(b.flightDate));
     });
-    setHotels(sorted);
+    setFlights(sorted);
   };
 
   const resetForm = () => {
     setForm({
       id: null,
-      hotelName: '',
-      hotelPlace: '',
-      hotelAddress: '',
+      flightFrom: '',
+      flightTo: '',
+      FlightAddress: '',
       cost: '',
-      startDate: '',
-      endDate: '',
+      flightDate: '',
     });
     setShowForm(false);
   };
@@ -80,83 +78,69 @@ export default function Hotels() {
     return new Date(`${year}-${month}-${day}`);
   };
 
-  const onStartDateChange = (event, selectedDate) => {
+  const onflightDateChange = (event, selectedDate) => {
     setShowStartPicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setForm({ ...form, startDate: formatDate(selectedDate) });
+      setForm({ ...form, flightDate: formatDate(selectedDate) });
     }
   };
 
-  const onEndDateChange = (event, selectedDate) => {
-    setShowEndPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setForm({ ...form, endDate: formatDate(selectedDate) });
-    }
-  };
 
   const handleSubmit = async () => {
-  const { hotelName, hotelPlace, hotelAddress, cost, startDate, endDate } = form;
+    const { flightFrom, flightTo, FlightAddress, cost, flightDate} = form;
 
-  if (!hotelName || !startDate || !endDate) {
-    Alert.alert('Hotel name and dates are required.');
-    return;
-  }
+    if (!flightFrom || !flightDate ) {
+      Alert.alert('Flight name and date are required.');
+      return;
+    }
 
-  const newHotel = {
-    id: isEditing ? form.id : Date.now().toString(),
-    tripId: selectedTripId,
-    hotelName,
-    hotelPlace,
-    hotelAddress,
-    cost: parseFloat(cost) || 0,
-    startDate,
-    endDate,
-  };
+    const newFlight = {
+      id: isEditing ? form.id : Date.now().toString(),
+      tripId: selectedTripId,
+      flightFrom,
+      flightTo,
+      FlightAddress,
+      cost: parseFloat(cost) || 0,
+      flightDate,
+    };
 
-  try {
     if (isEditing) {
-      await updateHotel(newHotel);
+      await updateFlight(newFlight);
     } else {
-      await addHotel(newHotel);
+      await addFlight(newFlight);
     }
 
     resetForm();
-    loadHotels();
-  } catch (err) {
-    console.error('💥 Failed to save hotel:', err);
-    Alert.alert('Error', 'Failed to save hotel. Check console for details.');
-  }
-};
+    loadFlights();
+  };
 
-
-  const handleEdit = (hotel) => {
+  const handleEdit = (Flight) => {
     setForm({
-      id: hotel.id,
-      hotelName: hotel.hotelName,
-      hotelPlace: hotel.hotelPlace,
-      hotelAddress: hotel.hotelAddress,
-      cost: hotel.cost.toString(),
-      startDate: hotel.startDate,
-      endDate: hotel.endDate,
+      id: Flight.id,
+      flightFrom: Flight.flightFrom,
+      flightTo: Flight.flightTo,
+      FlightAddress: Flight.FlightAddress,
+      cost: Flight.cost.toString(),
+      flightDate: Flight.flightDate,
     });
     setShowForm(true);
   };
 
   const handleDelete = async (id) => {
-    Alert.alert('Delete Hotel', 'Are you sure you want to delete this hotel?', [
+    Alert.alert('Delete Flight', 'Are you sure you want to delete this Flight?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
-          await deleteHotel(id);
-          loadHotels();
+          await deleteFlight(id);
+          loadFlights();
         },
       },
     ]);
   };
 
-  const tripStartDate = selectedTrip ? parseDate(selectedTrip.startDate) : null;
+  const tripStartDate = selectedTrip ? parseDate(selectedTrip.flightDate) : null;
   const tripEndDate = selectedTrip ? parseDate(selectedTrip.endDate) : null;
 
   return (
@@ -170,28 +154,28 @@ export default function Hotels() {
           onPress={() => setShowForm(true)}
           style={styles.button}
         >
-          Add Hotel
+          Add Flight
         </Button>
       )}
 
       {showForm && (
         <View style={styles.form}>
           <TextInput
-            label="Hotel Name"
-            value={form.hotelName}
-            onChangeText={(text) => setForm({ ...form, hotelName: text })}
+            label="Flight Name"
+            value={form.flightFrom}
+            onChangeText={(text) => setForm({ ...form, flightFrom: text })}
             style={styles.input}
           />
           <TextInput
-            label="Hotel Place"
-            value={form.hotelPlace}
-            onChangeText={(text) => setForm({ ...form, hotelPlace: text })}
+            label="Flight Place"
+            value={form.flightTo}
+            onChangeText={(text) => setForm({ ...form, flightTo: text })}
             style={styles.input}
           />
           <TextInput
-            label="Hotel Address"
-            value={form.hotelAddress}
-            onChangeText={(text) => setForm({ ...form, hotelAddress: text })}
+            label="Flight Address"
+            value={form.FlightAddress}
+            onChangeText={(text) => setForm({ ...form, FlightAddress: text })}
             style={styles.input}
           />
           <TextInput
@@ -208,16 +192,7 @@ export default function Hotels() {
             onPress={() => setShowStartPicker(true)}
             style={styles.dateButton}
           >
-            {form.startDate ? `Start: ${form.startDate}` : 'Select Start Date'}
-          </Button>
-
-          <Button
-            icon="calendar"
-            mode="outlined"
-            onPress={() => setShowEndPicker(true)}
-            style={styles.dateButton}
-          >
-            {form.endDate ? `End: ${form.endDate}` : 'Select End Date'}
+            {form.flightDate ? `Start: ${form.flightDate}` : 'Select Flight Date'}
           </Button>
 
           {showStartPicker && (
@@ -225,25 +200,14 @@ export default function Hotels() {
               value={tripStartDate || new Date()}
               mode="date"
               display="default"
-              onChange={onStartDateChange}
-              minimumDate={tripStartDate}
-              maximumDate={tripEndDate}
-            />
-          )}
-
-          {showEndPicker && (
-            <DateTimePicker
-              value={tripEndDate || new Date()}
-              mode="date"
-              display="default"
-              onChange={onEndDateChange}
+              onChange={onflightDateChange}
               minimumDate={tripStartDate}
               maximumDate={tripEndDate}
             />
           )}
 
           <Button mode="contained" onPress={handleSubmit} style={styles.button}>
-            {isEditing ? 'Update Hotel' : 'Save Hotel'}
+            {isEditing ? 'Update Flight' : 'Save Flight'}
           </Button>
           <Button onPress={resetForm} style={styles.cancelButton}>
             Cancel
@@ -253,16 +217,16 @@ export default function Hotels() {
       )}
 
       <View style={styles.list}>
-        {hotels.map((hotel) => (
-          <Card key={hotel.id} style={styles.card} onPress={() => handleEdit(hotel)}>
+        {Flights.map((Flight) => (
+          <Card key={Flight.id} style={styles.card} onPress={() => handleEdit(Flight)}>
             <Card.Title
-              title={hotel.hotelName || 'Unnamed Hotel'}
-              subtitle={`${hotel.startDate} → ${hotel.endDate}`}
+              title={`${Flight.flightFrom} → ${Flight.flightTo}` || 'Unnamed Flight'}
+              subtitle={`${Flight.flightDate}`}
               right={(props) => (
                 <IconButton
                   {...props}
                   icon="delete"
-                  onPress={() => handleDelete(hotel.id)}
+                  onPress={() => handleDelete(Flight.id)}
                 />
               )}
             />

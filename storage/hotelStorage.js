@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {createSpend, addSpend, getBudgetIdByName} from './budgetStorage';
+import { parse } from 'date-fns';
 
 const STORAGE_KEY_HOTEL = 'HOTELS';
 
@@ -12,11 +14,55 @@ export const getHotelsForTrip = async (tripId) => {
   return all.filter(pl => pl.tripId === tripId);
 };
 
-export const addHotel = async (Hotel) => {
-  const all = await getHotels();
-  const updated = [...all, Hotel];
-  await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
+//Helper function because of the god damn date argghghhghgh
+const fixDate = (ddmmyyyy) => {
+  try {
+    const parsed = parse(ddmmyyyy, 'dd/MM/yyyy', new Date());
+    return parsed.toISOString();
+  } catch (e) {
+    console.error('❌ Failed to parse date:', ddmmyyyy, e);
+    return new Date().toISOString(); // fallback
+  }
 };
+
+export const addHotel = async (Hotel) => {
+  try {
+    // Save hotel to storage
+    const all = await getHotels();
+    const updated = [...all, Hotel];
+    await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
+
+    // Try to find the Accomodation budget
+    const budgetId = await getBudgetIdByName('Accomodation', Hotel.tripId);
+    console.log(`📌 Found budget id: ${budgetId}`);
+
+    if (!budgetId) {
+      console.warn('⚠️ No "Accomodation" budget found, skipping spend creation.');
+      return;
+    }
+
+    // Format the date safely
+    const isoDate = fixDate(Hotel.startDate);
+    const hotel = `Accomodation: ${Hotel.hotelName}`
+
+    // Create and add the spend
+    const newSpend = createSpend(
+      budgetId,
+      hotel,
+      isoDate,
+      Hotel.cost,
+      Hotel.tripId
+    );
+
+    console.log('✅ Creating spend for hotel:', newSpend);
+
+    await addSpend(newSpend);
+  } catch (error) {
+    console.error('💥 Error in addHotel():', error);
+  }
+};
+
+
 
 export const updateHotel = async (Hotel) => {
   const all = await getHotels();

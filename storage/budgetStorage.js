@@ -67,18 +67,27 @@ export const getSpendsForBudget = async (budgetId) => {
 };
 
 export const addSpend = async (newSpend) => {
-  const spends = await getSpends();
-  spends.push(newSpend);
-  await saveSpends(spends);
+  try {
+    if (!newSpend || !newSpend.budgetId || typeof newSpend.spend !== 'number') {
+      throw new Error('Invalid spend object');
+    }
 
-  // Update the corresponding budget's spent amount
-  const budgets = await getBudgets();
-  const idx = budgets.findIndex(b => b.id === newSpend.budgetId);
-  if (idx !== -1) {
-    budgets[idx].spent = (budgets[idx].spent || 0) + newSpend.spend;
-    await saveBudgets(budgets);
+    const spends = await getSpends();
+    spends.push(newSpend);
+    await saveSpends(spends);
+
+    const budgets = await getBudgets();
+    const idx = budgets.findIndex(b => b.id === newSpend.budgetId);
+    if (idx !== -1) {
+      budgets[idx].spent = (budgets[idx].spent || 0) + newSpend.spend;
+      await saveBudgets(budgets);
+    }
+  } catch (err) {
+    console.error('💥 Error in addSpend:', err);
+    throw err; // re-throw so the caller knows something went wrong
   }
 };
+
 
 export const updateSpend = async (updatedSpend) => {
   const spends = await getSpends();
@@ -115,3 +124,12 @@ export const deleteSpend = async (spendId) => {
     await saveBudgets(budgets);
   }
 };
+
+// EXTRA FUNCTION DO TO BE USED FOR HOTELS AND FLIGTHS -------------------------------------------------------
+
+export const getBudgetIdByName = async (budgetName, tripId) => {
+  const budgets = await getBudgets();
+  const budget = budgets.find(b => b.budgetName === budgetName && b.tripId === tripId);
+  return budget ? budget.id : null;
+};
+

@@ -59,7 +59,7 @@ export default function SpendScreen({ route, navigation }) {
       };
       await updateSpend(updated);
     } else {
-      const newSpend = createSpend(tripId, budgetId, spendName, dateValue, amount);
+      const newSpend = createSpend(budgetId, spendName, dateValue, amount, tripId);
       await addSpend(newSpend);
     }
 
