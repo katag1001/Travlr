@@ -86,7 +86,7 @@ export default function SpendScreen({ route, navigation }) {
 
   const renderSpend = ({ item }) => (
     <Card style={styles.card}>
-      <TouchableOpacity onPress={() => showDialog(item)} activeOpacity={0.7}>
+      <TouchableOpacity onPress={() => showDialog(item)} >
         <Card.Content style={styles.cardContent}>
           <View style={styles.leftContent}>
             <Text style={styles.spendName}>{item.spendName || 'Unnamed Spend'}</Text>

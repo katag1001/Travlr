@@ -159,9 +159,9 @@ export default function MyTrips() {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
-          await deleteTrip(tripId);
-          await loadTrips();
-        },
+        await deleteTrip(tripId);
+        setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== tripId));
+        }
       },
     ]);
   };

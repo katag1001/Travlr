@@ -71,7 +71,7 @@ export const deleteTrip = async (tripId) => {
   console.log("hotels deleted")
 
   // Delete associated flights
-  const allFlights = await getHotels();
+  const allFlights = await getFlights();
   const remainingFlights = allFlights.filter(f => f.tripId !== tripId);
   await AsyncStorage.setItem('FLIGHTS', JSON.stringify(remainingFlights));
   console.log("fligths deleted")

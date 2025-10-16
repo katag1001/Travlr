@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,FlatList,TextInput,KeyboardAvoidingView,Platform,Keyboard,TouchableWithoutFeedback,} from 'react-native';
-import { Text, Card, Button } from 'react-native-paper';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import { Text, Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getItineraryForTrip, updateItineraryEntry } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
@@ -56,10 +65,11 @@ export default function Itinerary() {
 
   const renderEntry = ({ item }) => {
     const dateObj = new Date(item.date);
+    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' }); // e.g. Fri
     const dayNum = dateObj.getDate().toString().padStart(2, '0');
-    const monthNum = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    const year = dateObj.getFullYear();
-    const displayDate = `${dayNum}/${monthNum}/${year}`;
+    const monthShort = dateObj.toLocaleDateString('en-US', { month: 'short' }); // e.g. Oct
+    const yearShort = dateObj.getFullYear().toString().slice(-2);
+    const displayDate = `${dayNum}-${monthShort}-${yearShort}`;
 
     const local = localEdits[item.id] || { day: '', night: '' };
 
@@ -67,32 +77,43 @@ export default function Itinerary() {
       <Card style={styles.entryCard}>
         <View style={styles.row}>
           <View style={styles.dateBox}>
-            <Text>{displayDate}</Text>
+            <Text style={styles.weekdayText}>{weekday}</Text>
+            <Text style={styles.dateText}>{displayDate}</Text>
           </View>
 
-          <TextInput
-            style={styles.textBox}
-            placeholder="Day plan"
-            value={local.day}
-            onChangeText={(text) =>
-              handleLocalChange(item.id, 'day', text)
-            }
-            onBlur={() =>
-              handleUpdateEntry(item.id, 'day', local.day)
-            }
-          />
+          <View style={styles.planColumn}>
+            <View style={styles.dayPlan}>
+              <TextInput
+                style={styles.dayTextInput}
+                placeholder="Day plan"
+                placeholderTextColor="#666"
+                value={local.day}
+                onChangeText={(text) =>
+                  handleLocalChange(item.id, 'day', text)
+                }
+                onBlur={() =>
+                  handleUpdateEntry(item.id, 'day', local.day)
+                }
+                multiline
+              />
+            </View>
 
-          <TextInput
-            style={styles.textBox}
-            placeholder="Night plan"
-            value={local.night}
-            onChangeText={(text) =>
-              handleLocalChange(item.id, 'night', text)
-            }
-            onBlur={() =>
-              handleUpdateEntry(item.id, 'night', local.night)
-            }
-          />
+            <View style={styles.nightPlan}>
+              <TextInput
+                style={styles.nightTextInput}
+                placeholder="Night plan"
+                placeholderTextColor="#ccc"
+                value={local.night}
+                onChangeText={(text) =>
+                  handleLocalChange(item.id, 'night', text)
+                }
+                onBlur={() =>
+                  handleUpdateEntry(item.id, 'night', local.night)
+                }
+                multiline
+              />
+            </View>
+          </View>
         </View>
       </Card>
     );
@@ -100,36 +121,36 @@ export default function Itinerary() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TripSelector
-              selectedTripId={selectedTripId}
-              onSelectTrip={(tripId) => {
-                setSelectedTripId(tripId);
-              }}
-            />
-          </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <TripSelector
+                selectedTripId={selectedTripId}
+                onSelectTrip={(tripId) => {
+                  setSelectedTripId(tripId);
+                }}
+              />
+            </View>
 
-          {selectedTripId ? (
-            <FlatList
-              data={entries}
-              keyExtractor={(item) => item.id}
-              renderItem={renderEntry}
-              keyboardShouldPersistTaps="handled"
-            />
-          ) : (
-            <Text style={{ marginTop: 20 }}>
-              Select a trip to view itinerary
-            </Text>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+            {selectedTripId ? (
+              <FlatList
+                data={entries}
+                keyExtractor={(item) => item.id}
+                renderItem={renderEntry}
+                keyboardShouldPersistTaps="handled"
+              />
+            ) : (
+              <Text style={{ marginTop: 20 }}>
+                Select a trip to view itinerary
+              </Text>
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
@@ -139,30 +160,71 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'pink',
   },
-  container: { flex: 1, padding: 16 },
-  header: { marginBottom: 12 },
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  header: {
+    marginBottom: 12,
+  },
   entryCard: {
     marginBottom: 12,
     padding: 8,
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch', // ensures equal height
   },
   dateBox: {
-    width: 80,
+    width: 90,
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 8,
-    marginRight: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    marginRight: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  textBox: {
+  weekdayText: {
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  dateText: {
+    fontSize: 16,
+  },
+  planColumn: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  dayPlan: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
     borderWidth: 1,
     borderColor: '#ccc',
-    marginHorizontal: 4,
-    padding: 8,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+  },
+  dayTextInput: {
+    flex: 1,
+    color: 'black',
+    fontSize: 16,
+    paddingVertical: 6,
+  },
+  nightPlan: {
+    flex: 1,
+    backgroundColor: 'black',
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+  },
+  nightTextInput: {
+    flex: 1,
+    color: 'white',
+    fontSize: 16,
+    paddingVertical: 6,
   },
 });
