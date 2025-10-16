@@ -99,22 +99,31 @@ export default function Budget() {
  const renderBudget = ({ item }) => {
   const widthAndHeight = 150;
 
+  const noSpend = item.spent == null || item.spent == 0 ;
   const isEmpty = (item.spent + item.total) === 0;
   const isOverspent = item.spent > item.total;
 
-  const series = isEmpty
-    ? [{ value: 1, color: '#cccccc' }]
-    : isOverspent
-      ? [
-          { value: item.total, color: '#ff0000' }, 
-          { value: item.spent - item.total, color: '#ffa500' },
-        ]
-      : [
-        { value: item.total - item.spent, color: '#2fff00ff' },  
-        { value: item.spent, color: '#00d9ffff' },
-          
-        ];
+  let series;
 
+if (isEmpty) {
+  series = [{ value: 1, color: '#cccccc' }];
+} else if (isOverspent) {
+  series = [{ value: 1, color: 'red' }];
+} else if (noSpend) {
+  series = [{ value: 1, color: 'green' }];
+} else {
+  series = [
+    { value: item.total - item.spent, color: '#2fff00ff' },
+    { value: item.spent, color: '#00d9ffff' },
+    
+  ];
+}
+
+  const centerText = isEmpty
+  ? '£0'
+  : isOverspent
+    ? `£${item.spent -item.total} over budget`
+    : `£${item.spent} out of £${item.total}`;
   return (
     <Card
       style={styles.card}
@@ -129,11 +138,13 @@ export default function Budget() {
       <Card.Title title={item.budgetName} />
       <Card.Content>
         <View style={styles.container}>
-          <Text style={styles.title}>Doughnut</Text>
-          <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.45} />
+          <View style={styles.chartWrapper}>
+            <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
+            <View style={styles.centeredTextWrapper}>
+              <Text style={styles.centeredText}>{centerText}</Text>
+            </View>
+          </View>
         </View>
-        <Text>Total:{item.total}</Text>
-        <Text>Spent:{item.spent}</Text>
       </Card.Content>
       <Card.Actions>
         <Button onPress={() => showDialog(item)}>Edit</Button>
@@ -223,4 +234,33 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     backgroundColor: 'purple',
   },
+chartWrapper: {
+  width: 150,
+  height: 150,
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative', // Important for absolute positioning of child
+},
+
+centeredTextWrapper: {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  width: 80,  // Smaller than chart
+  height: 80,
+  alignItems: 'center',
+  justifyContent: 'center',
+  transform: [
+    { translateX: -40 }, // -width/2
+    { translateY: -40 }, // -height/2
+  ],
+},
+
+centeredText: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  textAlign: 'center',
+},
+
+
 });
