@@ -1,24 +1,21 @@
-// screens/MyTrips.js
 import React, { useEffect, useState, useCallback } from 'react';
-import {View, StyleSheet, FlatList, Alert, Platform,} from 'react-native';
-import {Text, Button, Card, Divider,} from 'react-native-paper';
+import { View, StyleSheet, FlatList, Alert, Platform, Modal } from 'react-native';
+import {Text,Button,Card,Divider,TextInput,Portal,Provider as PaperProvider,IconButton,} from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
-import { TextInput } from 'react-native-paper';
 
-import {getTrips, addTrip, updateTrip,deleteTrip,} from '../storage/tripStorage';
+import {getTrips,addTrip,updateTrip,deleteTrip,} from '../storage/tripStorage';
+
 
 function TripForm({
   initialData = {},
   onSubmit,
   onCancel,
 }) {
-
   const [tripName, setTripName] = useState(initialData.tripName || '');
   const [startDate, setStartDate] = useState(initialData.startDate || '');
   const [endDate, setEndDate] = useState(initialData.endDate || '');
-  const [location, setLocation] = useState(initialData.location || '');
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -46,7 +43,7 @@ function TripForm({
   };
 
   const handleSubmit = () => {
-    if (!tripName || !startDate || !endDate || !location) {
+    if (!tripName || !startDate || !endDate) {
       Alert.alert('All fields are required.');
       return;
     }
@@ -55,7 +52,6 @@ function TripForm({
       tripName,
       startDate,
       endDate,
-      location,
       id: initialData.id || uuidv4(),
     };
     onSubmit(data);
@@ -63,17 +59,8 @@ function TripForm({
 
   return (
     <View style={styles.form}>
-      <Text
-        style={{ marginBottom: 4, fontSize: 16 }}
-      >
-        Trip Name
-      </Text>
-      <View style={{ marginBottom: 12 }}>
-        <TextInputWrapped
-          value={tripName}
-          onChangeText={setTripName}
-        />
-      </View>
+      <Text style={styles.label}>Trip Name</Text>
+      <TextInputWrapped value={tripName} onChangeText={setTripName} />
 
       <Button
         icon="calendar"
@@ -92,18 +79,6 @@ function TripForm({
       >
         {endDate ? `End: ${endDate}` : 'Select End Date'}
       </Button>
-
-      <Text
-        style={{ marginBottom: 4, marginTop: 12, fontSize: 16 }}
-      >
-        Location
-      </Text>
-      <View style={{ marginBottom: 12 }}>
-        <TextInputWrapped
-          value={location}
-          onChangeText={setLocation}
-        />
-      </View>
 
       {showStartPicker && (
         <DateTimePicker
@@ -133,13 +108,14 @@ function TripForm({
   );
 }
 
-
+// Optimized TextInput Component
 const TextInputWrapped = React.memo(({ value, onChangeText }) => {
   return (
     <TextInput
       mode="outlined"
       value={value}
       onChangeText={onChangeText}
+      style={{ marginBottom: 12 }}
     />
   );
 });
@@ -148,6 +124,7 @@ export default function MyTrips() {
   const [trips, setTrips] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const loadTrips = useCallback(async () => {
     const data = await getTrips();
@@ -159,26 +136,25 @@ export default function MyTrips() {
   }, [loadTrips]);
 
   const handleAddOrUpdate = async (tripData) => {
-    if (tripData.id && trips.some(t => t.id === tripData.id)) {
-      // update
+    if (tripData.id && trips.some((t) => t.id === tripData.id)) {
       await updateTrip(tripData);
     } else {
-      // add new
       await addTrip(tripData);
     }
     await loadTrips();
     setShowForm(false);
     setEditingTrip(null);
+    setIsModalVisible(false);
   };
 
   const handleEdit = (trip) => {
     setEditingTrip(trip);
-    setShowForm(true);
+    setIsModalVisible(true);
   };
 
   const handleDelete = async (tripId) => {
     Alert.alert('Delete Trip', 'Are you sure you want to delete?', [
-      { text: 'Cancel' },
+      { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
@@ -191,64 +167,116 @@ export default function MyTrips() {
   };
 
   const TripCard = ({ item }) => (
-    <Card style={styles.card}>
-      <Card.Title title={item.tripName} subtitle={item.location} />
-      <Card.Content>
-        <Text>Start: {item.startDate}</Text>
-        <Text>End: {item.endDate}</Text>
-      </Card.Content>
-      <Card.Actions>
-        <Button onPress={() => handleEdit(item)}>Edit</Button>
-        <Button onPress={() => handleDelete(item.id)} textColor="red">
-          Delete
-        </Button>
-      </Card.Actions>
+    <Card style={styles.card} onPress={() => handleEdit(item)}>
+      <Card.Title
+        title={item.tripName}
+        subtitle={`${item.startDate} → ${item.endDate}`}
+        right={(props) => (
+          <IconButton
+            {...props}
+            icon="delete"
+            onPress={() => handleDelete(item.id)}
+            color="red"
+          />
+        )}
+      />
     </Card>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      {!showForm && (
-        <Button
-          icon="plus"
-          mode="contained"
-          onPress={() => setShowForm(true)}
-          style={styles.button}
-        >
-          New Trip
-        </Button>
-      )}
-      {showForm && (
-        <TripForm
-          initialData={editingTrip || {}}
-          onSubmit={handleAddOrUpdate}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingTrip(null);
-          }}
-        />
-      )}
+    <PaperProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          {!showForm && !isModalVisible && (
+            <Button
+              icon="plus"
+              mode="contained"
+              onPress={() => setShowForm(true)}
+              style={styles.button}
+            >
+              New Trip
+            </Button>
+          )}
 
-      <FlatList
-        data={trips}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <TripCard item={item} />}
-        ListEmptyComponent={<Text>No trips yet.</Text>}
-      />
-    </View>
-    </SafeAreaView>
+          {showForm && !editingTrip && (
+            <TripForm
+              onSubmit={handleAddOrUpdate}
+              onCancel={() => setShowForm(false)}
+            />
+          )}
+
+          <FlatList
+            data={trips}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <TripCard item={item} />}
+            ListEmptyComponent={<Text>No trips yet.</Text>}
+          />
+
+          <Portal>
+            <Modal
+              visible={isModalVisible}
+              transparent
+              onRequestClose={() => {
+                setIsModalVisible(false);
+                setEditingTrip(null);
+              }}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <TripForm
+                    initialData={editingTrip}
+                    onSubmit={handleAddOrUpdate}
+                    onCancel={() => {
+                      setIsModalVisible(false);
+                      setEditingTrip(null);
+                    }}
+                  />
+                </View>
+              </View>
+            </Modal>
+          </Portal>
+        </View>
+      </SafeAreaView>
+    </PaperProvider>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'pink',
   },
-  container: { flex: 1, padding: 20 },
-  form: { marginVertical: 10 },
-  dateButton: { marginBottom: 10, justifyContent: 'flex-start' },
-  button: { marginVertical: 10 },
-  card: { marginBottom: 15 },
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  form: {
+    marginVertical: 10,
+  },
+  dateButton: {
+    marginBottom: 10,
+    justifyContent: 'flex-start',
+  },
+  button: {
+    marginVertical: 10,
+  },
+  card: {
+    marginBottom: 12,
+  },
+  label: {
+    marginBottom: 4,
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+  },
 });

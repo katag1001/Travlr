@@ -91,7 +91,7 @@ export default function SpendScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Spends for "{budgetName}"</Text>
+      <Text style={styles.header}>Spends for {budgetName}</Text>
 
       <FlatList
         data={spends}
