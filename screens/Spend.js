@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native';
+import { Text, Card, Button, TextInput, Dialog, Portal, FAB, IconButton } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Card, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 
 import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend } from '../storage/budgetStorage';
 
@@ -14,7 +15,9 @@ export default function SpendScreen({ route, navigation }) {
 
   const [spendName, setSpendName] = useState('');
   const [spendAmount, setSpendAmount] = useState('');
-  const [spendDate, setSpendDate] = useState('');
+  const [spendDate, setSpendDate] = useState(new Date());
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadSpends = async () => {
     const loaded = await getSpendsForBudget(budgetId);
@@ -30,11 +33,11 @@ export default function SpendScreen({ route, navigation }) {
     if (spend) {
       setSpendName(spend.spendName);
       setSpendAmount(String(spend.spend));
-      setSpendDate(spend.date);
+      setSpendDate(new Date(spend.date));
     } else {
       setSpendName('');
       setSpendAmount('');
-      setSpendDate(new Date().toISOString().split('T')[0]);
+      setSpendDate(new Date());
     }
     setDialogVisible(true);
   };
@@ -44,12 +47,13 @@ export default function SpendScreen({ route, navigation }) {
     setEditingSpend(null);
     setSpendName('');
     setSpendAmount('');
-    setSpendDate('');
+    setSpendDate(new Date());
+    setShowDatePicker(false);
   };
 
   const handleSaveSpend = async () => {
     const amount = parseFloat(spendAmount) || 0;
-    const dateValue = spendDate;
+    const dateValue = spendDate.toISOString().split('T')[0];
 
     if (editingSpend) {
       const updated = {
@@ -73,29 +77,43 @@ export default function SpendScreen({ route, navigation }) {
     loadSpends();
   };
 
+  const onDateChange = (event, selectedDate) => {
+    setShowDatePicker(Platform.OS === 'ios'); // keep open on iOS, close on Android
+    if (selectedDate) {
+      setSpendDate(selectedDate);
+    }
+  };
+
   const renderSpend = ({ item }) => (
     <Card style={styles.card}>
-      <Card.Title title={item.spendName || 'Unnamed Spend'} />
-      <Card.Content>
-        <Text>Date: {new Date(item.date).toLocaleDateString()}</Text>
-        <Text>Amount: {item.spend}</Text>
-      </Card.Content>
-      <Card.Actions>
-        <Button onPress={() => showDialog(item)}>Edit</Button>
-        <Button onPress={() => handleDeleteSpend(item.id)} textColor="red">
-          Delete
-        </Button>
-      </Card.Actions>
+      <TouchableOpacity onPress={() => showDialog(item)} activeOpacity={0.7}>
+        <Card.Content style={styles.cardContent}>
+          <View style={styles.leftContent}>
+            <Text style={styles.spendName}>{item.spendName || 'Unnamed Spend'}</Text>
+            <Text style={styles.spendDate}>{new Date(item.date).toLocaleDateString()}</Text>
+          </View>
+          <View style={styles.rightContent}>
+            <Text style={styles.spendAmount}>£{item.spend.toFixed(2)}</Text>
+            <IconButton
+              icon="delete"
+              size={20}
+              onPress={() => handleDeleteSpend(item.id)}
+              style={styles.deleteButton}
+              accessibilityLabel="Delete spend"
+            />
+          </View>
+        </Card.Content>
+      </TouchableOpacity>
     </Card>
   );
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
-      <Text style={styles.header}>Spends for {budgetName}</Text>
-
+      <Text style={styles.header}>Spending for {budgetName}</Text>
       <FlatList
         data={spends}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={renderSpend}
         ListEmptyComponent={<Text>No spends added yet.</Text>}
       />
@@ -119,12 +137,24 @@ export default function SpendScreen({ route, navigation }) {
               keyboardType="numeric"
               style={styles.input}
             />
-            <TextInput
-              label="Date (YYYY-MM-DD)"
-              value={spendDate}
-              onChangeText={setSpendDate}
-              style={styles.input}
-            />
+
+            <Button
+              icon="calendar"
+              mode="outlined"
+              onPress={() => setShowDatePicker(true)}
+              style={{ marginBottom: 10 }}
+            >
+              {spendDate ? spendDate.toLocaleDateString() : 'Select Date'}
+            </Button>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={spendDate || new Date()}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={hideDialog}>Cancel</Button>
@@ -133,13 +163,17 @@ export default function SpendScreen({ route, navigation }) {
         </Dialog>
       </Portal>
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'pink',
+  },
   container: {
     flex: 1,
-    paddingTop: 50,
     paddingHorizontal: 20,
   },
   header: {
@@ -149,6 +183,35 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 10,
+    padding: 10,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  leftContent: {
+    flex: 1,
+  },
+  spendName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  spendDate: {
+    fontSize: 12,
+    color: 'gray',
+  },
+  rightContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  spendAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
+  deleteButton: {
+    margin: 0,
   },
   fab: {
     position: 'absolute',

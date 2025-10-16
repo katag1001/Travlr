@@ -124,7 +124,7 @@ const renderFullBudget = () => {
   const centerText = isEmpty
     ? '£0'
     : isOverspent
-    ? `£${totalSpent - totalBudget} over`
+    ? `£${totalSpent - totalBudget} over budget`
     : `£${totalSpent} of £${totalBudget}`;
 
   return (
@@ -168,7 +168,7 @@ const renderFullBudget = () => {
     const centerText = isEmpty
       ? '£0'
       : isOverspent
-        ? `£${item.spent - item.total} over`
+        ? `£${item.spent - item.total} over budget`
         : `£${item.spent} of £${item.total}`;
 
     return (
