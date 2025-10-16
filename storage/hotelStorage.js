@@ -20,7 +20,7 @@ const fixDate = (ddmmyyyy) => {
     const parsed = parse(ddmmyyyy, 'dd/MM/yyyy', new Date());
     return parsed.toISOString();
   } catch (e) {
-    return new Date().toISOString(); // fallback
+    return new Date().toISOString();
   }
 };
 

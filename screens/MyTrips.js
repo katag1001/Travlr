@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {View, StyleSheet, FlatList, Alert, Platform,} from 'react-native';
 import {Text, Button, Card, Divider,} from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
 import { TextInput } from 'react-native-paper';
@@ -206,6 +207,7 @@ export default function MyTrips() {
   );
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       {!showForm && (
         <Button
@@ -235,10 +237,15 @@ export default function MyTrips() {
         ListEmptyComponent={<Text>No trips yet.</Text>}
       />
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'pink',
+  },
   container: { flex: 1, padding: 20 },
   form: { marginVertical: 10 },
   dateButton: { marginBottom: 10, justifyContent: 'flex-start' },

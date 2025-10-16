@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Card, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 
 import TripSelector from '../components/TripSelector';
@@ -119,13 +120,16 @@ export default function Budget() {
   );
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} />
-        <Button mode="contained" onPress={() => showDialog()} disabled={!selectedTripId}>
-          Add Budget
+    <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} /> 
+        <Button 
+        mode="contained" 
+        onPress={() => showDialog()} 
+        disabled={!selectedTripId}
+        style={styles.button}>
+          + Add Budget
         </Button>
-      </View>
 
       <FlatList
         data={budgets}
@@ -162,14 +166,18 @@ export default function Budget() {
         </Dialog>
       </Portal>
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+   safeArea: {
+    flex: 1,
+    backgroundColor: 'pink',
+  },
   container: {
     flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 20,
+    padding: 16
   },
   headerRow: {
     flexDirection: 'row',
@@ -182,5 +190,9 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+  },
+  button: {
+    marginVertical: 8,
+    backgroundColor: 'purple',
   },
 });

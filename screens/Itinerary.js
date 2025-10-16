@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {View,StyleSheet,FlatList,TextInput,KeyboardAvoidingView,Platform,Keyboard,TouchableWithoutFeedback,} from 'react-native';
 import { Text, Card, Button } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { getItineraryForTrip, updateItineraryEntry } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 
@@ -98,6 +99,7 @@ export default function Itinerary() {
   };
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -128,10 +130,15 @@ export default function Itinerary() {
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'pink',
+  },
   container: { flex: 1, padding: 16 },
   header: { marginBottom: 12 },
   entryCard: {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,ScrollView,Alert,Platform} from 'react-native';
+import {View,StyleSheet,ScrollView,Alert,Platform, SafeAreaView} from 'react-native';
 import {Text,Card,TextInput,Button,IconButton,Divider} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -144,6 +144,7 @@ export default function Flights() {
   const tripEndDate = selectedTrip ? parseDate(selectedTrip.endDate) : null;
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <ScrollView contentContainerStyle={styles.container}>
       <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} />
 
@@ -234,10 +235,15 @@ export default function Flights() {
         ))}
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'pink',
+  },
   container: {
     padding: 16,
   },

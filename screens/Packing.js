@@ -1,8 +1,30 @@
 // screens/Packing.js
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,FlatList,Alert,Keyboard,TouchableWithoutFeedback,} from 'react-native';
-import {Text,Button,Card,TextInput,Checkbox,IconButton,Divider,} from 'react-native-paper';
-import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import {
+  Text,
+  Button,
+  Card,
+  TextInput,
+  Checkbox,
+  IconButton,
+  Divider,
+  Dialog,
+  Portal,
+} from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  getPackingListsForTrip,
+  addPackingList,
+  updatePackingList,
+  deletePackingList,
+} from '../storage/packingStorage';
 
 import { v4 as uuidv4 } from 'uuid';
 import TripSelector from '../components/TripSelector';
@@ -14,6 +36,8 @@ export default function Packing() {
 
   const [newTypeName, setNewTypeName] = useState('');
   const [newItemName, setNewItemName] = useState('');
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     if (selectedTripId) {
@@ -32,16 +56,22 @@ export default function Packing() {
   };
 
   const handleCreateList = async () => {
-    if (!newTypeName.trim() || !selectedTripId) return;
+    const trimmed = newTypeName.trim();
+    if (!trimmed || !selectedTripId) {
+      setErrorMsg('List name is required.');
+      return;
+    }
 
     const newList = {
       id: uuidv4(),
       tripId: selectedTripId,
-      type: newTypeName.trim(),
+      type: trimmed,
       items: [],
     };
     await addPackingList(newList);
     setNewTypeName('');
+    setErrorMsg('');
+    hideDialog();
     await loadPackingLists(selectedTripId);
   };
 
@@ -82,6 +112,18 @@ export default function Packing() {
     await loadPackingLists(selectedTripId);
   };
 
+  const showDialog = () => {
+    setNewTypeName('');
+    setErrorMsg('');
+    setDialogVisible(true);
+  };
+
+  const hideDialog = () => {
+    setDialogVisible(false);
+    setNewTypeName('');
+    setErrorMsg('');
+  };
+
   const renderListType = ({ item }) => (
     <Card style={styles.typeCard}>
       <Card.Title
@@ -108,70 +150,90 @@ export default function Packing() {
   );
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
-        <View style={styles.headerRow}>
-          <TripSelector
-            selectedTripId={selectedTripId}
-            onSelectTrip={handleTripChange}
-          />
-          <Button icon="plus" onPress={handleCreateList} style={styles.addButton}>
+    <SafeAreaView style={styles.safeArea}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <TripSelector selectedTripId={selectedTripId} onSelectTrip={handleTripChange} />
+
+          <Button
+            icon="plus"
+            onPress={showDialog}
+            disabled={!selectedTripId}
+            style={styles.button}
+          >
             New List
           </Button>
-        </View>
 
-        <TextInput
-          label="New List Name (Type)"
-          value={newTypeName}
-          onChangeText={setNewTypeName}
-          mode="outlined"
-          style={styles.input}
-        />
+          <Divider style={{ marginVertical: 10 }} />
 
-        <Divider style={{ marginVertical: 10 }} />
-
-        {!activeList ? (
-          <FlatList
-            data={packingLists}
-            keyExtractor={pl => pl.id}
-            renderItem={renderListType}
-            ListEmptyComponent={<Text>No packing lists yet.</Text>}
-          />
-        ) : (
-          <View style={{ flex: 1 }}>
-            <Card style={styles.activeListHeader}>
-              <Card.Title
-                title={`List: ${activeList.type}`}
-                right={() => (
-                  <Button onPress={() => setActiveList(null)}>Back</Button>
-                )}
-              />
-            </Card>
+          {!activeList ? (
             <FlatList
-              data={activeList.items}
-              keyExtractor={it => it.id}
-              renderItem={renderItem}
-              ListEmptyComponent={<Text>No items yet.</Text>}
+              data={packingLists}
+              keyExtractor={pl => pl.id}
+              renderItem={renderListType}
+              ListEmptyComponent={<Text>No packing lists yet.</Text>}
             />
-            <TextInput
-              label="New Item"
-              value={newItemName}
-              onChangeText={setNewItemName}
-              mode="outlined"
-              style={styles.input}
-            />
-            <Button mode="contained" onPress={handleAddItemToActive}>
-              Add Item
-            </Button>
-          </View>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
+          ) : (
+            <View style={{ flex: 1 }}>
+              <Card style={styles.activeListHeader}>
+                <Card.Title
+                  title={`List: ${activeList.type}`}
+                  right={() => <Button onPress={() => setActiveList(null)}>Back</Button>}
+                />
+              </Card>
+              <FlatList
+                data={activeList.items}
+                keyExtractor={it => it.id}
+                renderItem={renderItem}
+                ListEmptyComponent={<Text>No items yet.</Text>}
+              />
+              <TextInput
+                label="New Item"
+                value={newItemName}
+                onChangeText={setNewItemName}
+                mode="outlined"
+                style={styles.input}
+              />
+              <Button mode="contained" onPress={handleAddItemToActive}>
+                Add Item
+              </Button>
+            </View>
+          )}
+
+          {/* Dialog for creating new list */}
+          <Portal>
+            <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+              <Dialog.Title>New Packing List</Dialog.Title>
+              <Dialog.Content>
+                <TextInput
+                  label="List Name (Type)"
+                  value={newTypeName}
+                  onChangeText={setNewTypeName}
+                  mode="outlined"
+                  style={styles.input}
+                />
+                {errorMsg ? (
+                  <Text style={{ color: 'red', marginBottom: 10 }}>{errorMsg}</Text>
+                ) : null}
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={hideDialog}>Cancel</Button>
+                <Button onPress={handleCreateList}>Save</Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
+        </View>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'pink',
+  },
+  container: { flex: 1, padding: 16 },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -180,8 +242,10 @@ const styles = StyleSheet.create({
   input: {
     marginVertical: 10,
   },
-  addButton: {
-    marginLeft: 10,
+  button: {
+    marginVertical: 8,
+    backgroundColor: 'purple',
+    color: 'white',
   },
   typeCard: {
     marginBottom: 10,
