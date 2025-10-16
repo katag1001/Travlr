@@ -95,6 +95,54 @@ export default function Budget() {
     loadBudgets();
   };
 
+  // Render total combined budget as a full-width card
+  // Inside renderFullBudget function:
+const renderFullBudget = () => {
+  const totalSpent = budgets.reduce((acc, b) => acc + (b.spent || 0), 0);
+  const totalBudget = budgets.reduce((acc, b) => acc + (b.total || 0), 0);
+
+  const widthAndHeight = 100; // same as small cards
+
+  const isEmpty = totalSpent === 0 && totalBudget === 0;
+  const isOverspent = totalSpent > totalBudget;
+  const noSpend = totalSpent === 0;
+
+  let series;
+  if (isEmpty) {
+    series = [{ value: 1, color: '#cccccc' }];
+  } else if (isOverspent) {
+    series = [{ value: 1, color: 'red' }];
+  } else if (noSpend) {
+    series = [{ value: 1, color: 'green' }];
+  } else {
+    series = [
+      { value: totalBudget - totalSpent, color: '#2fff00ff' },
+      { value: totalSpent, color: '#00d9ffff' },
+    ];
+  }
+
+  const centerText = isEmpty
+    ? '£0'
+    : isOverspent
+    ? `£${totalSpent - totalBudget} over`
+    : `£${totalSpent} of £${totalBudget}`;
+
+  return (
+    <Card style={[styles.card, styles.fullWidthCard]}>
+      <Card.Title title="Total Budget" titleStyle={styles.cardTitle} />
+      <Card.Content style={{ alignItems: 'center' }}>
+        <View style={styles.chartWrapper}>
+          <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
+          <View style={styles.centeredTextWrapper}>
+            <Text style={styles.centeredText}>{centerText}</Text>
+          </View>
+        </View>
+      </Card.Content>
+    </Card>
+  );
+};
+
+
   const renderBudget = ({ item }) => {
     const widthAndHeight = 100;
 
@@ -144,22 +192,21 @@ export default function Budget() {
           </View>
         </Card.Content>
         <Card.Actions style={styles.cardActions}>
-  <View style={styles.buttonContainer}>
-    <Button compact onPress={() => showDialog(item)} style={styles.actionButton}>
-      Edit
-    </Button>
-    {item.budgetName !== 'Accomodation' && item.budgetName !== 'Flights' && (
-      <Button
-        compact
-        icon="delete"
-        onPress={() => handleDeleteBudget(item.id)}
-        textColor="black"
-        style={styles.actionButton}
-      />
-    )}
-  </View>
-</Card.Actions>
-
+          <View style={styles.buttonContainer}>
+            <Button compact onPress={() => showDialog(item)} style={styles.actionButton}>
+              Edit
+            </Button>
+            {item.budgetName !== 'Accomodation' && item.budgetName !== 'Flights' && (
+              <Button
+                compact
+                icon="delete"
+                onPress={() => handleDeleteBudget(item.id)}
+                textColor="black"
+                style={styles.actionButton}
+              />
+            )}
+          </View>
+        </Card.Actions>
       </Card>
     );
   };
@@ -176,15 +223,17 @@ export default function Budget() {
           + Add Budget
         </Button>
 
+        {budgets.length > 0 && renderFullBudget()}
+
         <FlatList
-        data={budgets}
-        keyExtractor={item => item.id}
-        renderItem={renderBudget}
-        numColumns={2}
-        key={2} 
-        columnWrapperStyle={styles.row}
-        ListEmptyComponent={<Text>No budgets found.</Text>}
-      />
+          data={budgets}
+          keyExtractor={item => item.id}
+          renderItem={renderBudget}
+          numColumns={2}
+          key={2} 
+          columnWrapperStyle={styles.row}
+          ListEmptyComponent={<Text>No budgets found.</Text>}
+        />
 
         <Portal>
           <Dialog visible={dialogVisible} onDismiss={hideDialog}>
@@ -231,33 +280,38 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
- row: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  width: '100%',  
-  marginBottom: 10,
-},
-card: {
-  flex: 1,
-  marginHorizontal: 4, 
-  maxWidth: '48%', 
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',  
+    marginBottom: 10,
+  },
+  card: {
+    flex: 1,
+    marginHorizontal: 4, 
+    maxWidth: '48%', 
+  },
+ fullWidthCard: {
+  maxWidth: '100%',
+  marginBottom: 16,
+  flex: 0,
 },
   cardTitle: {
     textAlign: 'center',
     fontSize: 16,
   },
   cardActions: {
-  justifyContent: 'center',
-},
-buttonContainer: {
-  flexDirection: 'row',   
-  justifyContent: 'center', 
-  gap: 10,                    
-},
-actionButton: {
-  minWidth: 80,             
-  marginHorizontal: 5,      
-},
+    justifyContent: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',   
+    justifyContent: 'center', 
+    gap: 10,                    
+  },
+  actionButton: {
+    minWidth: 80,             
+    marginHorizontal: 5,      
+  },
   input: {
     marginBottom: 10,
   },
@@ -265,14 +319,14 @@ actionButton: {
     marginVertical: 8,
     backgroundColor: 'purple',
   },
-  chartWrapper: {
-    width: 100,
-    height: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    alignSelf: 'center',
-  },
+ chartWrapper: {
+  width: 100,
+  height: 100,
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative',
+  alignSelf: 'center',
+},
   centeredTextWrapper: {
     position: 'absolute',
     top: '50%',
