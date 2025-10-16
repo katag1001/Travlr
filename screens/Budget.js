@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { View, StyleSheet, FlatList, } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Card, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
-import PieChart from 'react-native-pie-chart'
-
+import { Text, Card, Button, TextInput, Dialog, Portal } from 'react-native-paper';
+import PieChart from 'react-native-pie-chart';
 
 import TripSelector from '../components/TripSelector';
 import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
@@ -96,137 +95,169 @@ export default function Budget() {
     loadBudgets();
   };
 
- const renderBudget = ({ item }) => {
-  const widthAndHeight = 150;
+  const renderBudget = ({ item }) => {
+    const widthAndHeight = 100;
 
-  const noSpend = item.spent == null || item.spent == 0 ;
-  const isEmpty = (item.spent + item.total) === 0;
-  const isOverspent = item.spent > item.total;
+    const noSpend = item.spent == null || item.spent == 0;
+    const isEmpty = (item.spent + item.total) === 0;
+    const isOverspent = item.spent > item.total;
 
-  let series;
+    let series;
 
-if (isEmpty) {
-  series = [{ value: 1, color: '#cccccc' }];
-} else if (isOverspent) {
-  series = [{ value: 1, color: 'red' }];
-} else if (noSpend) {
-  series = [{ value: 1, color: 'green' }];
-} else {
-  series = [
-    { value: item.total - item.spent, color: '#2fff00ff' },
-    { value: item.spent, color: '#00d9ffff' },
-    
-  ];
-}
+    if (isEmpty) {
+      series = [{ value: 1, color: '#cccccc' }];
+    } else if (isOverspent) {
+      series = [{ value: 1, color: 'red' }];
+    } else if (noSpend) {
+      series = [{ value: 1, color: 'green' }];
+    } else {
+      series = [
+        { value: item.total - item.spent, color: '#2fff00ff' },
+        { value: item.spent, color: '#00d9ffff' },
+      ];
+    }
 
-  const centerText = isEmpty
-  ? '£0'
-  : isOverspent
-    ? `£${item.spent -item.total} over budget`
-    : `£${item.spent} out of £${item.total}`;
-  return (
-    <Card
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate('Spends', {
-          budgetId: item.id,
-          budgetName: item.budgetName,
-          tripId: selectedTripId,
-        })
-      }
-    >
-      <Card.Title title={item.budgetName} />
-      <Card.Content>
-        <View style={styles.container}>
+    const centerText = isEmpty
+      ? '£0'
+      : isOverspent
+        ? `£${item.spent - item.total} over`
+        : `£${item.spent} of £${item.total}`;
+
+    return (
+      <Card
+        style={styles.card}
+        onPress={() =>
+          navigation.navigate('Spends', {
+            budgetId: item.id,
+            budgetName: item.budgetName,
+            tripId: selectedTripId,
+          })
+        }
+      >
+        <Card.Title title={item.budgetName} titleStyle={styles.cardTitle} />
+        <Card.Content>
           <View style={styles.chartWrapper}>
             <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
             <View style={styles.centeredTextWrapper}>
               <Text style={styles.centeredText}>{centerText}</Text>
             </View>
           </View>
-        </View>
-      </Card.Content>
-      <Card.Actions>
-        <Button onPress={() => showDialog(item)}>Edit</Button>
-        <Button onPress={() => handleDeleteBudget(item.id)} textColor="red">
-          Delete
-        </Button>
-      </Card.Actions>
-    </Card>
-  );
-};
+        </Card.Content>
+        <Card.Actions style={styles.cardActions}>
+  <View style={styles.buttonContainer}>
+    <Button compact onPress={() => showDialog(item)} style={styles.actionButton}>
+      Edit
+    </Button>
+    {item.budgetName !== 'Accomodation' && item.budgetName !== 'Flights' && (
+      <Button
+        compact
+        icon="delete"
+        onPress={() => handleDeleteBudget(item.id)}
+        textColor="black"
+        style={styles.actionButton}
+      />
+    )}
+  </View>
+</Card.Actions>
 
-
+      </Card>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-    <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} /> 
-        <Button 
-        mode="contained" 
-        onPress={() => showDialog()} 
-        disabled={!selectedTripId}
-        style={styles.button}>
+      <View style={styles.container}>
+        <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} />
+        <Button
+          mode="contained"
+          onPress={() => showDialog()}
+          disabled={!selectedTripId}
+          style={styles.button}>
           + Add Budget
         </Button>
 
-      <FlatList
+        <FlatList
         data={budgets}
         keyExtractor={item => item.id}
         renderItem={renderBudget}
+        numColumns={2}
+        key={2} 
+        columnWrapperStyle={styles.row}
         ListEmptyComponent={<Text>No budgets found.</Text>}
       />
 
-      <Portal>
-        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>{editingBudget ? 'Edit Budget' : 'New Budget'}</Dialog.Title>
-          <Dialog.Content>
-            <TextInput
-              label="Budget Name"
-              value={budgetName}
-              onChangeText={setBudgetName}
-              style={styles.input}
-            />
-            <TextInput
-              label="Total Amount"
-              value={budgetTotal}
-              onChangeText={setBudgetTotal}
-              keyboardType="numeric"
-              style={styles.input}
-            />
-            {errorMsg ? (
-              <Text style={{ color: 'red', marginBottom: 10 }}>{errorMsg}</Text>
-            ) : null}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={hideDialog}>Cancel</Button>
-            <Button onPress={handleSaveBudget}>Save</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    </View>
+        <Portal>
+          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+            <Dialog.Title>{editingBudget ? 'Edit Budget' : 'New Budget'}</Dialog.Title>
+            <Dialog.Content>
+              <TextInput
+                label="Budget Name"
+                value={budgetName}
+                onChangeText={setBudgetName}
+                style={styles.input}
+              />
+              <TextInput
+                label="Total Amount"
+                value={budgetTotal}
+                onChangeText={setBudgetTotal}
+                keyboardType="numeric"
+                style={styles.input}
+              />
+              {errorMsg ? (
+                <Text style={{ color: 'red', marginBottom: 10 }}>{errorMsg}</Text>
+              ) : null}
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>Cancel</Button>
+              <Button onPress={handleSaveBudget}>Save</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </View>
     </SafeAreaView>
   );
 }
 
+const screenWidth = Dimensions.get('window').width;
+const cardMargin = 10;
+const cardWidth = (screenWidth / 2) - (cardMargin * 2);
+
 const styles = StyleSheet.create({
-   safeArea: {
+  safeArea: {
     flex: 1,
     backgroundColor: 'pink',
   },
   container: {
     flex: 1,
-    padding: 16
+    padding: 16,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+ row: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',  
+  marginBottom: 10,
+},
+card: {
+  flex: 1,
+  marginHorizontal: 4, 
+  maxWidth: '48%', 
+},
+  cardTitle: {
+    textAlign: 'center',
+    fontSize: 16,
   },
-  card: {
-    marginBottom: 15,
-  },
+  cardActions: {
+  justifyContent: 'center',
+},
+buttonContainer: {
+  flexDirection: 'row',   
+  justifyContent: 'center', 
+  gap: 10,                    
+},
+actionButton: {
+  minWidth: 80,             
+  marginHorizontal: 5,      
+},
   input: {
     marginBottom: 10,
   },
@@ -234,33 +265,30 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     backgroundColor: 'purple',
   },
-chartWrapper: {
-  width: 150,
-  height: 150,
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative', // Important for absolute positioning of child
-},
-
-centeredTextWrapper: {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  width: 80,  // Smaller than chart
-  height: 80,
-  alignItems: 'center',
-  justifyContent: 'center',
-  transform: [
-    { translateX: -40 }, // -width/2
-    { translateY: -40 }, // -height/2
-  ],
-},
-
-centeredText: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  textAlign: 'center',
-},
-
-
+  chartWrapper: {
+    width: 100,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    alignSelf: 'center',
+  },
+  centeredTextWrapper: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [
+      { translateX: -40 },
+      { translateY: -40 },
+    ],
+  },
+  centeredText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
