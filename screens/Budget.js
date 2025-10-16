@@ -3,6 +3,8 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { View, StyleSheet, FlatList, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Card, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
+import PieChart from 'react-native-pie-chart'
+
 
 import TripSelector from '../components/TripSelector';
 import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
@@ -94,7 +96,26 @@ export default function Budget() {
     loadBudgets();
   };
 
-  const renderBudget = ({ item }) => (
+ const renderBudget = ({ item }) => {
+  const widthAndHeight = 150;
+
+  const isEmpty = (item.spent + item.total) === 0;
+  const isOverspent = item.spent > item.total;
+
+  const series = isEmpty
+    ? [{ value: 1, color: '#cccccc' }]
+    : isOverspent
+      ? [
+          { value: item.total, color: '#ff0000' }, 
+          { value: item.spent - item.total, color: '#ffa500' },
+        ]
+      : [
+        { value: item.total - item.spent, color: '#2fff00ff' },  
+        { value: item.spent, color: '#00d9ffff' },
+          
+        ];
+
+  return (
     <Card
       style={styles.card}
       onPress={() =>
@@ -107,8 +128,12 @@ export default function Budget() {
     >
       <Card.Title title={item.budgetName} />
       <Card.Content>
-        <Text>Spent: {item.spent}</Text>
-        <Text>Total: {item.total}</Text>
+        <View style={styles.container}>
+          <Text style={styles.title}>Doughnut</Text>
+          <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.45} />
+        </View>
+        <Text>Total:{item.total}</Text>
+        <Text>Spent:{item.spent}</Text>
       </Card.Content>
       <Card.Actions>
         <Button onPress={() => showDialog(item)}>Edit</Button>
@@ -118,6 +143,9 @@ export default function Budget() {
       </Card.Actions>
     </Card>
   );
+};
+
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
