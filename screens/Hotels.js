@@ -6,13 +6,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import TripSelector from '../components/TripSelector';
 import { getTrips } from '../storage/tripStorage';
+import { useTrip } from '../components/TripContext';
 import {getHotelsForTrip,addHotel,updateHotel,deleteHotel} from '../storage/hotelStorage';
 
 
 export default function Hotels() {
-  const [selectedTripId, setSelectedTripId] = useState(null);
-  const [selectedTrip, setSelectedTrip] = useState(null);
-  const [trips, setTrips] = useState([]);
+  const { selectedTripId, selectedTrip } = useTrip();
   const [hotels, setHotels] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
@@ -30,15 +29,6 @@ export default function Hotels() {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const isEditing = !!form.id;
 
-  useEffect(() => {
-    const loadTrips = async () => {
-      const allTrips = await getTrips();
-      setTrips(allTrips);
-      const trip = allTrips.find((t) => t.id === selectedTripId);
-      setSelectedTrip(trip || null);
-    };
-    loadTrips();
-  }, [selectedTripId]);
 
   useEffect(() => {
     if (selectedTripId) {
@@ -163,7 +153,7 @@ export default function Hotels() {
   return (
     <SafeAreaView style={styles.safeArea}>
     <ScrollView contentContainerStyle={styles.container}>
-      <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} />
+      <TripSelector/>
 
       {selectedTripId && !showForm && (
         <Button

@@ -1,12 +1,13 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Keyboard } from 'react-native';
 import { Menu, Button } from 'react-native-paper';
 import { getTrips } from '../storage/tripStorage';
+import { useTrip } from './TripContext';
 
-export default function TripSelector({ selectedTripId, onSelectTrip }) {
+export default function TripSelector() {
   const [trips, setTrips] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
+  const { selectedTripId, setSelectedTripId } = useTrip();
 
   useEffect(() => {
     const loadTrips = async () => {
@@ -16,7 +17,7 @@ export default function TripSelector({ selectedTripId, onSelectTrip }) {
     loadTrips();
   }, [selectedTripId, menuVisible]);
 
-  const selectedTrip = trips.find(t => t.id === selectedTripId);
+  const selectedTrip = trips.find((t) => t.id === selectedTripId);
 
   const openMenu = () => {
     Keyboard.dismiss();
@@ -39,7 +40,7 @@ export default function TripSelector({ selectedTripId, onSelectTrip }) {
             key={trip.id}
             title={trip.tripName}
             onPress={() => {
-              onSelectTrip(trip.id);
+              setSelectedTripId(trip.id); // ✅ set globally
               setMenuVisible(false);
             }}
           />

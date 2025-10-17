@@ -9,6 +9,7 @@ import 'react-native-get-random-values';
 
 import MainTabs from './MainTabs';
 import SpendScreen from './screens/Spend';
+import { TripProvider } from './components/TripContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,22 +17,24 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <PaperProvider>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="MainTabs"
-              component={MainTabs}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Spends"
-              component={SpendScreen}
-              options={({ route }) => ({
-                title: `Spends for ${route.params?.budgetName || ''}`,
-              })}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <TripProvider>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="MainTabs"
+                component={MainTabs}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Spends"
+                component={SpendScreen}
+                options={({ route }) => ({
+                  title: `Spends for ${route.params?.budgetName || ''}`,
+                })}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </TripProvider>
       </PaperProvider>
     </SafeAreaProvider>
   );

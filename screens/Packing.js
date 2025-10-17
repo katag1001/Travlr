@@ -6,9 +6,10 @@ import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingLis
 
 import { v4 as uuidv4 } from 'uuid';
 import TripSelector from '../components/TripSelector';
+import { useTrip } from '../components/TripContext';
 
 export default function Packing() {
-  const [selectedTripId, setSelectedTripId] = useState(null);
+  const { selectedTripId } = useTrip();
   const [packingLists, setPackingLists] = useState([]);
   const [activeList, setActiveList] = useState(null);
 
@@ -28,10 +29,6 @@ export default function Packing() {
     setPackingLists(lists);
   };
 
-  const handleTripChange = (tripId) => {
-    setSelectedTripId(tripId);
-    setActiveList(null);
-  };
 
   const handleCreateList = async () => {
     const trimmed = newTypeName.trim();
@@ -134,7 +131,7 @@ export default function Packing() {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
-            <TripSelector selectedTripId={selectedTripId} onSelectTrip={handleTripChange} />
+            <TripSelector />
 
             <Button
               icon="plus"

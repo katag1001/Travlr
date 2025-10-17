@@ -13,9 +13,10 @@ import { Text, Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getItineraryForTrip, updateItineraryEntry } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
+import { useTrip } from '../components/TripContext';
 
 export default function Itinerary() {
-  const [selectedTripId, setSelectedTripId] = useState(null);
+  const { selectedTripId } = useTrip();
   const [entries, setEntries] = useState([]);
   const [localEdits, setLocalEdits] = useState({});
 

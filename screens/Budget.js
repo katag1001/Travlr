@@ -6,6 +6,7 @@ import { Text, Card, Button, TextInput, Dialog, Portal } from 'react-native-pape
 import PieChart from 'react-native-pie-chart';
 
 import TripSelector from '../components/TripSelector';
+import { useTrip } from '../components/TripContext';
 import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
 
 export default function Budget() {
@@ -17,7 +18,7 @@ export default function Budget() {
   const [budgetTotal, setBudgetTotal] = useState('');
   const [editingBudget, setEditingBudget] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
-  const [selectedTripId, setSelectedTripId] = useState(null);
+  const { selectedTripId } = useTrip();
 
   const loadBudgets = async () => {
     const all = await getBudgets();
@@ -214,7 +215,7 @@ const renderFullBudget = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <TripSelector selectedTripId={selectedTripId} onSelectTrip={setSelectedTripId} />
+        <TripSelector/>
         <Button
           mode="contained"
           onPress={() => showDialog()}
