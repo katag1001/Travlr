@@ -16,7 +16,7 @@ export const addTrip = async (trip) => {
   await saveTrips(updatedTrips);
   console.log('✅ Trip saved successfully:', trip);
 
-  // ADDING ITINERARIES AUTOMATICALLY (IN HELPER FUNCTION)
+  // ADDING ITINERARIES AUTOMATICALLY (THROUGH HELPER FUNCTION)
   const itineraryEntries = generateItinerary(trip);
   await addItineraryEntries(itineraryEntries);
 

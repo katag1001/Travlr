@@ -1,21 +1,34 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, StyleSheet, FlatList, Alert, Platform, Modal } from 'react-native';
+import {Image, View,StyleSheet,FlatList,Alert,Platform,Modal,} from 'react-native';
 import {Text,Button,Card,Divider,TextInput,Portal,Provider as PaperProvider,IconButton,} from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
 import { v4 as uuidv4 } from 'uuid';
+import { Banner } from '../components/Banner';
 
 import {getTrips,addTrip,updateTrip,deleteTrip,} from '../storage/tripStorage';
 
+// Theme options
+const themes = [
+  'North America',
+  'South America',
+  'Indian Subcontinent',
+  'Southeast Asia',
+  'East Asia',
+  'Oceania',
+  'Africa',
+  'Middle East',
+  'Russia',
+  'Europe',
+  'Central Asia',
+];
 
-function TripForm({
-  initialData = {},
-  onSubmit,
-  onCancel,
-}) {
+function TripForm({ initialData = {}, onSubmit, onCancel }) {
   const [tripName, setTripName] = useState(initialData.tripName || '');
   const [startDate, setStartDate] = useState(initialData.startDate || '');
   const [endDate, setEndDate] = useState(initialData.endDate || '');
+  const [theme, setTheme] = useState(initialData.theme || themes[0]); // ✅ Theme state
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -52,6 +65,7 @@ function TripForm({
       tripName,
       startDate,
       endDate,
+      theme, // ✅ Add theme
       id: initialData.id || uuidv4(),
     };
     onSubmit(data);
@@ -61,6 +75,19 @@ function TripForm({
     <View style={styles.form}>
       <Text style={styles.label}>Trip Name</Text>
       <TextInputWrapped value={tripName} onChangeText={setTripName} />
+
+      <Text style={styles.label}>Theme</Text>
+      <View style={styles.pickerWrapper}>
+        <Picker
+          selectedValue={theme}
+          onValueChange={(itemValue) => setTheme(itemValue)}
+          style={styles.picker}
+        >
+          {themes.map((t) => (
+            <Picker.Item key={t} label={t} value={t} />
+          ))}
+        </Picker>
+      </View>
 
       <Button
         icon="calendar"
@@ -108,7 +135,6 @@ function TripForm({
   );
 }
 
-// Optimized TextInput Component
 const TextInputWrapped = React.memo(({ value, onChangeText }) => {
   return (
     <TextInput
@@ -120,7 +146,10 @@ const TextInputWrapped = React.memo(({ value, onChangeText }) => {
   );
 });
 
+// MAIN FUNCTION ----------------------------------------------------------------------------------------------
+
 export default function MyTrips() {
+
   const [trips, setTrips] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
@@ -159,9 +188,11 @@ export default function MyTrips() {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
-        await deleteTrip(tripId);
-        setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== tripId));
-        }
+          await deleteTrip(tripId);
+          setTrips((prevTrips) =>
+            prevTrips.filter((trip) => trip.id !== tripId)
+          );
+        },
       },
     ]);
   };
@@ -183,9 +214,12 @@ export default function MyTrips() {
     </Card>
   );
 
+
+  // RETRUN ------------------------------------------------------------------------------------------------
   return (
     <PaperProvider>
       <SafeAreaView style={styles.safeArea}>
+        
         <View style={styles.container}>
           {!showForm && !isModalVisible && (
             <Button
@@ -241,7 +275,6 @@ export default function MyTrips() {
   );
 }
 
-// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -267,6 +300,17 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 4,
     fontSize: 16,
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
   },
   modalOverlay: {
     flex: 1,

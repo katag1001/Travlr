@@ -40,7 +40,7 @@ export default function TripSelector() {
             key={trip.id}
             title={trip.tripName}
             onPress={() => {
-              setSelectedTripId(trip.id); // ✅ set globally
+              setSelectedTripId(trip.id);
               setMenuVisible(false);
             }}
           />
