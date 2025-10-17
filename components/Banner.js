@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 const themeImageMap = {
@@ -15,14 +15,52 @@ const themeImageMap = {
   'Central Asia': require('../assets/images/banners/central_asia.png'),
 };
 
-const defaultImage = require('../assets/images/banners/travel.png');
-
 export default function Banner({ theme }) {
   const imageSource = themeImageMap[theme] || defaultImage;
+  const [aspectRatio, setAspectRatio] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (typeof imageSource === 'number') {
+      const resolved = Image.resolveAssetSource(imageSource);
+      if (resolved && resolved.width && resolved.height && isMounted) {
+        setAspectRatio(resolved.width / resolved.height);
+      }
+      return () => { isMounted = false; };
+    }
+
+    const uri = imageSource?.uri;
+    if (uri) {
+
+      Image.getSize(
+        uri,
+        (width, height) => { if (isMounted) setAspectRatio(width / height); },
+        (err) => {
+
+          console.warn('Image.getSize failed for', uri, err);
+          if (isMounted) setAspectRatio(16 / 9);
+        }
+      );
+    } else {
+      setAspectRatio(16 / 9);
+    }
+
+    return () => { isMounted = false; };
+  }, [imageSource]);
 
   return (
     <View style={styles.container}>
-      <Image source={imageSource} style={styles.image} resizeMode="cover" />
+      {aspectRatio ? (
+        <Image
+          source={imageSource}
+          style={[styles.image, { aspectRatio }]}
+          resizeMode="contain"
+        />
+      ) : (
+
+        <View style={{ width: '100%', height: 1 }} />
+      )}
     </View>
   );
 }
@@ -30,11 +68,12 @@ export default function Banner({ theme }) {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 12,
-    borderRadius: 8,
     overflow: 'hidden',
+        borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   image: {
     width: '100%',
-    height: 180,
+    height: undefined,
   },
 });
