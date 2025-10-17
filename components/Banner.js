@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 const themeImageMap = {
-  'North America': require('../assets/images/banners/north_america.png'),
   'South America': require('../assets/images/banners/south_america.png'),
   'Indian Subcontinent': require('../assets/images/banners/india.png'),
   'Southeast Asia': require('../assets/images/banners/se_asia.png'),
