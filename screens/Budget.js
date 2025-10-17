@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Card, Button, TextInput, Dialog, Portal } from 'react-native-paper';
 import PieChart from 'react-native-pie-chart';
 
+
+import Banner from '../components/Banner';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
@@ -18,7 +20,9 @@ export default function Budget() {
   const [budgetTotal, setBudgetTotal] = useState('');
   const [editingBudget, setEditingBudget] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+
   const { selectedTripId } = useTrip();
+  const { selectedTrip } = useTrip();
 
   const loadBudgets = async () => {
     const all = await getBudgets();
@@ -215,6 +219,7 @@ const renderFullBudget = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {selectedTrip && <Banner theme={selectedTrip.theme} />}
         <TripSelector/>
         <Button
           mode="contained"

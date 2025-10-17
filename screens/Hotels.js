@@ -4,14 +4,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {Text,Card,TextInput,Button,IconButton,Divider} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+import {getHotelsForTrip,addHotel,updateHotel,deleteHotel} from '../storage/hotelStorage';
 import TripSelector from '../components/TripSelector';
 import { getTrips } from '../storage/tripStorage';
 import { useTrip } from '../components/TripContext';
-import {getHotelsForTrip,addHotel,updateHotel,deleteHotel} from '../storage/hotelStorage';
+import Banner from '../components/Banner';
+
 
 
 export default function Hotels() {
   const { selectedTripId, selectedTrip } = useTrip();
+
   const [hotels, setHotels] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
@@ -153,6 +156,7 @@ export default function Hotels() {
   return (
     <SafeAreaView style={styles.safeArea}>
     <ScrollView contentContainerStyle={styles.container}>
+      {selectedTrip && <Banner theme={selectedTrip.theme} />}
       <TripSelector/>
 
       {selectedTripId && !showForm && (

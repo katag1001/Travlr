@@ -7,9 +7,13 @@ import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingLis
 import { v4 as uuidv4 } from 'uuid';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
+import Banner from '../components/Banner';
 
 export default function Packing() {
+
   const { selectedTripId } = useTrip();
+  const { selectedTrip } = useTrip();
+
   const [packingLists, setPackingLists] = useState([]);
   const [activeList, setActiveList] = useState(null);
 
@@ -17,6 +21,8 @@ export default function Packing() {
   const [newItemName, setNewItemName] = useState('');
   const [dialogVisible, setDialogVisible] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  
 
   useEffect(() => {
     if (selectedTripId) {
@@ -131,6 +137,7 @@ export default function Packing() {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
+            {selectedTrip && <Banner theme={selectedTrip.theme} />}
             <TripSelector />
 
             <Button

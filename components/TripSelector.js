@@ -7,12 +7,22 @@ import { useTrip } from './TripContext';
 export default function TripSelector() {
   const [trips, setTrips] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
-  const { selectedTripId, setSelectedTripId } = useTrip();
+
+  const {
+    selectedTripId,
+    setSelectedTripId,
+    setSelectedTrip, // 👈 Get from context
+  } = useTrip();
 
   useEffect(() => {
     const loadTrips = async () => {
       const tr = await getTrips();
       setTrips(tr);
+
+      const trip = tr.find((t) => t.id === selectedTripId);
+      if (trip) {
+        setSelectedTrip(trip); // 👈 Set selectedTrip in global context
+      }
     };
     loadTrips();
   }, [selectedTripId, menuVisible]);
@@ -41,6 +51,7 @@ export default function TripSelector() {
             title={trip.tripName}
             onPress={() => {
               setSelectedTripId(trip.id);
+              setSelectedTrip(trip);
               setMenuVisible(false);
             }}
           />

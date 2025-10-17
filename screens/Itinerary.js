@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import {View,StyleSheet,FlatList,TextInput,KeyboardAvoidingView,Platform,Keyboard,TouchableWithoutFeedback,} from 'react-native';
 import { Text, Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { getItineraryForTrip, updateItineraryEntry } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
+import Banner from '../components/Banner';
 
 export default function Itinerary() {
+
   const { selectedTripId } = useTrip();
+  const { selectedTrip } = useTrip();
+
   const [entries, setEntries] = useState([]);
   const [localEdits, setLocalEdits] = useState({});
 
@@ -129,6 +125,7 @@ export default function Itinerary() {
         >
           <View style={styles.container}>
             <View style={styles.header}>
+              {selectedTrip && <Banner theme={selectedTrip.theme} />}
               <TripSelector
                 selectedTripId={selectedTripId}
                 onSelectTrip={(tripId) => {

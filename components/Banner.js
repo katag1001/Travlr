@@ -1,4 +1,3 @@
-// components/Banner.js
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
@@ -16,14 +15,14 @@ const themeImageMap = {
   'Central Asia': require('../assets/images/banners/central_asia.png'),
 };
 
+const defaultImage = require('../assets/images/banners/travel.png');
+
 export default function Banner({ theme }) {
-  if (!theme || !themeImageMap[theme]) {
-    return null;
-  }
+  const imageSource = themeImageMap[theme] || defaultImage;
 
   return (
     <View style={styles.container}>
-      <Image source={themeImageMap[theme]} style={styles.image} resizeMode="cover" />
+      <Image source={imageSource} style={styles.image} resizeMode="cover" />
     </View>
   );
 }
