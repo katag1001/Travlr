@@ -26,23 +26,19 @@ const fixDate = (ddmmyyyy) => {
 
 export const addHotel = async (Hotel) => {
   try {
-    // Save hotel to storage
     const all = await getHotels();
     const updated = [...all, Hotel];
     await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
 
-    // Try to find the Accomodation budget
     const budgetId = await getBudgetIdByName('Accomodation', Hotel.tripId);
 
     if (!budgetId) {
       return;
     }
 
-    // Format the date safely
     const isoDate = fixDate(Hotel.startDate);
     const hotel = `${Hotel.hotelName}`
 
-    // Create and add the spend
     const newSpend = createSpend(
       budgetId,
       hotel,

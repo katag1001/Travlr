@@ -153,6 +153,31 @@ export default function Hotels() {
   const tripStartDate = selectedTrip ? parseDate(selectedTrip.startDate) : null;
   const tripEndDate = selectedTrip ? parseDate(selectedTrip.endDate) : null;
 
+const formatStayDetail = (start, end) => {
+  const startDate = parseDate(start);
+  const endDate = parseDate(end);
+
+  if (!startDate || !endDate || isNaN(startDate) || isNaN(endDate)) {
+    return '';
+  }
+
+  const nights = Math.max(
+    Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)),
+    0
+  );
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+
+  const startFormatted = formatter.format(startDate);
+  const endFormatted = formatter.format(endDate);
+  const nightLabel = nights === 1 ? 'Night' : 'Nights';
+
+  return `${startFormatted}–${endFormatted} · ${nights} ${nightLabel}`;
+};
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -279,7 +304,7 @@ export default function Hotels() {
           getIcon={() => 'bed'} 
           getTitle={(h) => h.hotelName || 'Unnamed Hotel'}
           getSubtitle={(h) => h.hotelPlace}
-          getDetail={(h) => `${h.startDate} → ${h.endDate}`}
+          getDetail={(h) => formatStayDetail(h.startDate, h.endDate)}
           getRight={(h) => h.cost ? `£${h.cost}` : ''}
           />
 
