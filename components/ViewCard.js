@@ -70,44 +70,43 @@ export default function ViewCard({
 
         return (
           <Card
-            key={item.id || index}
-            style={styles.card}
-            onPress={() => onPressItem(item)}
-          >
-            <Card.Title
-              title={
-                <View style={styles.titleRow}>
-                  <Text style={styles.titleText}>{title}</Text>
-                  {getSubtitle(item) ? (
-                    <Text style={styles.subtitleText}> — {getSubtitle(item)}</Text>
-                  ) : null}
-                </View>
-              }
-              subtitle={getDetail(item)}
-              left={(props) => (
-                <View style={styles.leftContent}>
-                  <Avatar.Icon
-                    {...props}
-                    icon={icon}
-                    color={'rgb(52, 72, 104)'}
-                    style={styles.avatarBackground}
-                  />
-                </View>
-              )}
-      
-              right={(props) =>
-                getRight(item) ? (
-                  <Text
-                    style={[
-                      styles.rightContent,
-                      ]}>
-                        
-                    {getRight(item)}
-                  </Text>
-                ) : null
-              }
-            />
-          </Card>
+  key={item.id || index}
+  style={styles.card}
+  onPress={() => onPressItem(item)}
+>
+  <View style={styles.cardContent}>
+    <View style={styles.leftContent}>
+      <Avatar.Icon
+        icon={icon}
+        color={'rgb(52, 72, 104)'}
+        style={styles.avatarBackground}
+        size={40}
+      />
+    </View>
+
+    <View style={styles.textContainer}>
+      {/* Title + Subtitle 1 side by side */}
+      <View style={styles.titleRow}>
+        <Text style={styles.titleText}>{getTitle(item)}</Text>
+        {getSubtitle(item) ? (
+          <Text style={styles.subtitle1}>{getSubtitle(item)}</Text>
+        ) : null}
+      </View>
+
+      {/* Subtitle 2 below */}
+      {getDetail(item) ? (
+        <Text style={styles.subtitle2}>{getDetail(item)}</Text>
+      ) : null}
+    </View>
+
+    {/* Right-aligned content like cost */}
+    {getRight(item) ? (
+      <Text style={styles.rightContent}>{getRight(item)}</Text>
+    ) : null}
+  </View>
+</Card>
+
+
         );
       })}
     </View>
@@ -117,7 +116,6 @@ export default function ViewCard({
 const styles = StyleSheet.create({
   list: {
     marginTop: 8,
-    // Removed paddingHorizontal here so cards can extend to container edges
   },
   card: {
     marginBottom: 12,
@@ -129,38 +127,56 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  titleText: {
-    fontWeight: '600',
-    fontSize: 16,
-    color: 'rgb(52, 72, 104)',
-  },
-  subtitleText: {
-    marginLeft: 4,
-    color: 'rgb(136, 136, 136)',
-    fontSize: 14,
-    fontWeight: '400',
-  },
-  subtitle: {
-    fontSize: 13,
-    color: 'rgb(136, 136, 136)',
-    marginTop: 2,
-  },
-  rightContent: {
-    marginRight: 16,
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: 'rgb(52, 72, 104)',
-    alignSelf: 'center',
-  },
-  leftContent: {
-    alignSelf: 'center',
-  },
-  avatarBackground: {
-    backgroundColor: 'rgb(244, 241, 235)',
-  },
+  cardContent: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  padding: 16,
+},
+
+leftContent: {
+  alignSelf: 'center',
+},
+
+textContainer: {
+  flex: 1,
+  marginLeft: 12,
+},
+
+titleRow: {
+  flexDirection: 'row',
+  alignItems: 'baseline',
+  flexWrap: 'wrap',
+},
+
+titleText: {
+  fontWeight: '650',
+  fontSize: 16,
+  color: 'rgb(52, 72, 104)',
+  marginRight: 8,
+},
+
+subtitle1: {
+  fontSize: 13,
+  color: '#999',
+  fontWeight: '400',
+},
+
+subtitle2: {
+  fontSize: 12,
+  color: '#666',
+  marginTop: 2,
+},
+
+rightContent: {
+  alignSelf: 'center',
+  marginLeft: 8,
+  fontSize: 15,
+  fontWeight: 'bold',
+  color: 'rgb(52, 72, 104)',
+},
+
+avatarBackground: {
+  backgroundColor: 'rgb(244, 241, 235)',
+},
+
 });
