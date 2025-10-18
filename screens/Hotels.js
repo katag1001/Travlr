@@ -1,21 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Platform,
-} from 'react-native';
+import {View,StyleSheet,ScrollView,Alert,Platform,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Text,
-  Card,
-  TextInput,
-  Button,
-  Divider,
-  Modal,
-  Portal,
-} from 'react-native-paper';
+import {Text,Card,TextInput,Button,Divider,Modal,Portal,} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {getHotelsForTrip,addHotel,updateHotel,deleteHotel,} from '../storage/hotelStorage';
@@ -24,6 +10,7 @@ import { getTrips } from '../storage/tripStorage';
 import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import Banner from '../components/Banner';
+
 
 export default function Hotels() {
   const { selectedTripId, selectedTrip } = useTrip();
@@ -285,15 +272,18 @@ export default function Hotels() {
           </Modal>
         </Portal>
 
+
         <ViewCard
-  data={hotels}
-  onPressItem={handleEdit}
-  getIcon={() => 'bed'} // or use dynamic: (h) => h.icon
-  getTitle={(h) => h.hotelName || 'Unnamed Hotel'}
-  getSubtitle={(h) => h.hotelPlace}
-  getDetail={(h) => `${h.startDate} → ${h.endDate}`}
-  getRight={(h) => h.cost ? `£${h.cost}` : ''}
-/>
+          data={hotels}
+          onPressItem={handleEdit}
+          getIcon={() => 'bed'} 
+          getTitle={(h) => h.hotelName || 'Unnamed Hotel'}
+          getSubtitle={(h) => h.hotelPlace}
+          getDetail={(h) => `${h.startDate} → ${h.endDate}`}
+          getRight={(h) => h.cost ? `£${h.cost}` : ''}
+          />
+
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -302,7 +292,7 @@ export default function Hotels() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'pink',
+    backgroundColor: 'rgb(247, 247, 247,',
   },
   container: {
     padding: 16,
@@ -319,12 +309,6 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     marginBottom: 16,
-  },
-  list: {
-    marginTop: 8,
-  },
-  card: {
-    marginBottom: 12,
   },
   modalContainer: {
     backgroundColor: 'white',
