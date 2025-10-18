@@ -1,16 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,ScrollView,Alert,Platform} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {Text,Card,TextInput,Button,IconButton,Divider} from 'react-native-paper';
+import {
+  Text,
+  Card,
+  TextInput,
+  Button,
+  Divider,
+  Modal,
+  Portal,
+} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import {getHotelsForTrip,addHotel,updateHotel,deleteHotel} from '../storage/hotelStorage';
+import {getHotelsForTrip,addHotel,updateHotel,deleteHotel,} from '../storage/hotelStorage';
 import TripSelector from '../components/TripSelector';
 import { getTrips } from '../storage/tripStorage';
 import { useTrip } from '../components/TripContext';
+import ViewCard from '../components/ViewCard';
 import Banner from '../components/Banner';
-
-
 
 export default function Hotels() {
   const { selectedTripId, selectedTrip } = useTrip();
@@ -32,7 +45,6 @@ export default function Hotels() {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const isEditing = !!form.id;
 
-
   useEffect(() => {
     if (selectedTripId) {
       loadHotels();
@@ -42,7 +54,9 @@ export default function Hotels() {
   const loadHotels = async () => {
     const h = await getHotelsForTrip(selectedTripId);
     const sorted = h.sort((a, b) => {
-      return new Date(parseDate(a.startDate)) - new Date(parseDate(b.startDate));
+      return (
+        new Date(parseDate(a.startDate)) - new Date(parseDate(b.startDate))
+      );
     });
     setHotels(sorted);
   };
@@ -89,39 +103,38 @@ export default function Hotels() {
   };
 
   const handleSubmit = async () => {
-  const { hotelName, hotelPlace, hotelAddress, cost, startDate, endDate } = form;
+    const { hotelName, hotelPlace, hotelAddress, cost, startDate, endDate } = form;
 
-  if (!hotelName || !startDate || !endDate) {
-    Alert.alert('Hotel name and dates are required.');
-    return;
-  }
-
-  const newHotel = {
-    id: isEditing ? form.id : Date.now().toString(),
-    tripId: selectedTripId,
-    hotelName,
-    hotelPlace,
-    hotelAddress,
-    cost: parseFloat(cost) || 0,
-    startDate,
-    endDate,
-  };
-
-  try {
-    if (isEditing) {
-      await updateHotel(newHotel);
-    } else {
-      await addHotel(newHotel);
+    if (!hotelName || !startDate || !endDate) {
+      Alert.alert('Hotel name and dates are required.');
+      return;
     }
 
-    resetForm();
-    loadHotels();
-  } catch (err) {
-    console.error('💥 Failed to save hotel:', err);
-    Alert.alert('Error', 'Failed to save hotel. Check console for details.');
-  }
-};
+    const newHotel = {
+      id: isEditing ? form.id : Date.now().toString(),
+      tripId: selectedTripId,
+      hotelName,
+      hotelPlace,
+      hotelAddress,
+      cost: parseFloat(cost) || 0,
+      startDate,
+      endDate,
+    };
 
+    try {
+      if (isEditing) {
+        await updateHotel(newHotel);
+      } else {
+        await addHotel(newHotel);
+      }
+
+      resetForm();
+      loadHotels();
+    } catch (err) {
+      console.error('💥 Failed to save hotel:', err);
+      Alert.alert('Error', 'Failed to save hotel. Check console for details.');
+    }
+  };
 
   const handleEdit = (hotel) => {
     setForm({
@@ -155,117 +168,133 @@ export default function Hotels() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <ScrollView contentContainerStyle={styles.container}>
-      {selectedTrip && <Banner theme={selectedTrip.theme} />}
-      <TripSelector/>
+      <ScrollView contentContainerStyle={styles.container}>
+        {selectedTrip && <Banner theme={selectedTrip.theme} />}
+        <TripSelector />
 
-      {selectedTripId && !showForm && (
-        <Button
-          icon="plus"
-          mode="contained"
-          onPress={() => setShowForm(true)}
-          style={styles.button}
-        >
-          Add Hotel
-        </Button>
-      )}
 
-      {showForm && (
-        <View style={styles.form}>
-          <TextInput
-            label="Hotel Name"
-            value={form.hotelName}
-            onChangeText={(text) => setForm({ ...form, hotelName: text })}
-            style={styles.input}
-          />
-          <TextInput
-            label="Hotel Place"
-            value={form.hotelPlace}
-            onChangeText={(text) => setForm({ ...form, hotelPlace: text })}
-            style={styles.input}
-          />
-          <TextInput
-            label="Hotel Address"
-            value={form.hotelAddress}
-            onChangeText={(text) => setForm({ ...form, hotelAddress: text })}
-            style={styles.input}
-          />
-          <TextInput
-            label="Cost"
-            keyboardType="numeric"
-            value={form.cost}
-            onChangeText={(text) => setForm({ ...form, cost: text })}
-            style={styles.input}
-          />
-
+        {selectedTripId && (
           <Button
-            icon="calendar"
-            mode="outlined"
-            onPress={() => setShowStartPicker(true)}
-            style={styles.dateButton}
+            icon="plus"
+            mode="contained"
+            onPress={() => setShowForm(true)}
+            style={styles.button}
           >
-            {form.startDate ? `Start: ${form.startDate}` : 'Select Start Date'}
+            Add Hotel
           </Button>
+        )}
 
-          <Button
-            icon="calendar"
-            mode="outlined"
-            onPress={() => setShowEndPicker(true)}
-            style={styles.dateButton}
+        <Portal>
+          <Modal
+            visible={showForm}
+            onDismiss={resetForm}
+            contentContainerStyle={styles.modalContainer}
           >
-            {form.endDate ? `End: ${form.endDate}` : 'Select End Date'}
-          </Button>
+            <Text style={styles.modalTitle}>
+              {isEditing ? 'Edit Hotel' : 'Add Hotel'}
+            </Text>
 
-          {showStartPicker && (
-            <DateTimePicker
-              value={tripStartDate || new Date()}
-              mode="date"
-              display="default"
-              onChange={onStartDateChange}
-              minimumDate={tripStartDate}
-              maximumDate={tripEndDate}
+            <TextInput
+              label="Hotel Name"
+              value={form.hotelName}
+              onChangeText={(text) => setForm({ ...form, hotelName: text })}
+              style={styles.input}
             />
-          )}
-
-          {showEndPicker && (
-            <DateTimePicker
-              value={tripEndDate || new Date()}
-              mode="date"
-              display="default"
-              onChange={onEndDateChange}
-              minimumDate={tripStartDate}
-              maximumDate={tripEndDate}
+            <TextInput
+              label="Hotel Place"
+              value={form.hotelPlace}
+              onChangeText={(text) => setForm({ ...form, hotelPlace: text })}
+              style={styles.input}
             />
-          )}
-
-          <Button mode="contained" onPress={handleSubmit} style={styles.button}>
-            {isEditing ? 'Update Hotel' : 'Save Hotel'}
-          </Button>
-          <Button onPress={resetForm} style={styles.cancelButton}>
-            Cancel
-          </Button>
-          <Divider style={{ marginVertical: 20 }} />
-        </View>
-      )}
-
-      <View style={styles.list}>
-        {hotels.map((hotel) => (
-          <Card key={hotel.id} style={styles.card} onPress={() => handleEdit(hotel)}>
-            <Card.Title
-              title={hotel.hotelName || 'Unnamed Hotel'}
-              subtitle={`${hotel.startDate} → ${hotel.endDate}`}
-              right={(props) => (
-                <IconButton
-                  {...props}
-                  icon="delete"
-                  onPress={() => handleDelete(hotel.id)}
-                />
-              )}
+            <TextInput
+              label="Hotel Address"
+              value={form.hotelAddress}
+              onChangeText={(text) => setForm({ ...form, hotelAddress: text })}
+              style={styles.input}
             />
-          </Card>
-        ))}
-      </View>
-    </ScrollView>
+            <TextInput
+              label="Cost"
+              keyboardType="numeric"
+              value={form.cost}
+              onChangeText={(text) => setForm({ ...form, cost: text })}
+              style={styles.input}
+            />
+
+            <Button
+              icon="calendar"
+              mode="outlined"
+              onPress={() => setShowStartPicker(true)}
+              style={styles.dateButton}
+            >
+              {form.startDate ? `Start: ${form.startDate}` : 'Select Start Date'}
+            </Button>
+
+            <Button
+              icon="calendar"
+              mode="outlined"
+              onPress={() => setShowEndPicker(true)}
+              style={styles.dateButton}
+            >
+              {form.endDate ? `End: ${form.endDate}` : 'Select End Date'}
+            </Button>
+
+            {showStartPicker && (
+              <DateTimePicker
+                value={tripStartDate || new Date()}
+                mode="date"
+                display="default"
+                onChange={onStartDateChange}
+                minimumDate={tripStartDate}
+                maximumDate={tripEndDate}
+              />
+            )}
+
+            {showEndPicker && (
+              <DateTimePicker
+                value={tripEndDate || new Date()}
+                mode="date"
+                display="default"
+                onChange={onEndDateChange}
+                minimumDate={tripStartDate}
+                maximumDate={tripEndDate}
+              />
+            )}
+
+            <Button mode="contained" onPress={handleSubmit} style={styles.button}>
+              {isEditing ? 'Update Hotel' : 'Save Hotel'}
+            </Button>
+
+            {isEditing && (
+              <Button
+                icon="delete"
+                mode="outlined"
+                onPress={() => {
+                  resetForm();
+                  handleDelete(form.id);
+                }}
+                style={[styles.button, { borderColor: 'red' }]}
+                textColor="red"
+              >
+                Delete Hotel
+              </Button>
+            )}
+
+            <Button onPress={resetForm} style={styles.cancelButton}>
+              Cancel
+            </Button>
+          </Modal>
+        </Portal>
+
+        <ViewCard
+  data={hotels}
+  onPressItem={handleEdit}
+  getIcon={() => 'bed'} // or use dynamic: (h) => h.icon
+  getTitle={(h) => h.hotelName || 'Unnamed Hotel'}
+  getSubtitle={(h) => h.hotelPlace}
+  getDetail={(h) => `${h.startDate} → ${h.endDate}`}
+  getRight={(h) => h.cost ? `£${h.cost}` : ''}
+/>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -277,9 +306,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
-  },
-  form: {
-    marginTop: 16,
   },
   input: {
     marginBottom: 8,
@@ -298,6 +324,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   card: {
+    marginBottom: 12,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
+    borderRadius: 8,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 12,
   },
 });

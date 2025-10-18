@@ -100,8 +100,6 @@ export default function Budget() {
     loadBudgets();
   };
 
-  // Render total combined budget as a full-width card
-  // Inside renderFullBudget function:
 const renderFullBudget = () => {
   const totalSpent = budgets.reduce((acc, b) => acc + (b.spent || 0), 0);
   const totalBudget = budgets.reduce((acc, b) => acc + (b.total || 0), 0);
@@ -146,7 +144,6 @@ const renderFullBudget = () => {
     </Card>
   );
 };
-
 
   const renderBudget = ({ item }) => {
     const widthAndHeight = 100;
