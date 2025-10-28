@@ -1,154 +1,273 @@
-import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,FlatList,TextInput,KeyboardAvoidingView,Platform,Keyboard,TouchableWithoutFeedback,} from 'react-native';
-import { Text, Card } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  Modal,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
+import { Text, TextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { getItineraryForTrip, updateItineraryEntry } from '../storage/itineraryStorage';
+import {
+  getItineraryForTrip,
+  addItineraryEntry,
+  updateItineraryEntry,
+  deleteItineraryEntry,
+} from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
+import ViewCard from '../components/ViewCard';
 
 export default function Itinerary() {
+  const { selectedTripId, selectedTrip } = useTrip();
 
-  const { selectedTripId } = useTrip();
-  const { selectedTrip } = useTrip();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [itinerary, setItinerary] = useState([]);
 
-  const [entries, setEntries] = useState([]);
-  const [localEdits, setLocalEdits] = useState({});
+  const [form, setForm] = useState({
+    id: null,
+    title: '',
+    date: '',
+    notes: '',
+    cost: '',
+  });
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const isEditing = !!form.id;
 
   useEffect(() => {
     if (selectedTripId) {
-      loadEntries(selectedTripId);
+      loadItinerary();
     } else {
-      setEntries([]);
+      setItinerary([]);
     }
   }, [selectedTripId]);
 
-  const loadEntries = async (tripId) => {
-    const arr = await getItineraryForTrip(tripId);
-    setEntries(arr);
+  const loadItinerary = async () => {
+    const items = await getItineraryForTrip(selectedTripId);
+    const sorted = items.sort((a, b) => new Date(a.date) - new Date(b.date));
+    setItinerary(sorted);
+  };
 
-    const initialEdits = {};
-    arr.forEach((entry) => {
-      initialEdits[entry.id] = {
-        day: entry.day || '',
-        night: entry.night || '',
-      };
+  const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    const [day, month, year] = dateStr.split('/');
+    return new Date(`${year}-${month}-${day}`);
+  };
+
+  const formatDate = (dateObj) => {
+    if (!dateObj) return '';
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setForm({ ...form, date: formatDate(selectedDate) });
+    }
+  };
+
+  const resetForm = () => {
+    setForm({
+      id: null,
+      title: '',
+      date: '',
+      notes: '',
+      cost: '',
     });
-    setLocalEdits(initialEdits);
+    setModalVisible(false);
   };
 
-  const handleUpdateEntry = async (entryId, field, value) => {
-    const entry = entries.find((e) => e.id === entryId);
-    if (!entry) return;
+  const handleSave = async () => {
+    const { id, title, date, notes, cost } = form;
 
-    const updated = { ...entry, [field]: value };
-    await updateItineraryEntry(updated);
+    if (!title.trim() || !date.trim()) {
+      Alert.alert('Missing info', 'Please enter a title and date.');
+      return;
+    }
 
-    setEntries((prev) =>
-      prev.map((e) => (e.id === entryId ? updated : e))
-    );
+    if (!selectedTripId) {
+      Alert.alert('No Trip Selected', 'Please select a trip first.');
+      return;
+    }
+
+    const newItem = {
+      id: id || Date.now().toString(),
+      tripId: selectedTripId,
+      title: title.trim(),
+      date: date.trim(),
+      notes: notes.trim(),
+      cost: cost.trim(),
+    };
+
+    try {
+      if (isEditing) {
+        await updateItineraryEntry(newItem);
+      } else {
+        await addItineraryEntry(newItem);
+      }
+
+      Alert.alert('Success', isEditing ? 'Itinerary updated!' : 'Itinerary added!');
+      resetForm();
+      loadItinerary();
+    } catch (err) {
+      console.error('Error saving itinerary:', err);
+      Alert.alert('Error', 'Failed to save itinerary entry.');
+    }
   };
 
-  const handleLocalChange = (entryId, field, value) => {
-    setLocalEdits((prev) => ({
-      ...prev,
-      [entryId]: {
-        ...prev[entryId],
-        [field]: value,
+  const handleEdit = (item) => {
+    setForm({
+      id: item.id,
+      title: item.title,
+      date: item.date,
+      notes: item.notes,
+      cost: item.cost?.toString() || '',
+    });
+    setModalVisible(true);
+  };
+
+  const handleDelete = async (id) => {
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteItineraryEntry(id);
+          loadItinerary();
+        },
       },
-    }));
+    ]);
   };
 
-  const renderEntry = ({ item }) => {
-    const dateObj = new Date(item.date);
-    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' }); // e.g. Fri
-    const dayNum = dateObj.getDate().toString().padStart(2, '0');
-    const monthShort = dateObj.toLocaleDateString('en-US', { month: 'short' }); // e.g. Oct
-    const yearShort = dateObj.getFullYear().toString().slice(-2);
-    const displayDate = `${dayNum}-${monthShort}-${yearShort}`;
-
-    const local = localEdits[item.id] || { day: '', night: '' };
-
-    return (
-      <Card style={styles.entryCard}>
-        <View style={styles.row}>
-          <View style={styles.dateBox}>
-            <Text style={styles.weekdayText}>{weekday}</Text>
-            <Text style={styles.dateText}>{displayDate}</Text>
-          </View>
-
-          <View style={styles.planColumn}>
-            <View style={styles.dayPlan}>
-              <TextInput
-                style={styles.dayTextInput}
-                placeholder="Day plan"
-                placeholderTextColor="#666"
-                value={local.day}
-                onChangeText={(text) =>
-                  handleLocalChange(item.id, 'day', text)
-                }
-                onBlur={() =>
-                  handleUpdateEntry(item.id, 'day', local.day)
-                }
-                multiline
-              />
-            </View>
-
-            <View style={styles.nightPlan}>
-              <TextInput
-                style={styles.nightTextInput}
-                placeholder="Night plan"
-                placeholderTextColor="#ccc"
-                value={local.night}
-                onChangeText={(text) =>
-                  handleLocalChange(item.id, 'night', text)
-                }
-                onBlur={() =>
-                  handleUpdateEntry(item.id, 'night', local.night)
-                }
-                multiline
-              />
-            </View>
-          </View>
-        </View>
-      </Card>
-    );
-  };
+  const tripStartDate = selectedTrip ? parseDate(selectedTrip.startDate) : null;
+  const tripEndDate = selectedTrip ? parseDate(selectedTrip.endDate) : null;
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <View style={styles.container}>
-            <View style={styles.header}>
-              {selectedTrip && <Banner theme={selectedTrip.theme} />}
-              <TripSelector
-                selectedTripId={selectedTripId}
-                onSelectTrip={(tripId) => {
-                  setSelectedTripId(tripId);
-                }}
-              />
-            </View>
+      <View style={styles.container}>
+        {selectedTrip && <Banner theme={selectedTrip.theme} />}
+        <TripSelector />
 
-            {selectedTripId ? (
-              <FlatList
-                data={entries}
-                keyExtractor={(item) => item.id}
-                renderItem={renderEntry}
-                keyboardShouldPersistTaps="handled"
-              />
-            ) : (
-              <Text style={{ marginTop: 20 }}>
-                Select a trip to view itinerary
+        {selectedTripId && (
+          <Button
+            icon="plus"
+            mode="contained"
+            onPress={() => setModalVisible(true)}
+            style={styles.addButton}
+          >
+            Add Itinerary Item
+          </Button>
+        )}
+
+        <ViewCard
+          data={itinerary}
+          onPressItem={handleEdit}
+          getTitle={(i) => i.title}
+          getSubtitle={(i) => i.date}
+          getDetail={(i) => (i.notes ? i.notes : '')}
+          getRight={(i) => (i.cost ? `£${i.cost}` : '')}
+          getIcon={(i) => null}
+        />
+
+        {/* Modal for adding/editing itinerary item */}
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={resetForm}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>
+                {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
               </Text>
-            )}
+
+              <TextInput
+                label="Title"
+                mode="outlined"
+                placeholder="Title (e.g. Visit Eiffel Tower)"
+                value={form.title}
+                onChangeText={(text) => setForm({ ...form, title: text })}
+                style={styles.input}
+              />
+
+              <Button
+                icon="calendar"
+                mode="outlined"
+                onPress={() => setShowDatePicker(true)}
+                style={styles.dateButton}
+              >
+                {form.date ? `Date: ${form.date}` : 'Select Date'}
+              </Button>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={tripStartDate || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                  minimumDate={tripStartDate}
+                  maximumDate={tripEndDate}
+                />
+              )}
+
+              <TextInput
+                label="Cost (optional)"
+                mode="outlined"
+                placeholder="e.g. 50"
+                value={form.cost}
+                onChangeText={(text) => setForm({ ...form, cost: text })}
+                keyboardType="numeric"
+                style={styles.input}
+              />
+
+              <TextInput
+                label="Notes (optional)"
+                mode="outlined"
+                placeholder="Notes..."
+                value={form.notes}
+                onChangeText={(text) => setForm({ ...form, notes: text })}
+                multiline
+                numberOfLines={3}
+                style={[styles.input, { height: 80 }]}
+              />
+
+              <Button
+                mode="contained"
+                onPress={handleSave}
+                style={styles.saveButton}
+              >
+                {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
+              </Button>
+
+              {isEditing && (
+                <Button
+                  icon="delete"
+                  mode="outlined"
+                  onPress={() => handleDelete(form.id)}
+                  style={[styles.deleteButton, { borderColor: 'red' }]}
+                  textColor="red"
+                >
+                  Delete Itinerary
+                </Button>
+              )}
+
+              <Button onPress={resetForm} style={styles.cancelButton}>
+                Cancel
+              </Button>
+            </View>
           </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+        </Modal>
+      </View>
     </SafeAreaView>
   );
 }
@@ -156,73 +275,47 @@ export default function Itinerary() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'pink',
+    backgroundColor: '#f2f1ec',
   },
   container: {
     flex: 1,
     padding: 16,
   },
-  header: {
-    marginBottom: 12,
+  addButton: {
+    marginVertical: 10,
   },
-  entryCard: {
-    marginBottom: 12,
-    padding: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'stretch', // ensures equal height
-  },
-  dateBox: {
-    width: 90,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    marginRight: 12,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  weekdayText: {
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  dateText: {
-    fontSize: 16,
-  },
-  planColumn: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-  },
-  dayPlan: {
-    flex: 1,
+  modalContainer: {
+    width: '90%',
     backgroundColor: 'white',
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingHorizontal: 8,
-    justifyContent: 'center',
+    borderRadius: 8,
+    padding: 20,
+    elevation: 5,
   },
-  dayTextInput: {
-    flex: 1,
-    color: 'black',
-    fontSize: 16,
-    paddingVertical: 6,
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
   },
-  nightPlan: {
-    flex: 1,
-    backgroundColor: 'black',
-    borderBottomLeftRadius: 4,
-    borderBottomRightRadius: 4,
-    paddingHorizontal: 8,
-    justifyContent: 'center',
+  input: {
+    marginBottom: 10,
   },
-  nightTextInput: {
-    flex: 1,
-    color: 'white',
-    fontSize: 16,
-    paddingVertical: 6,
+  dateButton: {
+    marginBottom: 10,
+    justifyContent: 'flex-start',
+  },
+  saveButton: {
+    marginTop: 10,
+  },
+  deleteButton: {
+    marginTop: 10,
+  },
+  cancelButton: {
+    marginTop: 10,
   },
 });

@@ -6,7 +6,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {getHotelsForTrip,addHotel,updateHotel,deleteHotel,} from '../storage/hotelStorage';
 import TripSelector from '../components/TripSelector';
-import { getTrips } from '../storage/tripStorage';
 import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import Banner from '../components/Banner';
@@ -317,7 +316,7 @@ const formatStayDetail = (start, end) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'rgb(247, 247, 247,',
+    backgroundColor: '#f2f1ec',
   },
   container: {
     padding: 16,

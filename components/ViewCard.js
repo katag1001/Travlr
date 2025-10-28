@@ -78,7 +78,7 @@ export default function ViewCard({
     <View style={styles.leftContent}>
       <Avatar.Icon
         icon={icon}
-        color={'rgb(52, 72, 104)'}
+        color={'#263041'}
         style={styles.avatarBackground}
         size={40}
       />
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 12,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f4f1ea',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -151,19 +151,19 @@ titleRow: {
 titleText: {
   fontWeight: '650',
   fontSize: 16,
-  color: 'rgb(52, 72, 104)',
+  color: '#263041',
   marginRight: 8,
 },
 
 subtitle1: {
   fontSize: 13,
-  color: '#999',
+  color: '#5c5f62',
   fontWeight: '400',
 },
 
 subtitle2: {
   fontSize: 12,
-  color: '#666',
+  color: '#5c5f62',
   marginTop: 2,
 },
 
@@ -172,11 +172,11 @@ rightContent: {
   marginLeft: 8,
   fontSize: 15,
   fontWeight: 'bold',
-  color: 'rgb(52, 72, 104)',
+  color: '#263041',
 },
 
 avatarBackground: {
-  backgroundColor: 'rgb(244, 241, 235)',
+  backgroundColor: '#ece9e2',
 },
 
 });

@@ -37,7 +37,7 @@ export const addHotel = async (Hotel) => {
     }
 
     const isoDate = fixDate(Hotel.startDate);
-    const hotel = `${Hotel.hotelName}`
+    const hotel = `Accomodation: ${Hotel.hotelName}`
 
     const newSpend = createSpend(
       budgetId,

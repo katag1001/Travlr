@@ -16,9 +16,9 @@ export const addTrip = async (trip) => {
   await saveTrips(updatedTrips);
   console.log('✅ Trip saved successfully:', trip);
 
-  // ADDING ITINERARIES AUTOMATICALLY (THROUGH HELPER FUNCTION)
+  /*Taking out for now to change way itineraries are added 
   const itineraryEntries = generateItinerary(trip);
-  await addItineraryEntries(itineraryEntries);
+  await addItineraryEntries(itineraryEntries); */
 
   // ADDING AUTOMATIC BUDGETS HERE
   const existingBudgets = await getBudgets();
@@ -93,7 +93,7 @@ export const deleteTrip = async (tripId) => {
 
 // HELPER FUNCTIONS FOR OTHER PAGE FUNCTIONS ----------------------------------------------------------------
 
-// generate itinerary for the trip dates
+/* generate itinerary for the trip dates
 const generateItinerary = (trip) => {
   const { id: tripId, startDate, endDate } = trip;
 
@@ -113,4 +113,4 @@ const generateItinerary = (trip) => {
     });
   }
   return entries;
-};
+}; */
