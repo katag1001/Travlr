@@ -4,12 +4,12 @@ import {
   StyleSheet,
   Alert,
   Modal,
-  TouchableOpacity,
   Platform,
 } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Calendar } from 'react-native-calendars';
 
 import {
   getItineraryForTrip,
@@ -27,6 +27,8 @@ export default function Itinerary() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [itinerary, setItinerary] = useState([]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [viewMode, setViewMode] = useState('calendar');
 
   const [form, setForm] = useState({
     id: null,
@@ -70,7 +72,9 @@ export default function Itinerary() {
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setForm({ ...form, date: formatDate(selectedDate) });
+      const formatted = formatDate(selectedDate);
+      setForm({ ...form, date: formatted });
+      setSelectedDate(formatted);
     }
   };
 
@@ -114,7 +118,6 @@ export default function Itinerary() {
         await addItineraryEntry(newItem);
       }
 
-
       resetForm();
       loadItinerary();
     } catch (err) {
@@ -131,59 +134,156 @@ export default function Itinerary() {
       notes: item.notes,
       cost: item.cost?.toString() || '',
     });
+    setSelectedDate(item.date);
     setModalVisible(true);
   };
 
   const handleDelete = async (id) => {
-  Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
-    { text: 'Cancel', style: 'cancel' },
-    {
-      text: 'Delete',
-      style: 'destructive',
-      onPress: async () => {
-        try {
-          await deleteItineraryEntry(id);
-          await loadItinerary();
-          resetForm();
-        } catch (err) {
-          console.error('Error deleting itinerary:', err);
-          Alert.alert('Error', 'Failed to delete itinerary entry.');
-        }
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteItineraryEntry(id);
+            await loadItinerary();
+            resetForm();
+          } catch (err) {
+            console.error('Error deleting itinerary:', err);
+            Alert.alert('Error', 'Failed to delete itinerary entry.');
+          }
+        },
       },
-    },
-  ]);
-};
-
+    ]);
+  };
 
   const tripStartDate = selectedTrip ? parseDate(selectedTrip.startDate) : null;
   const tripEndDate = selectedTrip ? parseDate(selectedTrip.endDate) : null;
 
+
+  const filteredItinerary = selectedDate
+    ? itinerary.filter((i) => i.date === selectedDate)
+    : [];
+
+  const handleDaySelect = (day) => {
+    const formatted = day.dateString.split('-').reverse().join('/');
+    setSelectedDate(formatted);
+    setViewMode('day');
+  };
+
+  const handleBackToCalendar = () => {
+    setSelectedDate('');
+    setViewMode('calendar');
+  };
+
+
+// Generates markedDates for react-native-calendars
+const getMarkedDates = (startDate, endDate, selectedDate = null) => {
+  if (!startDate || !endDate) return {};
+
+  const dates = {};
+  const date = new Date(startDate);
+
+  while (date <= endDate) {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const dateString = `${yyyy}-${mm}-${dd}`;
+
+    dates[dateString] = {
+      selected: true,
+      selectedColor: 'green', // green for all dates in the range
+      selectedTextColor: 'white',
+    };
+
+    date.setDate(date.getDate() + 1);
+  }
+
+  // Optionally override the currently selected date with a different style
+  if (selectedDate) {
+    const [day, month, year] = selectedDate.split('/');
+    const formatted = `${year}-${month}-${day}`;
+    dates[formatted] = {
+      selected: true,
+      selectedColor: '#006400', // darker green for selected day
+      selectedTextColor: 'white',
+    };
+  }
+
+  return dates;
+};
+
+
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
         <TripSelector />
 
-        {selectedTripId && (
-          <Button
-            icon="plus"
-            mode="contained"
-            onPress={() => setModalVisible(true)}
-            style={styles.addButton}
-          >
-            Add Itinerary Item
-          </Button>
-        )}
+        {selectedTripId && viewMode === 'calendar' && (
+  <View style={styles.calendarContainer}>
+    <Calendar
+  onDayPress={handleDaySelect}
+  minDate={tripStartDate?.toISOString().split('T')[0]}
+  maxDate={tripEndDate?.toISOString().split('T')[0]}
+  style={styles.calendar}
+  hideExtraDays={true}
+  disableMonthChange={true}
+  theme={{
+    backgroundColor: '#f2f1ec',
+    calendarBackground: '#f2f1ec',
+    textSectionTitleColor: '#000',
+    todayTextColor: '#222',
+    dayTextColor: '#222',
+    textDisabledColor: '#999',
+    arrowColor: 'black',
+  }}
+  markedDates={getMarkedDates(tripStartDate, tripEndDate, selectedDate)}
+/>
 
-        <ViewCard
-          data={itinerary}
-          onPressItem={handleEdit}
-          getTitle={(i) => i.title}
-          getSubtitle={(i) => i.date}
-          getDetail={(i) => (i.notes ? i.notes : '')}
-          getRight={(i) => (i.cost ? `£${i.cost}` : '')}
-          getIcon={(i) => null}
-        />
+  </View>
+)}
+
+
+        {selectedTripId && viewMode === 'day' && (
+          <>
+            <Button onPress={handleBackToCalendar} style={{ marginBottom: 10 }}>
+            Back to Calendar
+            </Button>
+
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+              Itinerary for {selectedDate}
+            </Text>
+
+            <Button
+              icon="plus"
+              mode="contained"
+              onPress={() => {
+                setForm({ ...form, date: selectedDate });
+                setModalVisible(true);
+              }}
+              style={styles.addButton}
+            >
+              Add Itinerary Item
+            </Button>
+
+            {filteredItinerary.length === 0 ? (
+              <Text>No itinerary items for this date.</Text>
+            ) : (
+              <ViewCard
+                data={filteredItinerary}
+                onPressItem={handleEdit}
+                getTitle={(i) => i.title}
+                getSubtitle={(i) => i.date}
+                getDetail={(i) => (i.notes ? i.notes : '')}
+                getRight={(i) => (i.cost ? `£${i.cost}` : '')}
+                getIcon={(i) => null}
+              />
+            )}
+          </>
+        )}
 
         {/* Modal for adding/editing itinerary item */}
         <Modal
@@ -218,7 +318,7 @@ export default function Itinerary() {
 
               {showDatePicker && (
                 <DateTimePicker
-                  value={tripStartDate || new Date()}
+                  value={parseDate(form.date) || tripStartDate || new Date()}
                   mode="date"
                   display="default"
                   onChange={handleDateChange}
@@ -325,4 +425,18 @@ const styles = StyleSheet.create({
   cancelButton: {
     marginTop: 10,
   },
+calendarContainer: {
+  flex: 1,
+  justifyContent: 'center', 
+  alignItems: 'center',
+  
+  backgroundColor: 'blue',
+},
+calendar: {
+  width: '350',
+  height: '100%',
+  backgroundColor: 'pink',
+},
+
+
 });
