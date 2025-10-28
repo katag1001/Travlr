@@ -114,7 +114,7 @@ export default function Itinerary() {
         await addItineraryEntry(newItem);
       }
 
-      Alert.alert('Success', isEditing ? 'Itinerary updated!' : 'Itinerary added!');
+
       resetForm();
       loadItinerary();
     } catch (err) {
@@ -135,18 +135,25 @@ export default function Itinerary() {
   };
 
   const handleDelete = async (id) => {
-    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
+  Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+    { text: 'Cancel', style: 'cancel' },
+    {
+      text: 'Delete',
+      style: 'destructive',
+      onPress: async () => {
+        try {
           await deleteItineraryEntry(id);
-          loadItinerary();
-        },
+          await loadItinerary();
+          resetForm();
+        } catch (err) {
+          console.error('Error deleting itinerary:', err);
+          Alert.alert('Error', 'Failed to delete itinerary entry.');
+        }
       },
-    ]);
-  };
+    },
+  ]);
+};
+
 
   const tripStartDate = selectedTrip ? parseDate(selectedTrip.startDate) : null;
   const tripEndDate = selectedTrip ? parseDate(selectedTrip.endDate) : null;

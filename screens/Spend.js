@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native';
-import { Text, Card, Button, TextInput, Dialog, Portal, FAB, IconButton } from 'react-native-paper';
+import { View, StyleSheet, Platform } from 'react-native';
+import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import ViewCard from '../components/ViewCard'; // Make sure path is correct
 import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend } from '../storage/budgetStorage';
 
 export default function SpendScreen({ route, navigation }) {
@@ -74,6 +75,7 @@ export default function SpendScreen({ route, navigation }) {
 
   const handleDeleteSpend = async (id) => {
     await deleteSpend(id);
+    hideDialog();
     loadSpends();
   };
 
@@ -84,85 +86,71 @@ export default function SpendScreen({ route, navigation }) {
     }
   };
 
-  const renderSpend = ({ item }) => (
-    <Card style={styles.card}>
-      <TouchableOpacity onPress={() => showDialog(item)} >
-        <Card.Content style={styles.cardContent}>
-          <View style={styles.leftContent}>
-            <Text style={styles.spendName}>{item.spendName || 'Unnamed Spend'}</Text>
-            <Text style={styles.spendDate}>{new Date(item.date).toLocaleDateString()}</Text>
-          </View>
-          <View style={styles.rightContent}>
-            <Text style={styles.spendAmount}>£{item.spend.toFixed(2)}</Text>
-            <IconButton
-              icon="delete"
-              size={20}
-              onPress={() => handleDeleteSpend(item.id)}
-              style={styles.deleteButton}
-              accessibilityLabel="Delete spend"
-            />
-          </View>
-        </Card.Content>
-      </TouchableOpacity>
-    </Card>
-  );
-
   return (
     <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      <Text style={styles.header}>Spending for {budgetName}</Text>
-      <FlatList
-        data={spends}
-        keyExtractor={(item) => item.id}
-        renderItem={renderSpend}
-        ListEmptyComponent={<Text>No spends added yet.</Text>}
-      />
+      <View style={styles.container}>
+        {spends.length > 0 ? (
+          <ViewCard
+            data={spends}
+            onPressItem={showDialog}
+            getTitle={(s) => s.spendName || 'Unnamed Spend'}
+            getSubtitle={(s) => new Date(s.date).toLocaleDateString()}
+            getRight={(s) => `£${s.spend.toFixed(2)}`}
+          />
+        ) : (
+          <Text>No spends added yet.</Text>
+        )}
 
-      <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
+        <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
 
-      <Portal>
-        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>{editingSpend ? 'Edit Spend' : 'New Spend'}</Dialog.Title>
-          <Dialog.Content>
-            <TextInput
-              label="Spend Name"
-              value={spendName}
-              onChangeText={setSpendName}
-              style={styles.input}
-            />
-            <TextInput
-              label="Amount"
-              value={spendAmount}
-              onChangeText={setSpendAmount}
-              keyboardType="numeric"
-              style={styles.input}
-            />
-
-            <Button
-              icon="calendar"
-              mode="outlined"
-              onPress={() => setShowDatePicker(true)}
-              style={{ marginBottom: 10 }}
-            >
-              {spendDate ? spendDate.toLocaleDateString() : 'Select Date'}
-            </Button>
-
-            {showDatePicker && (
-              <DateTimePicker
-                value={spendDate || new Date()}
-                mode="date"
-                display="default"
-                onChange={onDateChange}
+        <Portal>
+          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+            <Dialog.Title>{editingSpend ? 'Edit Spend' : 'New Spend'}</Dialog.Title>
+            <Dialog.Content>
+              <TextInput
+                label="Spend Name"
+                value={spendName}
+                onChangeText={setSpendName}
+                style={styles.input}
               />
-            )}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={hideDialog}>Cancel</Button>
-            <Button onPress={handleSaveSpend}>Save</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    </View>
+              <TextInput
+                label="Amount"
+                value={spendAmount}
+                onChangeText={setSpendAmount}
+                keyboardType="numeric"
+                style={styles.input}
+              />
+
+              <Button
+                icon="calendar"
+                mode="outlined"
+                onPress={() => setShowDatePicker(true)}
+                style={{ marginBottom: 10 }}
+              >
+                {spendDate ? spendDate.toLocaleDateString() : 'Select Date'}
+              </Button>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={spendDate || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>Cancel</Button>
+              {editingSpend && (
+                <Button onPress={() => handleDeleteSpend(editingSpend.id)} color="red">
+                  Delete
+                </Button>
+              )}
+              <Button onPress={handleSaveSpend}>Save</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </View>
     </SafeAreaView>
   );
 }
@@ -175,43 +163,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-  },
-  header: {
-    fontSize: 20,
-    marginBottom: 20,
-    fontWeight: 'bold',
-  },
-  card: {
-    marginBottom: 10,
-    padding: 10,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  leftContent: {
-    flex: 1,
-  },
-  spendName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  spendDate: {
-    fontSize: 12,
-    color: 'gray',
-  },
-  rightContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  spendAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  deleteButton: {
-    margin: 0,
   },
   fab: {
     position: 'absolute',

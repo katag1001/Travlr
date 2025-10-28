@@ -25,30 +25,51 @@ export default function ViewCard({
   getIcon = null,
 }) {
   const iconKeywordMap = {
-    hotel: 'bed',
-    accommodation: 'bed',
-    dinner: 'silverware-fork-knife',
-    meal: 'silverware-fork-knife',
-    flight: 'airplane',
-    airport: 'airplane',
-    car: 'car',
-    rental: 'car',
-    activity: 'map-marker',
-    tour: 'map-marker',
-    train: 'train',
-    bus: 'bus',
-    boat: 'ferry',
-    ferry: 'ferry',
-    event: 'calendar',
-    conference: 'account-group',
-    meeting: 'account-tie',
-    museum: 'palette',
-    restaurant: 'silverware',
-    breakfast: 'food-croissant',
-  };
+  hotel: 'bed',
+  accommodation: 'bed',
+  dinner: 'silverware-fork-knife',
+  meal: 'silverware-fork-knife',
+  flight: 'airplane',
+  airport: 'airplane',
+  car: 'car',
+  rental: 'car',
+  activity: 'map-marker',
+  tour: 'map-marker',
+  train: 'train',
+  bus: 'bus',
+  boat: 'ferry',
+  ferry: 'ferry',
+  event: 'calendar',
+  conference: 'account-group',
+  meeting: 'account-tie',
+  museum: 'palette',
+  restaurant: 'silverware',
+  breakfast: 'food-croissant',
+  beach: 'beach',
+  hiking: 'hiking',
+  mountain: 'terrain',
+  park: 'tree',
+  shopping: 'shopping',
+  spa: 'spa',
+  bar: 'glass-cocktail',
+  nightlife: 'music',
+  wifi: 'wifi',
+  luggage: 'briefcase',
+  passport: 'passport',
+  weather: 'weather-partly-cloudy',
+  map: 'map',
+  guide: 'account-voice',
+  ticket: 'ticket-confirmation',
+  gallery: 'palette',
+  landmark: 'office-building',
+  camping: 'tent',
+  swimming: 'pool',
+  taxi: 'taxi',
+};
+
 
   const getAutoIconFromTitle = (title) => {
-    if (!title) return 'information-outline';
+    if (!title) return 'passport';
     const lower = title.toLowerCase();
 
     for (const keyword in iconKeywordMap) {
@@ -57,7 +78,7 @@ export default function ViewCard({
       }
     }
 
-    return 'information-outline';
+    return 'passport';
   };
 
   return (

@@ -25,3 +25,10 @@ export const updateItineraryEntry = async (entry) => {
   const newAll = all.map(e => (e.id === entry.id ? entry : e));
   await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(newAll));
 };
+
+// ✅ NEW: Delete an itinerary entry by ID
+export const deleteItineraryEntry = async (id) => {
+  const all = await getItineraries();
+  const filtered = all.filter(entry => entry.id !== id);
+  await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(filtered));
+};
