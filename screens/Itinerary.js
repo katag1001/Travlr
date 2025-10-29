@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Alert,
-  Modal,
-  Platform,
-} from 'react-native';
+import {View,StyleSheet,Alert,Modal,Platform,} from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Calendar } from 'react-native-calendars';
+import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 
-import {
-  getItineraryForTrip,
-  addItineraryEntry,
-  updateItineraryEntry,
-  deleteItineraryEntry,
-} from '../storage/itineraryStorage';
+import {getItineraryForTrip,addItineraryEntry,updateItineraryEntry,deleteItineraryEntry,} from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
@@ -177,8 +166,6 @@ export default function Itinerary() {
     setViewMode('calendar');
   };
 
-
-// Generates markedDates for react-native-calendars
 const getMarkedDates = (startDate, endDate, selectedDate = null) => {
   if (!startDate || !endDate) return {};
 
@@ -186,30 +173,30 @@ const getMarkedDates = (startDate, endDate, selectedDate = null) => {
   const date = new Date(startDate);
 
   while (date <= endDate) {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const dateString = `${yyyy}-${mm}-${dd}`;
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const dateString = `${yyyy}-${mm}-${dd}`;
 
-    dates[dateString] = {
-      selected: true,
-      selectedColor: 'green', // green for all dates in the range
-      selectedTextColor: 'white',
-    };
+  dates[dateString] = {
+    customStyles: {
+      container: {
+        backgroundColor: 'green', 
+        borderRadius: 10,               
+        alignItems: 'center', 
+        justifyContent: 'center', 
+      },
+      text: {
+        color: 'white',        
+        fontWeight: 'bold', 
+        textAlign: 'center', 
+      },
+    },
+  };
 
-    date.setDate(date.getDate() + 1);
-  }
+  date.setDate(date.getDate() + 1);
+}
 
-  // Optionally override the currently selected date with a different style
-  if (selectedDate) {
-    const [day, month, year] = selectedDate.split('/');
-    const formatted = `${year}-${month}-${day}`;
-    dates[formatted] = {
-      selected: true,
-      selectedColor: '#006400', // darker green for selected day
-      selectedTextColor: 'white',
-    };
-  }
 
   return dates;
 };
@@ -231,16 +218,26 @@ const getMarkedDates = (startDate, endDate, selectedDate = null) => {
   style={styles.calendar}
   hideExtraDays={true}
   disableMonthChange={true}
+  enableSwipeMonths={true}
+    
+
+
+  
   theme={{
-    backgroundColor: '#f2f1ec',
-    calendarBackground: '#f2f1ec',
+    backgroundColor: 'pink',
+    calendarBackground: 'pink',
     textSectionTitleColor: '#000',
     todayTextColor: '#222',
     dayTextColor: '#222',
     textDisabledColor: '#999',
     arrowColor: 'black',
+    textDayFontSize: 16,
+    textMonthFontSize: 30,
+    textDayHeaderFontSize: 16
+
   }}
   markedDates={getMarkedDates(tripStartDate, tripEndDate, selectedDate)}
+  markingType="custom"
 />
 
   </View>
@@ -285,7 +282,7 @@ const getMarkedDates = (startDate, endDate, selectedDate = null) => {
           </>
         )}
 
-        {/* Modal for adding/editing itinerary item */}
+        {/*ADDING AND EDITING ITINERARY ITEMS*/}
         <Modal
           visible={modalVisible}
           animationType="slide"
@@ -382,7 +379,7 @@ const getMarkedDates = (startDate, endDate, selectedDate = null) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f2f1ec',
+    backgroundColor: 'green',
   },
   container: {
     flex: 1,
@@ -426,16 +423,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 calendarContainer: {
-  flex: 1,
-  justifyContent: 'center', 
+  flex: 0, // Prevents stretching
   alignItems: 'center',
-  
+  justifyContent: 'center',
   backgroundColor: 'blue',
+  paddingVertical: 10,
 },
 calendar: {
-  width: '350',
-  height: '100%',
+  width: 355,
+  height: 420,
   backgroundColor: 'pink',
+  borderRadius: 10,
+  elevation: 2,
 },
 
 
