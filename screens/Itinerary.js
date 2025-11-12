@@ -164,14 +164,16 @@ export default function Itinerary() {
         )}
 
         <ItineraryEntry
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          tripId={selectedTripId}
-          tripStartDate={selectedTrip ? parseDate(selectedTrip.startDate) : null}
-          tripEndDate={selectedTrip ? parseDate(selectedTrip.endDate) : null}
-          initialData={editingItem}
-          onSaved={loadItinerary}
-        />
+  visible={modalVisible}
+  onClose={() => setModalVisible(false)}
+  tripId={selectedTripId}
+  tripStartDate={selectedTrip ? parseDate(selectedTrip.startDate) : null}
+  tripEndDate={selectedTrip ? parseDate(selectedTrip.endDate) : null}
+  selectedDate={selectedDate} // 🆕 pass clicked date
+  initialData={editingItem}
+  onSaved={loadItinerary}
+/>
+
       </View>
     </SafeAreaView>
   );

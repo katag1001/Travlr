@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Platform, Alert } from 'react-native';
-import { Text, TextInput, Button } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { View, StyleSheet, Alert } from 'react-native';
+import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
 
-import { addItineraryEntry, updateItineraryEntry, deleteItineraryEntry } from '../storage/itineraryStorage';
+import {
+  addItineraryEntry,
+  updateItineraryEntry,
+  deleteItineraryEntry,
+} from '../storage/itineraryStorage';
+
+import {
+  getBudgets,
+  createSpend,
+  addSpend,
+  updateSpend,
+  deleteSpend,
+} from '../storage/budgetStorage';
 
 export default function ItineraryEntry({
   visible,
@@ -11,71 +22,82 @@ export default function ItineraryEntry({
   tripId,
   tripStartDate,
   tripEndDate,
+  selectedDate,
   initialData = {},
   onSaved,
 }) {
   const [form, setForm] = useState({
     id: null,
     title: '',
-    date: '',
+    date: '',  // Date is set automatically
     notes: '',
     cost: '',
+    spendId: null,
   });
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [budgets, setBudgets] = useState([]);
+  const [selectedBudgetId, setSelectedBudgetId] = useState('');
+  const [showBudgetMenu, setShowBudgetMenu] = useState(false);
 
   const isEditing = !!form.id;
 
+
+  // Whenever modal opens
+useEffect(() => {
+  if (visible) {
+    setShowBudgetMenu(false); // always start closed
+  }
+}, [visible]);
+
+
   useEffect(() => {
-    if (initialData) {
+    if (tripId) {
+      (async () => {
+        const all = await getBudgets();
+        const filtered = all.filter(b => b.tripId === tripId);
+        setBudgets(filtered);
+      })();
+    }
+  }, [tripId]);
+
+
+  useEffect(() => {
+    if (initialData && initialData.id) {
       setForm({
-        id: initialData.id || null,
+        id: initialData.id,
         title: initialData.title || '',
-        date: initialData.date || '',
+        date: initialData.date || selectedDate || '',  // Automatically set date from selectedDate
         notes: initialData.notes || '',
         cost: initialData.cost?.toString() || '',
+        spendId: initialData.spendId || null,
       });
+      setSelectedBudgetId(initialData.budgetId || '');
+    } else if (selectedDate) {
+      // New entry with preselected date
+      setForm(f => ({ ...f, date: selectedDate }));
     }
-  }, [initialData]);
-
-  const parseDate = (dateStr) => {
-    if (!dateStr) return null;
-    const [day, month, year] = dateStr.split('/');
-    return new Date(`${year}-${month}-${day}`);
-  };
-
-  const formatDate = (dateObj) => {
-    if (!dateObj) return '';
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const year = dateObj.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  const handleDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      const formatted = formatDate(selectedDate);
-      setForm({ ...form, date: formatted });
-    }
-  };
+  }, [initialData, selectedDate]);
 
   const resetForm = () => {
     setForm({
       id: null,
       title: '',
-      date: '',
+      date: '',  // Reset date automatically
       notes: '',
       cost: '',
+      spendId: null,
     });
+    setSelectedBudgetId('');
     onClose();
   };
 
+  // ✅ Save itinerary entry and optional linked spend
   const handleSave = async () => {
-    const { id, title, date, notes, cost } = form;
+    const { id, title, date, notes, cost, spendId } = form;
+    const parsedCost = parseFloat(cost) || 0;
 
     if (!title.trim() || !date.trim()) {
-      Alert.alert('Missing info', 'Please enter a title and date.');
+      Alert.alert('Missing info', 'Please enter a title (and ensure a date is set).');
       return;
     }
 
@@ -91,9 +113,43 @@ export default function ItineraryEntry({
       date: date.trim(),
       notes: notes.trim(),
       cost: cost.trim(),
+      budgetId: selectedBudgetId || null,
+      spendId: spendId || null,
     };
 
     try {
+      // --- Handle Spend logic ---
+      if (selectedBudgetId && parsedCost > 0) {
+        if (newItem.spendId) {
+          // Update existing spend
+          const updatedSpend = {
+            id: newItem.spendId,
+            tripId,
+            budgetId: selectedBudgetId,
+            spendName: newItem.title,
+            date: newItem.date.split('/').reverse().join('-'),
+            spend: parsedCost,
+          };
+          await updateSpend(updatedSpend);
+        } else {
+          // Create new spend
+          const spend = createSpend(
+            selectedBudgetId,
+            newItem.title,
+            newItem.date.split('/').reverse().join('-'),
+            parsedCost,
+            tripId
+          );
+          await addSpend(spend);
+          newItem.spendId = spend.id;
+        }
+      } else if (newItem.spendId) {
+        // Remove spend if budget removed or cost 0
+        await deleteSpend(newItem.spendId);
+        newItem.spendId = null;
+      }
+
+      // --- Save itinerary entry ---
       if (isEditing) {
         await updateItineraryEntry(newItem);
       } else {
@@ -108,6 +164,7 @@ export default function ItineraryEntry({
     }
   };
 
+  // ✅ Delete itinerary and linked spend
   const handleDelete = async () => {
     Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
       { text: 'Cancel', style: 'cancel' },
@@ -116,6 +173,7 @@ export default function ItineraryEntry({
         style: 'destructive',
         onPress: async () => {
           try {
+            if (form.spendId) await deleteSpend(form.spendId);
             await deleteItineraryEntry(form.id);
             resetForm();
             if (onSaved) onSaved();
@@ -141,36 +199,58 @@ export default function ItineraryEntry({
             mode="outlined"
             placeholder="Title (e.g. Visit Eiffel Tower)"
             value={form.title}
-            onChangeText={(text) => setForm({ ...form, title: text })}
+            onChangeText={text => setForm({ ...form, title: text })}
             style={styles.input}
           />
 
-          <Button
-            icon="calendar"
-            mode="outlined"
-            onPress={() => setShowDatePicker(true)}
-            style={styles.dateButton}
-          >
-            {form.date ? `Date: ${form.date}` : 'Select Date'}
-          </Button>
 
-          {showDatePicker && (
-            <DateTimePicker
-              value={parseDate(form.date) || tripStartDate || new Date()}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-              minimumDate={tripStartDate}
-              maximumDate={tripEndDate}
-            />
-          )}
+          {/* Budget Selector ----------------------------------------------------------------*/}
+          
+<View>
+  <Menu
+    visible={showBudgetMenu}
+    onDismiss={() => setShowBudgetMenu(false)}
+    anchor={
+      <Button
+        mode="outlined"
+        onPress={() => setShowBudgetMenu(true)}
+      >
+        {selectedBudgetId
+          ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
+          : 'Select Budget (optional)'}
+      </Button>
+    }
+  >
+    {budgets.map((b) => (
+      <Menu.Item
+  key={b.id}
+  onPress={() => {
+    setShowBudgetMenu(false); // close menu first
+    setTimeout(() => setSelectedBudgetId(b.id), 100); // then set budget
+  }}
+  title={b.budgetName}
+/>
+    ))}
+
+    <Divider />
+
+    <Menu.Item
+  onPress={() => {
+    setShowBudgetMenu(false);
+    setTimeout(() => setSelectedBudgetId(''), 100);
+  }}
+  title="No Budget"
+/>
+  </Menu>
+</View>
+
 
           <TextInput
             label="Cost (optional)"
             mode="outlined"
             placeholder="e.g. 50"
             value={form.cost}
-            onChangeText={(text) => setForm({ ...form, cost: text })}
+            onChangeText={text => setForm({ ...form, cost: text })}
             keyboardType="numeric"
             style={styles.input}
           />
@@ -180,7 +260,7 @@ export default function ItineraryEntry({
             mode="outlined"
             placeholder="Notes..."
             value={form.notes}
-            onChangeText={(text) => setForm({ ...form, notes: text })}
+            onChangeText={text => setForm({ ...form, notes: text })}
             multiline
             numberOfLines={3}
             style={[styles.input, { height: 80 }]}
@@ -232,10 +312,6 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
-  },
-  dateButton: {
-    marginBottom: 10,
-    justifyContent: 'flex-start',
   },
   saveButton: {
     marginTop: 10,

@@ -4,7 +4,7 @@ import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ViewCard from '../components/ViewCard'; // Make sure path is correct
+import ViewCard from '../components/ViewCard';
 import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend } from '../storage/budgetStorage';
 
 export default function SpendScreen({ route, navigation }) {
@@ -80,7 +80,7 @@ export default function SpendScreen({ route, navigation }) {
   };
 
   const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS === 'ios'); // keep open on iOS, close on Android
+    setShowDatePicker(Platform.OS === 'ios'); 
     if (selectedDate) {
       setSpendDate(selectedDate);
     }

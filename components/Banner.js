@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import defaultImage from '../assets/images/banners/africa.png' 
 
 const themeImageMap = {
   'South America': require('../assets/images/banners/south_america.png'),

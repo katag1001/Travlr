@@ -19,7 +19,7 @@ export const createBudget = (budgetName, total, tripId) => {
 export const createSpend = (budgetId, spendName, date, spend, tripId) => {
   return {
     id: UUID.v4(),
-    tripId, // ✅ Add tripId to spend
+    tripId,
     budgetId,
     spendName,
     date: date instanceof Date ? date.toISOString() : date,
