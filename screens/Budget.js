@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from 'react'; 
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Card, Button, TextInput, Dialog, Portal } from 'react-native-paper';
 import PieChart from 'react-native-pie-chart';
 
-
 import Banner from '../components/Banner';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
-import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
+
+import SpendView from './Spend';
+
+import {
+  getBudgets,
+  createBudget,
+  saveBudgets,
+  deleteBudget as removeBudget,
+} from '../storage/budgetStorage';
 
 export default function Budget() {
-  const navigation = useNavigation();
-
   const [budgets, setBudgets] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [budgetName, setBudgetName] = useState('');
@@ -21,8 +25,9 @@ export default function Budget() {
   const [editingBudget, setEditingBudget] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const { selectedTripId } = useTrip();
-  const { selectedTrip } = useTrip();
+  const { selectedTripId, selectedTrip } = useTrip();
+
+  const [activeBudget, setActiveBudget] = useState(null);
 
   const loadBudgets = async () => {
     const all = await getBudgets();
@@ -31,18 +36,8 @@ export default function Budget() {
   };
 
   useEffect(() => {
-    if (selectedTripId) {
-      loadBudgets();
-    }
+    if (selectedTripId) loadBudgets();
   }, [selectedTripId]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (selectedTripId) {
-        loadBudgets();
-      }
-    }, [selectedTripId])
-  );
 
   const showDialog = (budget = null) => {
     setEditingBudget(budget);
@@ -59,40 +54,36 @@ export default function Budget() {
 
   const hideDialog = () => {
     setDialogVisible(false);
+    setEditingBudget(null);
     setBudgetName('');
     setBudgetTotal('');
-    setEditingBudget(null);
     setErrorMsg('');
   };
 
   const handleSaveBudget = async () => {
-    try {
-      const total = parseFloat(budgetTotal);
-      if (!budgetName.trim()) {
-        setErrorMsg('Budget name is required.');
-        return;
-      }
-      if (isNaN(total) || total <= 0) {
-        setErrorMsg('Total amount must be a positive number.');
-        return;
-      }
+    const total = parseFloat(budgetTotal);
 
-      if (editingBudget) {
-        const updated = budgets.map(b =>
-          b.id === editingBudget.id ? { ...b, budgetName, total } : b
-        );
-        await saveBudgets(updated);
-      } else {
-        const newBudget = createBudget(budgetName, total, selectedTripId);
-        const updated = [...budgets, newBudget];
-        await saveBudgets(updated);
-      }
-
-      hideDialog();
-      loadBudgets();
-    } catch (err) {
-      setErrorMsg('An error occurred while saving.');
+    if (!budgetName.trim()) {
+      setErrorMsg('Budget name is required.');
+      return;
     }
+    if (isNaN(total) || total <= 0) {
+      setErrorMsg('Total amount must be a positive number.');
+      return;
+    }
+
+    if (editingBudget) {
+      const updated = budgets.map(b =>
+        b.id === editingBudget.id ? { ...b, budgetName, total } : b
+      );
+      await saveBudgets(updated);
+    } else {
+      const newBudget = createBudget(budgetName, total, selectedTripId);
+      await saveBudgets([...budgets, newBudget]);
+    }
+
+    hideDialog();
+    loadBudgets();
   };
 
   const handleDeleteBudget = async (id) => {
@@ -100,57 +91,31 @@ export default function Budget() {
     loadBudgets();
   };
 
-const renderFullBudget = () => {
-  const totalSpent = budgets.reduce((acc, b) => acc + (b.spent || 0), 0);
-  const totalBudget = budgets.reduce((acc, b) => acc + (b.total || 0), 0);
-
-  const widthAndHeight = 100; // same as small cards
-
-  const isEmpty = totalSpent === 0 && totalBudget === 0;
-  const isOverspent = totalSpent > totalBudget;
-  const noSpend = totalSpent === 0;
-
-  let series;
-  if (isEmpty) {
-    series = [{ value: 1, color: '#cccccc' }];
-  } else if (isOverspent) {
-    series = [{ value: 1, color: 'red' }];
-  } else if (noSpend) {
-    series = [{ value: 1, color: 'green' }];
-  } else {
-    series = [
-      { value: totalBudget - totalSpent, color: '#2fff00ff' },
-      { value: totalSpent, color: '#00d9ffff' },
-    ];
+  // -------------------------------------------------------
+  // SPEND VIEW (internal navigation)
+  // -------------------------------------------------------
+  if (activeBudget) {
+    return (
+      <SpendView
+        budget={activeBudget}
+        onBack={() => setActiveBudget(null)}
+      />
+    );
   }
 
-  const centerText = isEmpty
-    ? '£0'
-    : isOverspent
-    ? `£${totalSpent - totalBudget} over budget`
-    : `£${totalSpent} of £${totalBudget}`;
+  // -------------------------------------------------------
+  // TOTAL BUDGET CARD (RESTORED)
+  // -------------------------------------------------------
 
-  return (
-    <Card style={[styles.card, styles.fullWidthCard]}>
-      <Card.Title title="Total Budget" titleStyle={styles.cardTitle} />
-      <Card.Content style={{ alignItems: 'center' }}>
-        <View style={styles.chartWrapper}>
-          <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
-          <View style={styles.centeredTextWrapper}>
-            <Text style={styles.centeredText}>{centerText}</Text>
-          </View>
-        </View>
-      </Card.Content>
-    </Card>
-  );
-};
+  const renderFullBudget = () => {
+    const totalSpent = budgets.reduce((sum, b) => sum + (b.spent || 0), 0);
+    const totalBudget = budgets.reduce((sum, b) => sum + (b.total || 0), 0);
 
-  const renderBudget = ({ item }) => {
-    const widthAndHeight = 100;
+    const widthAndHeight = 120;
 
-    const noSpend = item.spent == null || item.spent == 0;
-    const isEmpty = (item.spent + item.total) === 0;
-    const isOverspent = item.spent > item.total;
+    const isEmpty = totalSpent === 0 && totalBudget === 0;
+    const isOverspent = totalSpent > totalBudget;
+    const noSpend = totalSpent === 0;
 
     let series;
 
@@ -162,67 +127,89 @@ const renderFullBudget = () => {
       series = [{ value: 1, color: 'green' }];
     } else {
       series = [
-        { value: item.total - item.spent, color: '#2fff00ff' },
-        { value: item.spent, color: '#00d9ffff' },
+        { value: totalBudget - totalSpent, color: '#2fff00ff' },
+        { value: totalSpent, color: '#00d9ffff' },
       ];
     }
 
     const centerText = isEmpty
       ? '£0'
       : isOverspent
-        ? `£${item.spent - item.total} over budget`
-        : `£${item.spent} of £${item.total}`;
+      ? `£${totalSpent - totalBudget} over`
+      : `£${totalSpent} of £${totalBudget}`;
 
     return (
-      <Card
-        style={styles.card}
-        onPress={() =>
-          navigation.navigate('Spends', {
-            budgetId: item.id,
-            budgetName: item.budgetName,
-            tripId: selectedTripId,
-          })
-        }
-      >
+      <Card style={[styles.card, styles.fullWidthCard]}>
+        <Card.Title title="Total Budget" titleStyle={styles.cardTitle} />
+        <Card.Content style={{ alignItems: 'center' }}>
+          <View style={styles.chartWrapper}>
+            <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
+            <View style={styles.centerTextWrapper}>
+              <Text style={styles.centerText}>{centerText}</Text>
+            </View>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
+
+  // -------------------------------------------------------
+  // INDIVIDUAL BUDGET CARDS
+  // -------------------------------------------------------
+
+  const renderBudget = ({ item }) => {
+    const widthAndHeight = 100;
+
+    const noSpend = !item.spent || item.spent === 0;
+    const isOverspent = item.spent > item.total;
+
+    let series;
+
+    if (noSpend) {
+      series = [{ value: 1, color: 'green' }];
+    } else if (isOverspent) {
+      series = [{ value: 1, color: 'red' }];
+    } else {
+      series = [
+        { value: item.total - item.spent, color: '#2fff00ff' },
+        { value: item.spent, color: '#00d9ffff' },
+      ];
+    }
+
+    return (
+      <Card style={styles.card} onPress={() => setActiveBudget(item)}>
         <Card.Title title={item.budgetName} titleStyle={styles.cardTitle} />
         <Card.Content>
           <View style={styles.chartWrapper}>
             <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
-            <View style={styles.centeredTextWrapper}>
-              <Text style={styles.centeredText}>{centerText}</Text>
-            </View>
           </View>
         </Card.Content>
         <Card.Actions style={styles.cardActions}>
-          <View style={styles.buttonContainer}>
-            <Button compact onPress={() => showDialog(item)} style={styles.actionButton}>
-              Edit
-            </Button>
-            {item.budgetName !== 'Accomodation' && item.budgetName !== 'Flights' && (
-              <Button
-                compact
-                icon="delete"
-                onPress={() => handleDeleteBudget(item.id)}
-                textColor="black"
-                style={styles.actionButton}
-              />
-            )}
-          </View>
+          <Button compact onPress={() => showDialog(item)}>Edit</Button>
+          {item.budgetName !== 'Accomodation' && item.budgetName !== 'Flights' && (
+            <Button compact icon="delete" onPress={() => handleDeleteBudget(item.id)} />
+          )}
         </Card.Actions>
       </Card>
     );
   };
 
+  // -------------------------------------------------------
+  // MAIN RENDER
+  // -------------------------------------------------------
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
-        <TripSelector/>
+        <TripSelector />
+
         <Button
           mode="contained"
           onPress={() => showDialog()}
           disabled={!selectedTripId}
-          style={styles.button}>
+          style={styles.addButton}
+        >
           + Add Budget
         </Button>
 
@@ -233,11 +220,10 @@ const renderFullBudget = () => {
           keyExtractor={item => item.id}
           renderItem={renderBudget}
           numColumns={2}
-          key={2} 
           columnWrapperStyle={styles.row}
-          ListEmptyComponent={<Text>No budgets found.</Text>}
         />
 
+        {/* Budget form dialog */}
         <Portal>
           <Dialog visible={dialogVisible} onDismiss={hideDialog}>
             <Dialog.Title>{editingBudget ? 'Edit Budget' : 'New Budget'}</Dialog.Title>
@@ -246,18 +232,14 @@ const renderFullBudget = () => {
                 label="Budget Name"
                 value={budgetName}
                 onChangeText={setBudgetName}
-                style={styles.input}
               />
               <TextInput
                 label="Total Amount"
                 value={budgetTotal}
                 onChangeText={setBudgetTotal}
                 keyboardType="numeric"
-                style={styles.input}
               />
-              {errorMsg ? (
-                <Text style={{ color: 'red', marginBottom: 10 }}>{errorMsg}</Text>
-              ) : null}
+              {errorMsg ? <Text style={{ color: 'red' }}>{errorMsg}</Text> : null}
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={hideDialog}>Cancel</Button>
@@ -265,14 +247,13 @@ const renderFullBudget = () => {
             </Dialog.Actions>
           </Dialog>
         </Portal>
+
       </View>
     </SafeAreaView>
   );
 }
 
 const screenWidth = Dimensions.get('window').width;
-const cardMargin = 10;
-const cardWidth = (screenWidth / 2) - (cardMargin * 2);
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -283,22 +264,25 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  addButton: {
+    marginVertical: 10,
+    backgroundColor: 'purple',
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',  
+    width: '100%',
     marginBottom: 10,
   },
   card: {
     flex: 1,
-    marginHorizontal: 4, 
-    maxWidth: '48%', 
+    marginHorizontal: 4,
+    maxWidth: '48%',
   },
- fullWidthCard: {
-  maxWidth: '100%',
-  marginBottom: 16,
-  flex: 0,
-},
+  fullWidthCard: {
+    maxWidth: '100%',
+    marginBottom: 16,
+  },
   cardTitle: {
     textAlign: 'center',
     fontSize: 16,
@@ -306,44 +290,21 @@ const styles = StyleSheet.create({
   cardActions: {
     justifyContent: 'center',
   },
-  buttonContainer: {
-    flexDirection: 'row',   
-    justifyContent: 'center', 
-    gap: 10,                    
-  },
-  actionButton: {
-    minWidth: 80,             
-    marginHorizontal: 5,      
-  },
-  input: {
-    marginBottom: 10,
-  },
-  button: {
-    marginVertical: 8,
-    backgroundColor: 'purple',
-  },
- chartWrapper: {
-  width: 100,
-  height: 100,
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative',
-  alignSelf: 'center',
-},
-  centeredTextWrapper: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 80,
-    height: 80,
+  chartWrapper: {
+    width: 120,
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [
-      { translateX: -40 },
-      { translateY: -40 },
-    ],
+    position: 'relative',
   },
-  centeredText: {
+  centerTextWrapper: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerText: {
     fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',

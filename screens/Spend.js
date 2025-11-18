@@ -5,10 +5,16 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ViewCard from '../components/ViewCard';
-import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend } from '../storage/budgetStorage';
+import {
+  getSpendsForBudget,
+  addSpend,
+  updateSpend,
+  deleteSpend,
+  createSpend
+} from '../storage/budgetStorage';
 
-export default function SpendScreen({ route, navigation }) {
-  const { budgetId, budgetName, tripId } = route.params;
+export default function Spend({ budget, onBack }) {
+  const { id: budgetId, budgetName, tripId } = budget;
 
   const [spends, setSpends] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -17,7 +23,6 @@ export default function SpendScreen({ route, navigation }) {
   const [spendName, setSpendName] = useState('');
   const [spendAmount, setSpendAmount] = useState('');
   const [spendDate, setSpendDate] = useState(new Date());
-
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadSpends = async () => {
@@ -57,12 +62,7 @@ export default function SpendScreen({ route, navigation }) {
     const dateValue = spendDate.toISOString().split('T')[0];
 
     if (editingSpend) {
-      const updated = {
-        ...editingSpend,
-        spendName,
-        spend: amount,
-        date: dateValue,
-      };
+      const updated = { ...editingSpend, spendName, spend: amount, date: dateValue };
       await updateSpend(updated);
     } else {
       const newSpend = createSpend(budgetId, spendName, dateValue, amount, tripId);
@@ -80,77 +80,69 @@ export default function SpendScreen({ route, navigation }) {
   };
 
   const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS === 'ios'); 
-    if (selectedDate) {
-      setSpendDate(selectedDate);
-    }
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) setSpendDate(selectedDate);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {spends.length > 0 ? (
-          <ViewCard
-            data={spends}
-            onPressItem={showDialog}
-            getTitle={(s) => s.spendName || 'Unnamed Spend'}
-            getSubtitle={(s) => new Date(s.date).toLocaleDateString()}
-            getRight={(s) => `£${s.spend.toFixed(2)}`}
-          />
-        ) : (
-          <Text>No spends added yet.</Text>
-        )}
+      <Button onPress={onBack} mode="contained" style={{ marginBottom: 10 }}>
+        ← Back to Budgets
+      </Button>
 
-        <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
+      <Text style={styles.title}>{budgetName}</Text>
 
-        <Portal>
-          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-            <Dialog.Title>{editingSpend ? 'Edit Spend' : 'New Spend'}</Dialog.Title>
-            <Dialog.Content>
-              <TextInput
-                label="Spend Name"
-                value={spendName}
-                onChangeText={setSpendName}
-                style={styles.input}
+      {spends.length > 0 ? (
+        <ViewCard
+          data={spends}
+          onPressItem={showDialog}
+          getTitle={s => s.spendName}
+          getSubtitle={s => new Date(s.date).toLocaleDateString()}
+          getRight={s => `£${s.spend.toFixed(2)}`}
+        />
+      ) : (
+        <Text>No spends yet.</Text>
+      )}
+
+      <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
+
+      <Portal>
+        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+          <Dialog.Title>{editingSpend ? 'Edit Spend' : 'New Spend'}</Dialog.Title>
+          <Dialog.Content>
+            <TextInput label="Spend Name" value={spendName} onChangeText={setSpendName} />
+            <TextInput
+              label="Amount"
+              value={spendAmount}
+              onChangeText={setSpendAmount}
+              keyboardType="numeric"
+            />
+
+            <Button icon="calendar" mode="outlined" onPress={() => setShowDatePicker(true)}>
+              {spendDate.toLocaleDateString()}
+            </Button>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={spendDate}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
               />
-              <TextInput
-                label="Amount"
-                value={spendAmount}
-                onChangeText={setSpendAmount}
-                keyboardType="numeric"
-                style={styles.input}
-              />
+            )}
+          </Dialog.Content>
 
-              <Button
-                icon="calendar"
-                mode="outlined"
-                onPress={() => setShowDatePicker(true)}
-                style={{ marginBottom: 10 }}
-              >
-                {spendDate ? spendDate.toLocaleDateString() : 'Select Date'}
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>Cancel</Button>
+            {editingSpend && (
+              <Button onPress={() => handleDeleteSpend(editingSpend.id)} color="red">
+                Delete
               </Button>
-
-              {showDatePicker && (
-                <DateTimePicker
-                  value={spendDate || new Date()}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={hideDialog}>Cancel</Button>
-              {editingSpend && (
-                <Button onPress={() => handleDeleteSpend(editingSpend.id)} color="red">
-                  Delete
-                </Button>
-              )}
-              <Button onPress={handleSaveSpend}>Save</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
-      </View>
+            )}
+            <Button onPress={handleSaveSpend}>Save</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 }
@@ -159,17 +151,17 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'pink',
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
+    padding: 16,
   },
   fab: {
     position: 'absolute',
     right: 20,
     bottom: 20,
   },
-  input: {
-    marginBottom: 10,
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
