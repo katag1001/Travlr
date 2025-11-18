@@ -3,6 +3,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
+import 'react-native-get-random-values';
+
 
 import MainTabs from './MainTabs';
 import { TripProvider } from './components/TripContext';
