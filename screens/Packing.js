@@ -1,33 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,FlatList,Keyboard,TouchableWithoutFeedback,KeyboardAvoidingView,Platform,} from 'react-native';
-import {Text,Button,Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal,} from 'react-native-paper';
+import {
+  View,
+  StyleSheet,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+
+import {
+  Text,
+  Button,
+  Card,
+  TextInput,
+  Checkbox,
+  IconButton,
+  Divider,
+  Dialog,
+  Portal,
+} from 'react-native-paper';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
+import {
+  getPackingListsForTrip,
+  addPackingList,
+  updatePackingList,
+  deletePackingList,
+} from '../storage/packingStorage';
 
 import { v4 as uuidv4 } from 'uuid';
+
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
 
-export default function Packing() {
+// Import your shared ViewCard component
+import ViewCard from '../components/ViewCard';
 
-  const { selectedTripId } = useTrip();
-  const { selectedTrip } = useTrip();
+export default function Packing() {
+  const { selectedTripId, selectedTrip } = useTrip();
 
   const [packingLists, setPackingLists] = useState([]);
   const [activeList, setActiveList] = useState(null);
-
   const [newTypeName, setNewTypeName] = useState('');
   const [newItemName, setNewItemName] = useState('');
   const [dialogVisible, setDialogVisible] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-
-  
+  const [renameDialogVisible, setRenameDialogVisible] = useState(false);
 
   useEffect(() => {
-    if (selectedTripId) {
-      loadPackingLists(selectedTripId);
-    }
+    if (selectedTripId) loadPackingLists(selectedTripId);
   }, [selectedTripId]);
 
   const loadPackingLists = async (tripId) => {
@@ -35,7 +57,9 @@ export default function Packing() {
     setPackingLists(lists);
   };
 
-
+  // -------------------------
+  // PACKING LIST CRUD
+  // -------------------------
   const handleCreateList = async () => {
     const trimmed = newTypeName.trim();
     if (!trimmed || !selectedTripId) {
@@ -49,9 +73,8 @@ export default function Packing() {
       type: trimmed,
       items: [],
     };
+
     await addPackingList(newList);
-    setNewTypeName('');
-    setErrorMsg('');
     hideDialog();
     await loadPackingLists(selectedTripId);
   };
@@ -67,8 +90,12 @@ export default function Packing() {
 
     const updated = {
       ...activeList,
-      items: [...activeList.items, { id: uuidv4(), item: newItemName.trim(), checked: false }],
+      items: [
+        ...activeList.items,
+        { id: uuidv4(), item: newItemName.trim(), checked: false },
+      ],
     };
+
     await updatePackingList(updated);
     setNewItemName('');
     setActiveList(updated);
@@ -76,9 +103,10 @@ export default function Packing() {
   };
 
   const toggleItemChecked = async (itemId) => {
-    const updatedItems = activeList.items.map(it =>
+    const updatedItems = activeList.items.map((it) =>
       it.id === itemId ? { ...it, checked: !it.checked } : it
     );
+
     const updatedList = { ...activeList, items: updatedItems };
     await updatePackingList(updatedList);
     setActiveList(updatedList);
@@ -86,13 +114,31 @@ export default function Packing() {
   };
 
   const handleDeleteItem = async (itemId) => {
-    const updatedItems = activeList.items.filter(it => it.id !== itemId);
+    const updatedItems = activeList.items.filter((it) => it.id !== itemId);
     const updatedList = { ...activeList, items: updatedItems };
+
     await updatePackingList(updatedList);
     setActiveList(updatedList);
     await loadPackingLists(selectedTripId);
   };
 
+  const handleRenameList = async () => {
+    const trimmed = newTypeName.trim();
+    if (!trimmed || !activeList) {
+      setErrorMsg('List name is required.');
+      return;
+    }
+
+    const updatedList = { ...activeList, type: trimmed };
+    await updatePackingList(updatedList);
+    setActiveList(updatedList);
+    hideRenameDialog();
+    await loadPackingLists(selectedTripId);
+  };
+
+  // -------------------------
+  // DIALOG HANDLERS
+  // -------------------------
   const showDialog = () => {
     setNewTypeName('');
     setErrorMsg('');
@@ -105,29 +151,18 @@ export default function Packing() {
     setErrorMsg('');
   };
 
-  const renderListType = ({ item }) => (
-    <TouchableWithoutFeedback onPress={() => setActiveList(item)}>
-      <Card style={styles.typeCard}>
-        <Card.Title
-          title={item.type}
-          right={(props) => (
-            <IconButton {...props} icon="delete" onPress={() => handleDeleteList(item.id)} />
-          )}
-        />
-      </Card>
-    </TouchableWithoutFeedback>
-  );
+  const showRenameDialog = () => {
+    if (!activeList) return;
+    setNewTypeName(activeList.type);
+    setErrorMsg('');
+    setRenameDialogVisible(true);
+  };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.itemRow}>
-      <Checkbox
-        status={item.checked ? 'checked' : 'unchecked'}
-        onPress={() => toggleItemChecked(item.id)}
-      />
-      <Text style={styles.itemText}>{item.item}</Text>
-      <IconButton icon="delete" onPress={() => handleDeleteItem(item.id)} />
-    </View>
-  );
+  const hideRenameDialog = () => {
+    setRenameDialogVisible(false);
+    setNewTypeName('');
+    setErrorMsg('');
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -138,6 +173,7 @@ export default function Packing() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
             {selectedTrip && <Banner theme={selectedTrip.theme} />}
+
             <TripSelector />
 
             <Button
@@ -151,27 +187,48 @@ export default function Packing() {
 
             <Divider style={{ marginVertical: 10 }} />
 
+            {/* ----------------------------
+                LIST OF PACKING LIST TYPES
+               ---------------------------- */}
             {!activeList ? (
-              <FlatList
+              <ViewCard
                 data={packingLists}
-                keyExtractor={pl => pl.id}
-                renderItem={renderListType}
-                ListEmptyComponent={<Text>No packing lists yet.</Text>}
+                onPressItem={(item) => setActiveList(item)}
+                getTitle={(pl) => pl.type}
+                getSubtitle={() => ''}
+                getDetail={(pl) => `${pl.items.length} items`}
+                getRight={() => ''}
+                getIcon={() => 'briefcase'}
               />
             ) : (
+              /* ----------------------------
+                  ACTIVE LIST ITEMS VIEW
+                 ---------------------------- */
               <View style={{ flex: 1 }}>
-                <Card style={styles.activeListHeader}>
+                {/* Clickable card header for renaming */}
+                <Card style={styles.activeListHeader} onPress={showRenameDialog}>
                   <Card.Title
                     title={`List: ${activeList.type}`}
-                    right={() => <Button onPress={() => setActiveList(null)}>Back</Button>}
+                    right={() => (
+                      <Button onPress={() => setActiveList(null)}>Back</Button>
+                    )}
                   />
                 </Card>
-                <FlatList
-                  data={activeList.items}
-                  keyExtractor={it => it.id}
-                  renderItem={renderItem}
-                  ListEmptyComponent={<Text>No items yet.</Text>}
-                />
+
+                {activeList.items.map((item) => (
+                  <View key={item.id} style={styles.itemRow}>
+                    <Checkbox
+                      status={item.checked ? 'checked' : 'unchecked'}
+                      onPress={() => toggleItemChecked(item.id)}
+                    />
+                    <Text style={styles.itemText}>{item.item}</Text>
+                    <IconButton
+                      icon="delete"
+                      onPress={() => handleDeleteItem(item.id)}
+                    />
+                  </View>
+                ))}
+
                 <TextInput
                   label="New Item"
                   value={newItemName}
@@ -179,13 +236,16 @@ export default function Packing() {
                   mode="outlined"
                   style={styles.input}
                 />
+
                 <Button mode="contained" onPress={handleAddItemToActive}>
                   Add Item
                 </Button>
               </View>
             )}
 
-            {/* Dialog for creating new list */}
+            {/* ----------------------------
+                Dialog - Create New List
+               ---------------------------- */}
             <Portal>
               <Dialog visible={dialogVisible} onDismiss={hideDialog}>
                 <Dialog.Title>New Packing List</Dialog.Title>
@@ -198,12 +258,39 @@ export default function Packing() {
                     style={styles.input}
                   />
                   {errorMsg ? (
-                    <Text style={{ color: 'red', marginBottom: 10 }}>{errorMsg}</Text>
+                    <Text style={{ color: 'red', marginBottom: 10 }}>
+                      {errorMsg}
+                    </Text>
                   ) : null}
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={hideDialog}>Cancel</Button>
                   <Button onPress={handleCreateList}>Save</Button>
+                </Dialog.Actions>
+              </Dialog>
+
+              {/* ----------------------------
+                  Dialog - Rename Active List
+                 ---------------------------- */}
+              <Dialog visible={renameDialogVisible} onDismiss={hideRenameDialog}>
+                <Dialog.Title>Rename List</Dialog.Title>
+                <Dialog.Content>
+                  <TextInput
+                    label="List Name"
+                    value={newTypeName}
+                    onChangeText={setNewTypeName}
+                    mode="outlined"
+                    style={styles.input}
+                  />
+                  {errorMsg ? (
+                    <Text style={{ color: 'red', marginBottom: 10 }}>
+                      {errorMsg}
+                    </Text>
+                  ) : null}
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button onPress={hideRenameDialog}>Cancel</Button>
+                  <Button onPress={handleRenameList}>Save</Button>
                 </Dialog.Actions>
               </Dialog>
             </Portal>
@@ -215,39 +302,11 @@ export default function Packing() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'pink',
-  },
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  input: {
-    marginVertical: 10,
-  },
-  button: {
-    marginVertical: 8,
-    backgroundColor: 'purple',
-    color: 'white',
-  },
-  typeCard: {
-    marginBottom: 10,
-  },
-  activeListHeader: {
-    marginBottom: 10,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemText: {
-    flex: 1,
-    fontSize: 16,
-  },
+  safeArea: { flex: 1, backgroundColor: 'pink' },
+  container: { flex: 1, padding: 16 },
+  input: { marginVertical: 10 },
+  button: { marginVertical: 8, backgroundColor: 'purple', color: 'white' },
+  activeListHeader: { marginBottom: 10 },
+  itemRow: { flexDirection: 'row', alignItems: 'center' },
+  itemText: { flex: 1, fontSize: 16 },
 });

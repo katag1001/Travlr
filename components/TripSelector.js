@@ -11,7 +11,7 @@ export default function TripSelector() {
   const {
     selectedTripId,
     setSelectedTripId,
-    setSelectedTrip, // 👈 Get from context
+    setSelectedTrip,
   } = useTrip();
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function TripSelector() {
 
       const trip = tr.find((t) => t.id === selectedTripId);
       if (trip) {
-        setSelectedTrip(trip); // 👈 Set selectedTrip in global context
+        setSelectedTrip(trip); 
       }
     };
     loadTrips();

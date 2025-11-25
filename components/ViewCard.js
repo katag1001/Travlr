@@ -10,7 +10,7 @@ import { Card, Text, Avatar } from 'react-native-paper';
   getSubtitle={(h) => h.hotelPlace}
   getDetail={(h) => `${h.startDate} → ${h.endDate}`}
   getRight={(h) => h.cost ? `£${h.cost}` : ''}
-  getIcon={(h) => h.customIcon || null || 'the name of the icon'} // null means fallback to title-based icon
+  getIcon={(h) => h.customIcon || null || 'the name of the icon'} 
 />
 -------------------------------------------------------------------------------------------------------------*/
 
