@@ -1,9 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-import {addItineraryEntry,updateItineraryEntry,deleteItineraryEntry,} from '../storage/itineraryStorage';
-import {getBudgets,createSpend,addSpend,updateSpend,deleteSpend} from '../storage/budgetStorage';
+import {
+  addItineraryEntry,
+  updateItineraryEntry,
+  deleteItineraryEntry,
+} from '../storage/itineraryStorage';
+
+import {
+  getBudgets,
+  createSpend,
+  addSpend,
+  updateSpend,
+  deleteSpend,
+} from '../storage/budgetStorage';
 
 export default function ItineraryEntry({
   visible,
@@ -19,6 +31,7 @@ export default function ItineraryEntry({
     id: null,
     title: '',
     date: selectedDate || '',
+    time: '',
     notes: '',
     cost: '',
     spendId: null,
@@ -28,15 +41,24 @@ export default function ItineraryEntry({
   const [selectedBudgetId, setSelectedBudgetId] = useState('');
   const [showBudgetMenu, setShowBudgetMenu] = useState(false);
 
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
   const isEditing = !!form.id;
 
+  const handleTimeChange = (event, selectedTime) => {
+    setShowTimePicker(false);
 
-useEffect(() => {
-  if (visible) {
-    setShowBudgetMenu(false); 
-  }
-}, [visible]);
+    if (selectedTime) {
+      const hours = selectedTime.getHours().toString().padStart(2, '0');
+      const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+      const formatted = `${hours}:${minutes}`;
+      setForm({ ...form, time: formatted });
+    }
+  };
 
+  useEffect(() => {
+    if (visible) setShowBudgetMenu(false);
+  }, [visible]);
 
   useEffect(() => {
     if (tripId) {
@@ -48,20 +70,19 @@ useEffect(() => {
     }
   }, [tripId]);
 
-
   useEffect(() => {
     if (initialData && initialData.id) {
       setForm({
         id: initialData.id,
         title: initialData.title || '',
-        date: initialData.date || selectedDate || '', 
+        date: initialData.date || selectedDate || '',
+        time: initialData.time || '',
         notes: initialData.notes || '',
         cost: initialData.cost?.toString() || '',
         spendId: initialData.spendId || null,
       });
       setSelectedBudgetId(initialData.budgetId || '');
     } else if (selectedDate) {
-
       setForm(f => ({ ...f, date: selectedDate }));
     }
   }, [initialData, selectedDate]);
@@ -70,7 +91,8 @@ useEffect(() => {
     setForm({
       id: null,
       title: '',
-      date: '',  
+      date: selectedDate || '',
+      time: '',
       notes: '',
       cost: '',
       spendId: null,
@@ -80,7 +102,7 @@ useEffect(() => {
   };
 
   const handleSave = async () => {
-    const { id, title, date, notes, cost, spendId } = form;
+    const { id, title, date, time, notes, cost, spendId } = form;
     const parsedCost = parseFloat(cost) || 0;
 
     if (!title.trim() || !date.trim()) {
@@ -98,6 +120,7 @@ useEffect(() => {
       tripId,
       title: title.trim(),
       date: date.trim(),
+      time: time.trim(),
       notes: notes.trim(),
       cost: cost.trim(),
       budgetId: selectedBudgetId || null,
@@ -132,7 +155,6 @@ useEffect(() => {
         newItem.spendId = null;
       }
 
-
       if (isEditing) {
         await updateItineraryEntry(newItem);
       } else {
@@ -146,7 +168,6 @@ useEffect(() => {
       Alert.alert('Error', 'Failed to save itinerary entry.');
     }
   };
-
 
   const handleDelete = async () => {
     Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
@@ -169,6 +190,10 @@ useEffect(() => {
     ]);
   };
 
+  // -------------------------------------------
+  // RENDER
+  // -------------------------------------------
+
   return (
     <View style={styles.modalOverlay} pointerEvents={visible ? 'auto' : 'none'}>
       {visible && (
@@ -177,6 +202,7 @@ useEffect(() => {
             {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
           </Text>
 
+          {/* Title */}
           <TextInput
             label="Title"
             mode="outlined"
@@ -186,48 +212,71 @@ useEffect(() => {
             style={styles.input}
           />
 
+          {/* Budget Selector */}
+          <View>
+            <Menu
+              visible={showBudgetMenu}
+              onDismiss={() => setShowBudgetMenu(false)}
+              anchor={
+                <Button mode="outlined" onPress={() => setShowBudgetMenu(true)}>
+                  {selectedBudgetId
+                    ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
+                    : 'Select Budget (optional)'}
+                </Button>
+              }
+            >
+              {budgets.map(b => (
+                <Menu.Item
+                  key={b.id}
+                  onPress={() => {
+                    setShowBudgetMenu(false);
+                    setTimeout(() => setSelectedBudgetId(b.id), 100);
+                  }}
+                  title={b.budgetName}
+                />
+              ))}
 
-{/* Budget Selector ----------------------------------------------------------------*/}
-          
-<View>
-  <Menu
-    visible={showBudgetMenu}
-    onDismiss={() => setShowBudgetMenu(false)}
-    anchor={
-      <Button
-        mode="outlined"
-        onPress={() => setShowBudgetMenu(true)}
-      >
-        {selectedBudgetId
-          ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
-          : 'Select Budget (optional)'}
-      </Button>
-    }
-  >
-    {budgets.map((b) => (
-      <Menu.Item
-  key={b.id}
-  onPress={() => {
-    setShowBudgetMenu(false); 
-    setTimeout(() => setSelectedBudgetId(b.id), 100); 
-  }}
-  title={b.budgetName}
-/>
-    ))}
+              <Divider />
 
-    <Divider />
+              <Menu.Item
+                onPress={() => {
+                  setShowBudgetMenu(false);
+                  setTimeout(() => setSelectedBudgetId(''), 100);
+                }}
+                title="No Budget"
+              />
+            </Menu>
+          </View>
 
-    <Menu.Item
-  onPress={() => {
-    setShowBudgetMenu(false);
-    setTimeout(() => setSelectedBudgetId(''), 100);
-  }}
-  title="No Budget"
-/>
-  </Menu>
-</View>
+          {/* ------------------------------------------- */}
+          {/* TIME INPUT (Touchable wrapper fix)         */}
+          {/* ------------------------------------------- */}
+          <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+            <TextInput
+              label="Time (optional)"
+              mode="outlined"
+              placeholder="Select time"
+              value={form.time}
+              editable={false}
+              pointerEvents="none"
+              style={styles.input}
+            />
+          </TouchableOpacity>
 
+          {showTimePicker && (
+            <DateTimePicker
+              mode="time"
+              is24Hour={true}
+              value={
+                form.time
+                  ? new Date(`2000-01-01T${form.time}:00`)
+                  : new Date()
+              }
+              onChange={handleTimeChange}
+            />
+          )}
 
+          {/* Cost */}
           <TextInput
             label="Cost (optional)"
             mode="outlined"
@@ -238,6 +287,7 @@ useEffect(() => {
             style={styles.input}
           />
 
+          {/* Notes */}
           <TextInput
             label="Notes (optional)"
             mode="outlined"
@@ -249,10 +299,12 @@ useEffect(() => {
             style={[styles.input, { height: 80 }]}
           />
 
+          {/* Save Button */}
           <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
             {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
           </Button>
 
+          {/* Delete */}
           {isEditing && (
             <Button
               icon="delete"
@@ -265,6 +317,7 @@ useEffect(() => {
             </Button>
           )}
 
+          {/* Cancel */}
           <Button onPress={resetForm} style={styles.cancelButton}>
             Cancel
           </Button>

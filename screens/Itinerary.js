@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar } from 'react-native-calendars';
@@ -28,9 +28,22 @@ export default function Itinerary() {
     }
   }, [selectedTripId]);
 
+  // ---------------------------------------------------------
+  // LOAD + SORT BY DATE AND TIME
+  // ---------------------------------------------------------
   const loadItinerary = async () => {
     const items = await getItineraryForTrip(selectedTripId);
-    const sorted = items.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const sorted = [...items].sort((a, b) => {
+      const aDate = a.date.split('/').reverse().join('-');
+      const bDate = b.date.split('/').reverse().join('-');
+
+      const aTime = a.time && a.time.length ? a.time : '23:59';
+      const bTime = b.time && b.time.length ? b.time : '23:59';
+
+      return new Date(`${aDate}T${aTime}`) - new Date(`${bDate}T${bTime}`);
+    });
+
     setItinerary(sorted);
   };
 
@@ -51,10 +64,12 @@ export default function Itinerary() {
     setViewMode('calendar');
   };
 
+  // FILTER ITINERARY BY SELECTED DATE
   const filteredItinerary = selectedDate
     ? itinerary.filter((i) => i.date === selectedDate)
     : [];
 
+  // DATE RANGE MARKINGS
   const getMarkedDates = (startDate, endDate, selectedDate = null) => {
     if (!startDate || !endDate) return {};
     const dates = {};
@@ -90,12 +105,21 @@ export default function Itinerary() {
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
         <TripSelector />
 
+        {/* CALENDAR VIEW */}
         {selectedTripId && viewMode === 'calendar' && (
           <View style={styles.calendarContainer}>
             <Calendar
               onDayPress={handleDaySelect}
-              minDate={selectedTrip ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0] : undefined}
-              maxDate={selectedTrip ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0] : undefined}
+              minDate={
+                selectedTrip
+                  ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0]
+                  : undefined
+              }
+              maxDate={
+                selectedTrip
+                  ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0]
+                  : undefined
+              }
               style={styles.calendar}
               hideExtraDays={true}
               disableMonthChange={true}
@@ -122,6 +146,7 @@ export default function Itinerary() {
           </View>
         )}
 
+        {/* DAY VIEW */}
         {selectedTripId && viewMode === 'day' && (
           <>
             <Button onPress={handleBackToCalendar} style={{ marginBottom: 10 }}>
@@ -154,8 +179,13 @@ export default function Itinerary() {
                   setModalVisible(true);
                 }}
                 getTitle={(i) => i.title}
-                getSubtitle={(i) => i.date}
+
+                // 💡 Subtitle = date + time
+                getSubtitle={(i) => `${i.date}${i.time ? ` ${i.time}` : ''}`}
+
+                // 💡 Detail = notes
                 getDetail={(i) => (i.notes ? i.notes : '')}
+
                 getRight={(i) => (i.cost ? `£${i.cost}` : '')}
                 getIcon={(i) => null}
               />
@@ -163,17 +193,17 @@ export default function Itinerary() {
           </>
         )}
 
+        {/* MODAL ENTRY FORM */}
         <ItineraryEntry
-  visible={modalVisible}
-  onClose={() => setModalVisible(false)}
-  tripId={selectedTripId}
-  tripStartDate={selectedTrip ? parseDate(selectedTrip.startDate) : null}
-  tripEndDate={selectedTrip ? parseDate(selectedTrip.endDate) : null}
-  selectedDate={selectedDate} // 🆕 pass clicked date
-  initialData={editingItem}
-  onSaved={loadItinerary}
-/>
-
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          tripId={selectedTripId}
+          tripStartDate={selectedTrip ? parseDate(selectedTrip.startDate) : null}
+          tripEndDate={selectedTrip ? parseDate(selectedTrip.endDate) : null}
+          selectedDate={selectedDate} // keep selected date
+          initialData={editingItem}
+          onSaved={loadItinerary}
+        />
       </View>
     </SafeAreaView>
   );
