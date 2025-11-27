@@ -4,6 +4,7 @@ import { Text, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar } from 'react-native-calendars';
 
+
 import { getItineraryForTrip } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';

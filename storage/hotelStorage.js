@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createSpend, addSpend, getBudgetIdByName} from './budgetStorage';
 import { parse } from 'date-fns';
+import { addItineraryEntry } from './itineraryStorage';
 
 const STORAGE_KEY_HOTEL = 'HOTELS';
 
@@ -31,29 +32,49 @@ export const addHotel = async (Hotel) => {
     await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
 
     const budgetId = await getBudgetIdByName('Accomodation', Hotel.tripId);
-
-    if (!budgetId) {
-      return;
+    if (budgetId) {
+      const isoDate = fixDate(Hotel.startDate);
+      const hotelTitle = `Accomodation: ${Hotel.hotelName}`;
+      const newSpend = createSpend(
+        budgetId,
+        hotelTitle,
+        isoDate,
+        Hotel.cost,
+        Hotel.tripId
+      );
+      await addSpend(newSpend);
     }
 
-    const isoDate = fixDate(Hotel.startDate);
-    const hotel = `Accomodation: ${Hotel.hotelName}`
+    // ---------------------------------------
+    // Add itinerary entries for each night
+    // ---------------------------------------
+    const start = fixDate(Hotel.startDate);
+    const end = fixDate(Hotel.endDate);
+    const costPerNight = getCostPerNight(Hotel.cost, start, end);
+    const dates = getDatesBetween(start, end);
 
-    const newSpend = createSpend(
-      budgetId,
-      hotel,
-      isoDate,
-      Hotel.cost,
-      Hotel.tripId
-    );
+    for (const date of dates) {
+      const itineraryItem = {
+        id: Date.now().toString() + Math.random(), // ensure unique id
+        tripId: Hotel.tripId,
+        title: Hotel.hotelName,
+        date,                  // each night
+        time: '',
+        notes: '',
+        cost: costPerNight.toFixed(2),
+        budgetId: budgetId || null,
+        spendId: null,
+      };
 
-    console.log('✅ Creating spend for hotel:', newSpend);
+      await addItineraryEntry(itineraryItem);
+      console.log('✅ Added itinerary item:', itineraryItem);
+    }
 
-    await addSpend(newSpend);
   } catch (error) {
     console.error('💥 Error in addHotel():', error);
   }
 };
+
 
 
 
@@ -68,3 +89,31 @@ export const deleteHotel = async (listId) => {
   const filtered = all.filter(pl => pl.id !== listId);
   await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(filtered));
 };
+
+
+
+/* Helper to calculate dates between start and end and cost per night */
+
+export const getDatesBetween = (start, end) => {
+  const dates = [];
+  let current = new Date(start);
+  const last = new Date(end);
+
+  while (current < last) { // endDate - 1
+    const day = String(current.getDate()).padStart(2, '0');
+    const month = String(current.getMonth() + 1).padStart(2, '0');
+    const year = current.getFullYear();
+    dates.push(`${day}/${month}/${year}`);
+    current.setDate(current.getDate() + 1);
+  }
+
+  return dates;
+};
+
+export const getCostPerNight = (totalCost, startDate, endDate) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const nights = Math.max(Math.round((end - start) / (1000 * 60 * 60 * 24)), 1);
+  return totalCost / nights;
+};
+
