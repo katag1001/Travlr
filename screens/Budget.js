@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, TextInput, Dialog, Portal } from 'react-native-paper';
+import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 
 import Banner from '../components/Banner';
 import TripSelector from '../components/TripSelector';
@@ -100,16 +100,7 @@ export default function Budget() {
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
         <TripSelector />
 
-        <Button
-          mode="contained"
-          onPress={() => showDialog()}
-          disabled={!selectedTripId}
-          style={styles.addButton}
-        >
-          + Add Budget
-        </Button>
-
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        <ScrollView>
           {budgets.length > 0 && (
             <BudgetCard 
               budget={{
@@ -135,6 +126,8 @@ export default function Budget() {
             scrollEnabled={false}
           />
         </ScrollView>
+
+        <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Budget" />
 
         <Portal>
           <Dialog visible={dialogVisible} onDismiss={hideDialog}>
@@ -168,13 +161,16 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'pink',
+    bottom: 0,
+    marginBottom: 0,
   },
   container: {
     flex: 1,
     padding: 16,
   },
-  addButton: {
-    marginVertical: 10,
-    backgroundColor: 'purple',
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 0,
   },
 });

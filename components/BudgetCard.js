@@ -14,114 +14,153 @@ export default function BudgetCard({
   const total = budget.total;
 
   if (isTotal) {
-    const totalSpent = spent;
-    const totalBudget = total;
-
+    const remaining = Math.max(total - spent, 0);
     const widthAndHeight = 120;
 
-    const isEmpty = totalSpent === 0 && totalBudget === 0;
-    const isOverspent = totalSpent > totalBudget;
+    const isEmpty = spent === 0 && total === 0;
+    const isOverspent = spent > total;
 
     let series;
-
     if (isEmpty) {
       series = [{ value: 1, color: '#cccccc' }];
     } else if (isOverspent) {
       series = [{ value: 1, color: 'red' }];
     } else {
       series = [
-        { value: totalBudget - totalSpent, color: '#2fff00ff' },
-        { value: totalSpent, color: '#00d9ffff' },
+        { value: remaining, color: '#2fff00ff' },
+        { value: spent, color: '#00d9ffff' },
       ];
     }
 
-    const centerText = isEmpty
-      ? '£0'
-      : isOverspent
-      ? `£${(totalSpent - totalBudget).toFixed(2)} over`
-      : `£${totalSpent.toFixed(2)} of £${totalBudget.toFixed(2)}`;
-
     return (
-      <Card style={[styles.card, styles.fullWidthCard]}>
-        <Card.Title title="Total Budget" titleStyle={styles.cardTitle} />
+      <Card style={[styles.totalCard, styles.totalCardWrapper]}>
+        <Card.Title title="Total Budget" titleStyle={styles.totalCardTitle} />
+                  <View style={styles.totalSubRow}>
+            <Text style={styles.totalSubText}>Remaining: £{remaining.toFixed(2)}</Text>
+            <Text style={styles.totalSubText}>Total Spent: £{spent.toFixed(2)}</Text>
+          </View>
         <Card.Content style={{ alignItems: 'center' }}>
-          <View style={styles.chartWrapper}>
-            <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.8} />
-            <View style={styles.centerTextWrapper}>
-              <Text style={styles.centerText}>{centerText}</Text>
+          <View style={styles.totalChartWrapper}>
+            <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.6} />
+            <View style={styles.totalCenterTextWrapper}>
+              <Text style={styles.totalCenterText}>£{total.toFixed(2)}</Text>
             </View>
           </View>
+
         </Card.Content>
       </Card>
     );
   } else {
     const isOverspent = spent > total;
     const progress = Math.min(spent / total, 1);
-    const progressText = isOverspent
-      ? `Overbudget by £${(spent - total).toFixed(2)}`
-      : `Spent £${spent.toFixed(2)} out of £${total.toFixed(2)}`;
+    const percentSpent = ((spent / total) * 100).toFixed(1);
 
     return (
-      <Card style={styles.card} onPress={onPress}>
-        <Card.Title title={budget.budgetName} titleStyle={styles.cardTitle} />
+      <Card style={styles.subCard} onPress={onPress}>
         <Card.Content>
-          <Text style={styles.progressText}>{progressText}</Text>
-          <ProgressBar progress={progress} color={isOverspent ? 'red' : '#6200ee'} style={styles.progressBar} />
+          <View style={styles.subHeaderRow}>
+            <Text style={styles.subCardTitle}>{budget.budgetName}</Text>
+            <View style={styles.subActionButtons}>
+              <Button compact onPress={onEdit}>Edit</Button>
+              {budget.budgetName !== 'Accomodation' && budget.budgetName !== 'Flights' && (
+                <Button compact icon="delete" onPress={onDelete} />
+              )}
+            </View>
+          </View>
+          <Text style={styles.subBudgetTotal}>£{total.toFixed(2)}</Text>
+          <Text style={styles.subTitle}>Spend: £{spent.toFixed(2)} ({percentSpent}%)</Text>
+          <ProgressBar 
+            progress={progress} 
+            color={isOverspent ? 'red' : '#6200ee'} 
+            style={styles.subProgressBar} 
+          />
         </Card.Content>
-        <Card.Actions style={styles.cardActions}>
-          <Button compact onPress={onEdit}>Edit</Button>
-          {budget.budgetName !== 'Accomodation' && budget.budgetName !== 'Flights' && (
-            <Button compact icon="delete" onPress={onDelete} />
-          )}
-        </Card.Actions>
       </Card>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    marginHorizontal: 4,
+  // Total Card ----------------------------------------------------------------------------
+  totalCardWrapper: {
     maxWidth: '100%',
     marginBottom: 10,
+    marginTop: 10,
   },
-  fullWidthCard: {
-    maxWidth: '100%',
-    marginBottom: 16,
+  totalCard: {
+    flex: 1,
+    marginHorizontal: 4,
+    paddingVertical: 8,
   },
-  cardTitle: {
-    textAlign: 'center',
-    fontSize: 16,
+  totalCardTitle: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
-  cardActions: {
-    justifyContent: 'center',
-  },
-  chartWrapper: {
+  totalChartWrapper: {
     width: 120,
     height: 120,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    marginBottom: 8,
   },
-  centerTextWrapper: {
+  totalCenterTextWrapper: {
     position: 'absolute',
     width: 100,
     height: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  centerText: {
-    fontSize: 12,
+  totalCenterText: {
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  progressText: {
-    marginBottom: 4,
-    fontSize: 14,
+  totalSubRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 8,
+    marginTop: 4,
   },
-  progressBar: {
-    height: 10,
-    borderRadius: 5,
+  totalSubText: {
+    fontSize: 12,
+    color: '#666',
+  },
+
+  // Sub Cards -------------------------------------------------------------------------------
+  subCard: {
+    flex: 1,
+    marginHorizontal: 4,
+    maxWidth: '100%',
+    marginBottom: 8,
+    paddingVertical: 4,
+  },
+  subHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  subCardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  subActionButtons: {
+    flexDirection: 'row',
+  },
+  subBudgetTotal: {
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  subTitle: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  subProgressBar: {
+    height: 8,
+    borderRadius: 4,
   },
 });
