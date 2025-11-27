@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createSpend, addSpend, getBudgetIdByName} from './budgetStorage';
 import { parse } from 'date-fns';
-import { addItineraryEntry } from './itineraryStorage';
+import { addItineraryEntry, getItineraries } from './itineraryStorage';
 
 const STORAGE_KEY_HOTEL = 'HOTELS';
 
@@ -31,7 +31,7 @@ export const addHotel = async (Hotel) => {
     const updated = [...all, Hotel];
     await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
 
-    const budgetId = await getBudgetIdByName('Accomodation', Hotel.tripId);
+    const budgetId = await getBudgetIdByName('Accommodation', Hotel.tripId);
     if (budgetId) {
       const isoDate = fixDate(Hotel.startDate);
       const hotelTitle = `Accomodation: ${Hotel.hotelName}`;
@@ -45,9 +45,9 @@ export const addHotel = async (Hotel) => {
       await addSpend(newSpend);
     }
 
-    // ---------------------------------------
-    // Add itinerary entries for each night
-    // ---------------------------------------
+
+    // Add itinerary entries for each night -----------------------------------------------------
+
     const start = fixDate(Hotel.startDate);
     const end = fixDate(Hotel.endDate);
     const costPerNight = getCostPerNight(Hotel.cost, start, end);
@@ -55,10 +55,10 @@ export const addHotel = async (Hotel) => {
 
     for (const date of dates) {
       const itineraryItem = {
-        id: Date.now().toString() + Math.random(), // ensure unique id
+        id: Date.now().toString() + Math.random(),
         tripId: Hotel.tripId,
-        title: Hotel.hotelName,
-        date,                  // each night
+        title: `Accommodation: ${Hotel.hotelName}`,
+        date, 
         time: '',
         notes: '',
         cost: costPerNight.toFixed(2),
@@ -68,6 +68,7 @@ export const addHotel = async (Hotel) => {
 
       await addItineraryEntry(itineraryItem);
       console.log('✅ Added itinerary item:', itineraryItem);
+      getItineraries();
     }
 
   } catch (error) {
