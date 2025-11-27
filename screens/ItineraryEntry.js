@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Alert, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -17,15 +17,14 @@ import {
   deleteSpend,
 } from '../storage/budgetStorage';
 
-export default function ItineraryEntry({
-  visible,
-  onClose,
+export default function ItineraryEntryForm({
   tripId,
   tripStartDate,
   tripEndDate,
   selectedDate,
   initialData = {},
   onSaved,
+  onCancel,
 }) {
   const [form, setForm] = useState({
     id: null,
@@ -40,32 +39,24 @@ export default function ItineraryEntry({
   const [budgets, setBudgets] = useState([]);
   const [selectedBudgetId, setSelectedBudgetId] = useState('');
   const [showBudgetMenu, setShowBudgetMenu] = useState(false);
-
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const isEditing = !!form.id;
 
   const handleTimeChange = (event, selectedTime) => {
     setShowTimePicker(false);
-
     if (selectedTime) {
       const hours = selectedTime.getHours().toString().padStart(2, '0');
       const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
-      const formatted = `${hours}:${minutes}`;
-      setForm({ ...form, time: formatted });
+      setForm({ ...form, time: `${hours}:${minutes}` });
     }
   };
-
-  useEffect(() => {
-    if (visible) setShowBudgetMenu(false);
-  }, [visible]);
 
   useEffect(() => {
     if (tripId) {
       (async () => {
         const all = await getBudgets();
-        const filtered = all.filter(b => b.tripId === tripId);
-        setBudgets(filtered);
+        setBudgets(all.filter(b => b.tripId === tripId));
       })();
     }
   }, [tripId]);
@@ -98,7 +89,7 @@ export default function ItineraryEntry({
       spendId: null,
     });
     setSelectedBudgetId('');
-    onClose();
+    onCancel();
   };
 
   const handleSave = async () => {
@@ -107,11 +98,6 @@ export default function ItineraryEntry({
 
     if (!title.trim() || !date.trim()) {
       Alert.alert('Missing info', 'Please enter a title (and ensure a date is set).');
-      return;
-    }
-
-    if (!tripId) {
-      Alert.alert('No Trip Selected', 'Please select a trip first.');
       return;
     }
 
@@ -130,15 +116,14 @@ export default function ItineraryEntry({
     try {
       if (selectedBudgetId && parsedCost > 0) {
         if (newItem.spendId) {
-          const updatedSpend = {
+          await updateSpend({
             id: newItem.spendId,
             tripId,
             budgetId: selectedBudgetId,
             spendName: newItem.title,
             date: newItem.date.split('/').reverse().join('-'),
             spend: parsedCost,
-          };
-          await updateSpend(updatedSpend);
+          });
         } else {
           const spend = createSpend(
             selectedBudgetId,
@@ -190,172 +175,120 @@ export default function ItineraryEntry({
     ]);
   };
 
-  // -------------------------------------------
-  // RENDER
-  // -------------------------------------------
-
   return (
-    <View style={styles.modalOverlay} pointerEvents={visible ? 'auto' : 'none'}>
-      {visible && (
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>
-            {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
-          </Text>
+    <View>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>
+        {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
+      </Text>
 
-          {/* Title */}
-          <TextInput
-            label="Title"
-            mode="outlined"
-            placeholder="Title (e.g. Visit Eiffel Tower)"
-            value={form.title}
-            onChangeText={text => setForm({ ...form, title: text })}
-            style={styles.input}
-          />
+      {/* Title */}
+      <TextInput
+        label="Title"
+        mode="outlined"
+        placeholder="Title (e.g. Visit Eiffel Tower)"
+        value={form.title}
+        onChangeText={text => setForm({ ...form, title: text })}
+        style={{ marginBottom: 10 }}
+      />
 
-          {/* Budget Selector */}
-          <View>
-            <Menu
-              visible={showBudgetMenu}
-              onDismiss={() => setShowBudgetMenu(false)}
-              anchor={
-                <Button mode="outlined" onPress={() => setShowBudgetMenu(true)}>
-                  {selectedBudgetId
-                    ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
-                    : 'Select Budget (optional)'}
-                </Button>
-              }
-            >
-              {budgets.map(b => (
-                <Menu.Item
-                  key={b.id}
-                  onPress={() => {
-                    setShowBudgetMenu(false);
-                    setTimeout(() => setSelectedBudgetId(b.id), 100);
-                  }}
-                  title={b.budgetName}
-                />
-              ))}
-
-              <Divider />
-
-              <Menu.Item
-                onPress={() => {
-                  setShowBudgetMenu(false);
-                  setTimeout(() => setSelectedBudgetId(''), 100);
-                }}
-                title="No Budget"
-              />
-            </Menu>
-          </View>
-
-          {/* ------------------------------------------- */}
-          {/* TIME INPUT (Touchable wrapper fix)         */}
-          {/* ------------------------------------------- */}
-          <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-            <TextInput
-              label="Time (optional)"
-              mode="outlined"
-              placeholder="Select time"
-              value={form.time}
-              editable={false}
-              pointerEvents="none"
-              style={styles.input}
-            />
-          </TouchableOpacity>
-
-          {showTimePicker && (
-            <DateTimePicker
-              mode="time"
-              is24Hour={true}
-              value={
-                form.time
-                  ? new Date(`2000-01-01T${form.time}:00`)
-                  : new Date()
-              }
-              onChange={handleTimeChange}
-            />
-          )}
-
-          {/* Cost */}
-          <TextInput
-            label="Cost (optional)"
-            mode="outlined"
-            placeholder="e.g. 50"
-            value={form.cost}
-            onChangeText={text => setForm({ ...form, cost: text })}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-
-          {/* Notes */}
-          <TextInput
-            label="Notes (optional)"
-            mode="outlined"
-            placeholder="Notes..."
-            value={form.notes}
-            onChangeText={text => setForm({ ...form, notes: text })}
-            multiline
-            numberOfLines={3}
-            style={[styles.input, { height: 80 }]}
-          />
-
-          {/* Save Button */}
-          <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-            {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
-          </Button>
-
-          {/* Delete */}
-          {isEditing && (
-            <Button
-              icon="delete"
-              mode="outlined"
-              onPress={handleDelete}
-              style={[styles.deleteButton, { borderColor: 'red' }]}
-              textColor="red"
-            >
-              Delete Itinerary
+      {/* Budget Selector */}
+      <View>
+        <Menu
+          visible={showBudgetMenu}
+          onDismiss={() => setShowBudgetMenu(false)}
+          anchor={
+            <Button mode="outlined" onPress={() => setShowBudgetMenu(true)}>
+              {selectedBudgetId
+                ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
+                : 'Select Budget (optional)'}
             </Button>
-          )}
+          }
+        >
+          {budgets.map(b => (
+            <Menu.Item
+              key={b.id}
+              onPress={() => {
+                setShowBudgetMenu(false);
+                setTimeout(() => setSelectedBudgetId(b.id), 100);
+              }}
+              title={b.budgetName}
+            />
+          ))}
+          <Divider />
+          <Menu.Item
+            onPress={() => {
+              setShowBudgetMenu(false);
+              setTimeout(() => setSelectedBudgetId(''), 100);
+            }}
+            title="No Budget"
+          />
+        </Menu>
+      </View>
 
-          {/* Cancel */}
-          <Button onPress={resetForm} style={styles.cancelButton}>
-            Cancel
-          </Button>
-        </View>
+      {/* Time Picker */}
+      <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+        <TextInput
+          label="Time (optional)"
+          mode="outlined"
+          placeholder="Select time"
+          value={form.time}
+          editable={false}
+          pointerEvents="none"
+          style={{ marginBottom: 10 }}
+        />
+      </TouchableOpacity>
+
+      {showTimePicker && (
+        <DateTimePicker
+          mode="time"
+          is24Hour={true}
+          value={form.time ? new Date(`2000-01-01T${form.time}:00`) : new Date()}
+          onChange={handleTimeChange}
+        />
       )}
+
+      {/* Cost */}
+      <TextInput
+        label="Cost (optional)"
+        mode="outlined"
+        placeholder="e.g. 50"
+        value={form.cost}
+        onChangeText={text => setForm({ ...form, cost: text })}
+        keyboardType="numeric"
+        style={{ marginBottom: 10 }}
+      />
+
+      {/* Notes */}
+      <TextInput
+        label="Notes (optional)"
+        mode="outlined"
+        placeholder="Notes..."
+        value={form.notes}
+        onChangeText={text => setForm({ ...form, notes: text })}
+        multiline
+        numberOfLines={3}
+        style={{ marginBottom: 10, height: 80 }}
+      />
+
+      <Button mode="contained" onPress={handleSave} style={{ marginTop: 10 }}>
+        {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
+      </Button>
+
+      {isEditing && (
+        <Button
+          icon="delete"
+          mode="outlined"
+          onPress={handleDelete}
+          style={{ marginTop: 10, borderColor: 'red' }}
+          textColor="red"
+        >
+          Delete Itinerary
+        </Button>
+      )}
+
+      <Button onPress={resetForm} style={{ marginTop: 10 }}>
+        Cancel
+      </Button>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 20,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  input: {
-    marginBottom: 10,
-  },
-  saveButton: {
-    marginTop: 10,
-  },
-  deleteButton: {
-    marginTop: 10,
-  },
-  cancelButton: {
-    marginTop: 10,
-  },
-});

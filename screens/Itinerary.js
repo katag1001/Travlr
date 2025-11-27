@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Button, Portal, Modal } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar } from 'react-native-calendars';
-
 
 import { getItineraryForTrip } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
 import ViewCard from '../components/ViewCard';
-import ItineraryEntry from './ItineraryEntry';
+import ItineraryEntryForm from './ItineraryEntry';
 
 export default function Itinerary() {
   const { selectedTripId, selectedTrip } = useTrip();
@@ -29,22 +28,15 @@ export default function Itinerary() {
     }
   }, [selectedTripId]);
 
-  // ---------------------------------------------------------
-  // LOAD + SORT BY DATE AND TIME
-  // ---------------------------------------------------------
   const loadItinerary = async () => {
     const items = await getItineraryForTrip(selectedTripId);
-
     const sorted = [...items].sort((a, b) => {
       const aDate = a.date.split('/').reverse().join('-');
       const bDate = b.date.split('/').reverse().join('-');
-
       const aTime = a.time && a.time.length ? a.time : '23:59';
       const bTime = b.time && b.time.length ? b.time : '23:59';
-
       return new Date(`${aDate}T${aTime}`) - new Date(`${bDate}T${bTime}`);
     });
-
     setItinerary(sorted);
   };
 
@@ -65,13 +57,11 @@ export default function Itinerary() {
     setViewMode('calendar');
   };
 
-  // FILTER ITINERARY BY SELECTED DATE
   const filteredItinerary = selectedDate
     ? itinerary.filter((i) => i.date === selectedDate)
     : [];
 
-  // DATE RANGE MARKINGS
-  const getMarkedDates = (startDate, endDate, selectedDate = null) => {
+  const getMarkedDates = (startDate, endDate) => {
     if (!startDate || !endDate) return {};
     const dates = {};
     const date = new Date(startDate);
@@ -139,8 +129,7 @@ export default function Itinerary() {
               }}
               markedDates={getMarkedDates(
                 parseDate(selectedTrip?.startDate),
-                parseDate(selectedTrip?.endDate),
-                selectedDate
+                parseDate(selectedTrip?.endDate)
               )}
               markingType="custom"
             />
@@ -180,13 +169,8 @@ export default function Itinerary() {
                   setModalVisible(true);
                 }}
                 getTitle={(i) => i.title}
-
-                // 💡 Subtitle = date + time
                 getSubtitle={(i) => `${i.date}${i.time ? ` ${i.time}` : ''}`}
-
-                // 💡 Detail = notes
-                getDetail={(i) => (i.notes ? i.notes : '')}
-
+                getDetail={(i) => i.notes || ''}
                 getRight={(i) => (i.cost ? `£${i.cost}` : '')}
                 getIcon={(i) => null}
               />
@@ -194,17 +178,27 @@ export default function Itinerary() {
           </>
         )}
 
-        {/* MODAL ENTRY FORM */}
-        <ItineraryEntry
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          tripId={selectedTripId}
-          tripStartDate={selectedTrip ? parseDate(selectedTrip.startDate) : null}
-          tripEndDate={selectedTrip ? parseDate(selectedTrip.endDate) : null}
-          selectedDate={selectedDate} // keep selected date
-          initialData={editingItem}
-          onSaved={loadItinerary}
-        />
+        {/* PORTAL MODAL FOR ITINERARY ENTRY */}
+        <Portal>
+          <Modal
+            visible={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+            contentContainerStyle={styles.modalContainer}
+          >
+            <ItineraryEntryForm
+              tripId={selectedTripId}
+              tripStartDate={selectedTrip ? parseDate(selectedTrip.startDate) : null}
+              tripEndDate={selectedTrip ? parseDate(selectedTrip.endDate) : null}
+              selectedDate={selectedDate}
+              initialData={editingItem}
+              onSaved={() => {
+                loadItinerary();
+                setModalVisible(false);
+              }}
+              onCancel={() => setModalVisible(false)}
+            />
+          </Modal>
+        </Portal>
       </View>
     </SafeAreaView>
   );
@@ -235,5 +229,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     borderRadius: 10,
     elevation: 2,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
+    borderRadius: 8,
   },
 });
