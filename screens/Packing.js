@@ -1,32 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Keyboard,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-
-import {
-  Text,
-  Button,
-  Card,
-  TextInput,
-  Checkbox,
-  IconButton,
-  Divider,
-  Dialog,
-  Portal,
-} from 'react-native-paper';
-
+import {View,StyleSheet,Keyboard,TouchableWithoutFeedback,KeyboardAvoidingView,Platform,} from 'react-native';
+import {Text,Button,Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal} from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  getPackingListsForTrip,
-  addPackingList,
-  updatePackingList,
-  deletePackingList,
-} from '../storage/packingStorage';
+
+import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -34,7 +11,6 @@ import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
 
-// Import your shared ViewCard component
 import ViewCard from '../components/ViewCard';
 
 export default function Packing() {
@@ -57,9 +33,7 @@ export default function Packing() {
     setPackingLists(lists);
   };
 
-  // -------------------------
-  // PACKING LIST CRUD
-  // -------------------------
+
   const handleCreateList = async () => {
     const trimmed = newTypeName.trim();
     if (!trimmed || !selectedTripId) {
@@ -136,9 +110,6 @@ export default function Packing() {
     await loadPackingLists(selectedTripId);
   };
 
-  // -------------------------
-  // DIALOG HANDLERS
-  // -------------------------
   const showDialog = () => {
     setNewTypeName('');
     setErrorMsg('');
@@ -187,9 +158,6 @@ export default function Packing() {
 
             <Divider style={{ marginVertical: 10 }} />
 
-            {/* ----------------------------
-                LIST OF PACKING LIST TYPES
-               ---------------------------- */}
             {!activeList ? (
               <ViewCard
                 data={packingLists}
@@ -201,11 +169,7 @@ export default function Packing() {
                 getIcon={() => 'briefcase'}
               />
             ) : (
-              /* ----------------------------
-                  ACTIVE LIST ITEMS VIEW
-                 ---------------------------- */
               <View style={{ flex: 1 }}>
-                {/* Clickable card header for renaming */}
                 <Card style={styles.activeListHeader} onPress={showRenameDialog}>
                   <Card.Title
                     title={`List: ${activeList.type}`}
@@ -243,9 +207,6 @@ export default function Packing() {
               </View>
             )}
 
-            {/* ----------------------------
-                Dialog - Create New List
-               ---------------------------- */}
             <Portal>
               <Dialog visible={dialogVisible} onDismiss={hideDialog}>
                 <Dialog.Title>New Packing List</Dialog.Title>
@@ -269,9 +230,6 @@ export default function Packing() {
                 </Dialog.Actions>
               </Dialog>
 
-              {/* ----------------------------
-                  Dialog - Rename Active List
-                 ---------------------------- */}
               <Dialog visible={renameDialogVisible} onDismiss={hideRenameDialog}>
                 <Dialog.Title>Rename List</Dialog.Title>
                 <Dialog.Content>

@@ -2,19 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
 
-import {
-  addItineraryEntry,
-  updateItineraryEntry,
-  deleteItineraryEntry,
-} from '../storage/itineraryStorage';
-
-import {
-  getBudgets,
-  createSpend,
-  addSpend,
-  updateSpend,
-  deleteSpend,
-} from '../storage/budgetStorage';
+import {addItineraryEntry,updateItineraryEntry,deleteItineraryEntry,} from '../storage/itineraryStorage';
+import {getBudgets,createSpend,addSpend,updateSpend,deleteSpend} from '../storage/budgetStorage';
 
 export default function ItineraryEntry({
   visible,
@@ -29,7 +18,7 @@ export default function ItineraryEntry({
   const [form, setForm] = useState({
     id: null,
     title: '',
-    date: '',  // Date is set automatically
+    date: selectedDate || '',
     notes: '',
     cost: '',
     spendId: null,
@@ -42,10 +31,9 @@ export default function ItineraryEntry({
   const isEditing = !!form.id;
 
 
-  // Whenever modal opens
 useEffect(() => {
   if (visible) {
-    setShowBudgetMenu(false); // always start closed
+    setShowBudgetMenu(false); 
   }
 }, [visible]);
 
@@ -66,14 +54,14 @@ useEffect(() => {
       setForm({
         id: initialData.id,
         title: initialData.title || '',
-        date: initialData.date || selectedDate || '',  // Automatically set date from selectedDate
+        date: initialData.date || selectedDate || '', 
         notes: initialData.notes || '',
         cost: initialData.cost?.toString() || '',
         spendId: initialData.spendId || null,
       });
       setSelectedBudgetId(initialData.budgetId || '');
     } else if (selectedDate) {
-      // New entry with preselected date
+
       setForm(f => ({ ...f, date: selectedDate }));
     }
   }, [initialData, selectedDate]);
@@ -82,7 +70,7 @@ useEffect(() => {
     setForm({
       id: null,
       title: '',
-      date: '',  // Reset date automatically
+      date: '',  
       notes: '',
       cost: '',
       spendId: null,
@@ -91,7 +79,6 @@ useEffect(() => {
     onClose();
   };
 
-  // ✅ Save itinerary entry and optional linked spend
   const handleSave = async () => {
     const { id, title, date, notes, cost, spendId } = form;
     const parsedCost = parseFloat(cost) || 0;
@@ -118,10 +105,8 @@ useEffect(() => {
     };
 
     try {
-      // --- Handle Spend logic ---
       if (selectedBudgetId && parsedCost > 0) {
         if (newItem.spendId) {
-          // Update existing spend
           const updatedSpend = {
             id: newItem.spendId,
             tripId,
@@ -132,7 +117,6 @@ useEffect(() => {
           };
           await updateSpend(updatedSpend);
         } else {
-          // Create new spend
           const spend = createSpend(
             selectedBudgetId,
             newItem.title,
@@ -144,12 +128,11 @@ useEffect(() => {
           newItem.spendId = spend.id;
         }
       } else if (newItem.spendId) {
-        // Remove spend if budget removed or cost 0
         await deleteSpend(newItem.spendId);
         newItem.spendId = null;
       }
 
-      // --- Save itinerary entry ---
+
       if (isEditing) {
         await updateItineraryEntry(newItem);
       } else {
@@ -164,7 +147,7 @@ useEffect(() => {
     }
   };
 
-  // ✅ Delete itinerary and linked spend
+
   const handleDelete = async () => {
     Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
       { text: 'Cancel', style: 'cancel' },
@@ -204,7 +187,7 @@ useEffect(() => {
           />
 
 
-          {/* Budget Selector ----------------------------------------------------------------*/}
+{/* Budget Selector ----------------------------------------------------------------*/}
           
 <View>
   <Menu
@@ -225,8 +208,8 @@ useEffect(() => {
       <Menu.Item
   key={b.id}
   onPress={() => {
-    setShowBudgetMenu(false); // close menu first
-    setTimeout(() => setSelectedBudgetId(b.id), 100); // then set budget
+    setShowBudgetMenu(false); 
+    setTimeout(() => setSelectedBudgetId(b.id), 100); 
   }}
   title={b.budgetName}
 />
