@@ -100,7 +100,7 @@ export default function Budget() {
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
         <TripSelector />
 
-        <ScrollView>
+        <ScrollView style={styles.scrollArea}>
           {budgets.length > 0 && (
             <BudgetCard 
               budget={{
@@ -152,6 +152,8 @@ export default function Budget() {
             </Dialog.Actions>
           </Dialog>
         </Portal>
+
+
       </View>
     </SafeAreaView>
   );
@@ -163,6 +165,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     bottom: 0,
     marginBottom: 0,
+  },
+  scrollArea: {
+    flex: 1,
+    marginBottom: 0,
+    marginTop: 0,
   },
   container: {
     flex: 1,
