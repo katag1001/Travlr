@@ -1,9 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,Keyboard,TouchableWithoutFeedback,KeyboardAvoidingView,Platform,} from 'react-native';
-import {Text,Button,Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal} from 'react-native-paper';
+import {
+  View,
+  StyleSheet,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
+} from 'react-native';
+import {
+  Text,
+  Button,
+  Card,
+  TextInput,
+  Checkbox,
+  IconButton,
+  Divider,
+  Dialog,
+  Portal,
+  FAB
+} from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
+import {
+  getPackingListsForTrip,
+  addPackingList,
+  updatePackingList,
+  deletePackingList,
+} from '../storage/packingStorage';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -33,10 +57,15 @@ export default function Packing() {
     setPackingLists(lists);
   };
 
+  const handleDeleteList = async (listId) => {
+    await deletePackingList(listId);
+    if (activeList?.id === listId) setActiveList(null);
+    await loadPackingLists(selectedTripId);
+  };
 
   const handleCreateList = async () => {
     const trimmed = newTypeName.trim();
-    if (!trimmed || !selectedTripId) {
+    if (!trimmed) {
       setErrorMsg('List name is required.');
       return;
     }
@@ -50,12 +79,6 @@ export default function Packing() {
 
     await addPackingList(newList);
     hideDialog();
-    await loadPackingLists(selectedTripId);
-  };
-
-  const handleDeleteList = async (listId) => {
-    await deletePackingList(listId);
-    if (activeList?.id === listId) setActiveList(null);
     await loadPackingLists(selectedTripId);
   };
 
@@ -98,7 +121,7 @@ export default function Packing() {
 
   const handleRenameList = async () => {
     const trimmed = newTypeName.trim();
-    if (!trimmed || !activeList) {
+    if (!trimmed) {
       setErrorMsg('List name is required.');
       return;
     }
@@ -144,68 +167,67 @@ export default function Packing() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
             {selectedTrip && <Banner theme={selectedTrip.theme} />}
-
             <TripSelector />
 
-            <Button
+            <ScrollView style={styles.scrollArea}>
+              <Divider style={{ marginVertical: 10 }} />
+
+              {!activeList ? (
+                <ViewCard
+                  data={packingLists}
+                  onPressItem={(item) => setActiveList(item)}
+                  getTitle={(pl) => pl.type}
+                  getSubtitle={() => ''}
+                  getDetail={(pl) => `${pl.items.length} items`}
+                  getRight={() => ''}
+                  getIcon={() => 'briefcase'}
+                  deleteItem={async (pl) => {
+                    await handleDeleteList(pl.id);
+                  }}
+                />
+              ) : (
+                <View style={{ flex: 1 }}>
+                  <Card style={styles.activeListHeader} onPress={showRenameDialog}>
+                    <Card.Title
+                      title={`List: ${activeList.type}`}
+                      right={() => <Button onPress={() => setActiveList(null)}>Back</Button>}
+                    />
+                  </Card>
+
+                  {activeList.items.map((item) => (
+                    <View key={item.id} style={styles.itemRow}>
+                      <Checkbox
+                        status={item.checked ? 'checked' : 'unchecked'}
+                        onPress={() => toggleItemChecked(item.id)}
+                      />
+                      <Text style={styles.itemText}>{item.item}</Text>
+                      <IconButton icon="delete" onPress={() => handleDeleteItem(item.id)} />
+                    </View>
+                  ))}
+
+                  <TextInput
+                    label="New Item"
+                    value={newItemName}
+                    onChangeText={setNewItemName}
+                    mode="outlined"
+                    style={styles.input}
+                  />
+
+                  <Button mode="contained" onPress={handleAddItemToActive}>
+                    Add Item
+                  </Button>
+                </View>
+              )}
+            </ScrollView>
+
+            {/* FAB fixed outside ScrollView */}
+            <FAB
               icon="plus"
+              style={styles.fab}
+              label="New List"
               onPress={showDialog}
               disabled={!selectedTripId}
-              style={styles.button}
-            >
-              New List
-            </Button>
-
-            <Divider style={{ marginVertical: 10 }} />
-
-            {!activeList ? (
-              <ViewCard
-                data={packingLists}
-                onPressItem={(item) => setActiveList(item)}
-                getTitle={(pl) => pl.type}
-                getSubtitle={() => ''}
-                getDetail={(pl) => `${pl.items.length} items`}
-                getRight={() => ''}
-                getIcon={() => 'briefcase'}
-              />
-            ) : (
-              <View style={{ flex: 1 }}>
-                <Card style={styles.activeListHeader} onPress={showRenameDialog}>
-                  <Card.Title
-                    title={`List: ${activeList.type}`}
-                    right={() => (
-                      <Button onPress={() => setActiveList(null)}>Back</Button>
-                    )}
-                  />
-                </Card>
-
-                {activeList.items.map((item) => (
-                  <View key={item.id} style={styles.itemRow}>
-                    <Checkbox
-                      status={item.checked ? 'checked' : 'unchecked'}
-                      onPress={() => toggleItemChecked(item.id)}
-                    />
-                    <Text style={styles.itemText}>{item.item}</Text>
-                    <IconButton
-                      icon="delete"
-                      onPress={() => handleDeleteItem(item.id)}
-                    />
-                  </View>
-                ))}
-
-                <TextInput
-                  label="New Item"
-                  value={newItemName}
-                  onChangeText={setNewItemName}
-                  mode="outlined"
-                  style={styles.input}
-                />
-
-                <Button mode="contained" onPress={handleAddItemToActive}>
-                  Add Item
-                </Button>
-              </View>
-            )}
+            />
 
             <Portal>
               <Dialog visible={dialogVisible} onDismiss={hideDialog}>
@@ -218,11 +240,7 @@ export default function Packing() {
                     mode="outlined"
                     style={styles.input}
                   />
-                  {errorMsg ? (
-                    <Text style={{ color: 'red', marginBottom: 10 }}>
-                      {errorMsg}
-                    </Text>
-                  ) : null}
+                  {errorMsg ? <Text style={{ color: 'red' }}>{errorMsg}</Text> : null}
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={hideDialog}>Cancel</Button>
@@ -240,11 +258,7 @@ export default function Packing() {
                     mode="outlined"
                     style={styles.input}
                   />
-                  {errorMsg ? (
-                    <Text style={{ color: 'red', marginBottom: 10 }}>
-                      {errorMsg}
-                    </Text>
-                  ) : null}
+                  {errorMsg ? <Text style={{ color: 'red' }}>{errorMsg}</Text> : null}
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={hideRenameDialog}>Cancel</Button>
@@ -263,8 +277,17 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'pink' },
   container: { flex: 1, padding: 16 },
   input: { marginVertical: 10 },
-  button: { marginVertical: 8, backgroundColor: 'purple', color: 'white' },
   activeListHeader: { marginBottom: 10 },
   itemRow: { flexDirection: 'row', alignItems: 'center' },
   itemText: { flex: 1, fontSize: 16 },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16, 
+  },
+  scrollArea: {
+    flex: 1,
+    marginBottom: 0,
+    marginTop: 0,
+  },
 });

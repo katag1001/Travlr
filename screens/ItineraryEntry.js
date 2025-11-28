@@ -6,7 +6,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   addItineraryEntry,
   updateItineraryEntry,
-  deleteItineraryEntry,
 } from '../storage/itineraryStorage';
 
 import {
@@ -154,27 +153,6 @@ export default function ItineraryEntryForm({
     }
   };
 
-  const handleDelete = async () => {
-    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            if (form.spendId) await deleteSpend(form.spendId);
-            await deleteItineraryEntry(form.id);
-            resetForm();
-            if (onSaved) onSaved();
-          } catch (err) {
-            console.error('Error deleting itinerary:', err);
-            Alert.alert('Error', 'Failed to delete itinerary entry.');
-          }
-        },
-      },
-    ]);
-  };
-
   return (
     <View>
       <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>
@@ -273,18 +251,6 @@ export default function ItineraryEntryForm({
       <Button mode="contained" onPress={handleSave} style={{ marginTop: 10 }}>
         {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
       </Button>
-
-      {isEditing && (
-        <Button
-          icon="delete"
-          mode="outlined"
-          onPress={handleDelete}
-          style={{ marginTop: 10, borderColor: 'red' }}
-          textColor="red"
-        >
-          Delete Itinerary
-        </Button>
-      )}
 
       <Button onPress={resetForm} style={{ marginTop: 10 }}>
         Cancel

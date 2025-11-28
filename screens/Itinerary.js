@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, Button, Portal, Modal } from 'react-native-paper';
+import { View, StyleSheet, Alert } from 'react-native';
+import { Text, Button, Portal, Modal, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar } from 'react-native-calendars';
 
-import { getItineraryForTrip } from '../storage/itineraryStorage';
+import { getItineraryForTrip, deleteItineraryEntry } from '../storage/itineraryStorage';
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
@@ -90,27 +90,38 @@ export default function Itinerary() {
     return dates;
   };
 
+  const handleDeleteItinerary = (item) => {
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            if (item.spendId) await deleteItineraryEntry(item.spendId);
+            await deleteItineraryEntry(item.id);
+            loadItinerary();
+          } catch (err) {
+            console.error('Error deleting itinerary:', err);
+            Alert.alert('Error', 'Failed to delete itinerary entry.');
+          }
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
         <TripSelector />
 
-        {/* CALENDAR VIEW */}
         {selectedTripId && viewMode === 'calendar' && (
           <View style={styles.calendarContainer}>
             <Calendar
               onDayPress={handleDaySelect}
-              minDate={
-                selectedTrip
-                  ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0]
-                  : undefined
-              }
-              maxDate={
-                selectedTrip
-                  ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0]
-                  : undefined
-              }
+              minDate={selectedTrip ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0] : undefined}
+              maxDate={selectedTrip ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0] : undefined}
               style={styles.calendar}
               hideExtraDays={true}
               disableMonthChange={true}
@@ -136,7 +147,6 @@ export default function Itinerary() {
           </View>
         )}
 
-        {/* DAY VIEW */}
         {selectedTripId && viewMode === 'day' && (
           <>
             <Button onPress={handleBackToCalendar} style={{ marginBottom: 10 }}>
@@ -146,6 +156,20 @@ export default function Itinerary() {
             <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
               Itinerary for {selectedDate}
             </Text>
+
+            <ViewCard
+              data={filteredItinerary}
+              onPressItem={(item) => {
+                setEditingItem(item);
+                setModalVisible(true);
+              }}
+              getTitle={(i) => i.title}
+              getSubtitle={(i) => `${i.date}${i.time ? ` ${i.time}` : ''}`}
+              getDetail={(i) => i.notes || ''}
+              getRight={(i) => (i.cost ? `£${i.cost}` : '')}
+              getIcon={(i) => null}
+              deleteItem={handleDeleteItinerary} // new delete handler
+            />
 
             <Button
               icon="plus"
@@ -158,27 +182,9 @@ export default function Itinerary() {
             >
               Add Itinerary Item
             </Button>
-
-            {filteredItinerary.length === 0 ? (
-              <Text>No itinerary items for this date.</Text>
-            ) : (
-              <ViewCard
-                data={filteredItinerary}
-                onPressItem={(item) => {
-                  setEditingItem(item);
-                  setModalVisible(true);
-                }}
-                getTitle={(i) => i.title}
-                getSubtitle={(i) => `${i.date}${i.time ? ` ${i.time}` : ''}`}
-                getDetail={(i) => i.notes || ''}
-                getRight={(i) => (i.cost ? `£${i.cost}` : '')}
-                getIcon={(i) => null}
-              />
-            )}
           </>
         )}
 
-        {/* PORTAL MODAL FOR ITINERARY ENTRY */}
         <Portal>
           <Modal
             visible={modalVisible}
