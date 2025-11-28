@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 16,
-    bottom: 16, 
+    bottom: 25, 
   },
   scrollArea: {
     flex: 1,

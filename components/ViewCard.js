@@ -135,11 +135,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     minHeight: 70,
+    marginHorizontal: 4,
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: 16,
+    padding: 18,
     position: 'relative',
   },
   avatarBackground: { backgroundColor: '#ece9e2' },
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     position: 'absolute',
-    bottom: 4,
-    right: 4,
+    bottom: 0,
+    right: 0,
   },
 });
