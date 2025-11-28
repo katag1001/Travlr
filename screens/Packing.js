@@ -6,8 +6,9 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Text,
   Button,
@@ -18,9 +19,9 @@ import {
   Divider,
   Dialog,
   Portal,
-  FAB
 } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   getPackingListsForTrip,
@@ -29,25 +30,26 @@ import {
   deletePackingList,
 } from '../storage/packingStorage';
 
-import { v4 as uuidv4 } from 'uuid';
-
 import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
-
 import ViewCard from '../components/ViewCard';
+import ReusableFab from '../components/ReusableFab';   // ← NEW SHARED FAB
 
 export default function Packing() {
   const { selectedTripId, selectedTrip } = useTrip();
 
   const [packingLists, setPackingLists] = useState([]);
   const [activeList, setActiveList] = useState(null);
+
   const [newTypeName, setNewTypeName] = useState('');
   const [newItemName, setNewItemName] = useState('');
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [renameDialogVisible, setRenameDialogVisible] = useState(false);
 
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [renameDialogVisible, setRenameDialogVisible] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  // Load lists on trip change
   useEffect(() => {
     if (selectedTripId) loadPackingLists(selectedTripId);
   }, [selectedTripId]);
@@ -55,12 +57,6 @@ export default function Packing() {
   const loadPackingLists = async (tripId) => {
     const lists = await getPackingListsForTrip(tripId);
     setPackingLists(lists);
-  };
-
-  const handleDeleteList = async (listId) => {
-    await deletePackingList(listId);
-    if (activeList?.id === listId) setActiveList(null);
-    await loadPackingLists(selectedTripId);
   };
 
   const handleCreateList = async () => {
@@ -79,44 +75,7 @@ export default function Packing() {
 
     await addPackingList(newList);
     hideDialog();
-    await loadPackingLists(selectedTripId);
-  };
-
-  const handleAddItemToActive = async () => {
-    if (!activeList || !newItemName.trim()) return;
-
-    const updated = {
-      ...activeList,
-      items: [
-        ...activeList.items,
-        { id: uuidv4(), item: newItemName.trim(), checked: false },
-      ],
-    };
-
-    await updatePackingList(updated);
-    setNewItemName('');
-    setActiveList(updated);
-    await loadPackingLists(selectedTripId);
-  };
-
-  const toggleItemChecked = async (itemId) => {
-    const updatedItems = activeList.items.map((it) =>
-      it.id === itemId ? { ...it, checked: !it.checked } : it
-    );
-
-    const updatedList = { ...activeList, items: updatedItems };
-    await updatePackingList(updatedList);
-    setActiveList(updatedList);
-    await loadPackingLists(selectedTripId);
-  };
-
-  const handleDeleteItem = async (itemId) => {
-    const updatedItems = activeList.items.filter((it) => it.id !== itemId);
-    const updatedList = { ...activeList, items: updatedItems };
-
-    await updatePackingList(updatedList);
-    setActiveList(updatedList);
-    await loadPackingLists(selectedTripId);
+    loadPackingLists(selectedTripId);
   };
 
   const handleRenameList = async () => {
@@ -128,11 +87,59 @@ export default function Packing() {
 
     const updatedList = { ...activeList, type: trimmed };
     await updatePackingList(updatedList);
-    setActiveList(updatedList);
+
     hideRenameDialog();
-    await loadPackingLists(selectedTripId);
+    setActiveList(updatedList);
+    loadPackingLists(selectedTripId);
   };
 
+  const handleDeleteList = async (listId) => {
+    await deletePackingList(listId);
+    if (activeList?.id === listId) setActiveList(null);
+    loadPackingLists(selectedTripId);
+  };
+
+  const handleAddItemToActive = async () => {
+    if (!activeList || !newItemName.trim()) return;
+
+    const updatedList = {
+      ...activeList,
+      items: [
+        ...activeList.items,
+        { id: uuidv4(), item: newItemName.trim(), checked: false },
+      ],
+    };
+
+    await updatePackingList(updatedList);
+    setActiveList(updatedList);
+    setNewItemName('');
+    loadPackingLists(selectedTripId);
+  };
+
+  const toggleItemChecked = async (itemId) => {
+    const updatedItems = activeList.items.map((it) =>
+      it.id === itemId ? { ...it, checked: !it.checked } : it
+    );
+
+    const updatedList = { ...activeList, items: updatedItems };
+    await updatePackingList(updatedList);
+
+    setActiveList(updatedList);
+    loadPackingLists(selectedTripId);
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    const updatedList = {
+      ...activeList,
+      items: activeList.items.filter((it) => it.id !== itemId),
+    };
+
+    await updatePackingList(updatedList);
+    setActiveList(updatedList);
+    loadPackingLists(selectedTripId);
+  };
+
+  // ————— Dialog Helpers —————
   const showDialog = () => {
     setNewTypeName('');
     setErrorMsg('');
@@ -164,7 +171,7 @@ export default function Packing() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
             {selectedTrip && <Banner theme={selectedTrip.theme} />}
             <TripSelector />
@@ -176,21 +183,24 @@ export default function Packing() {
                 <ViewCard
                   data={packingLists}
                   onPressItem={(item) => setActiveList(item)}
+                  getIcon={() => 'briefcase'}
                   getTitle={(pl) => pl.type}
                   getSubtitle={() => ''}
                   getDetail={(pl) => `${pl.items.length} items`}
                   getRight={() => ''}
-                  getIcon={() => 'briefcase'}
-                  deleteItem={async (pl) => {
-                    await handleDeleteList(pl.id);
-                  }}
+                  deleteItem={(pl) => handleDeleteList(pl.id)}
                 />
               ) : (
                 <View style={{ flex: 1 }}>
-                  <Card style={styles.activeListHeader} onPress={showRenameDialog}>
+                  <Card
+                    style={styles.activeListHeader}
+                    onPress={showRenameDialog}
+                  >
                     <Card.Title
-                      title={`List: ${activeList.type}`}
-                      right={() => <Button onPress={() => setActiveList(null)}>Back</Button>}
+                      title={`${activeList.type}`}
+                      right={() => (
+                        <Button onPress={() => setActiveList(null)}>Back</Button>
+                      )}
                     />
                   </Card>
 
@@ -201,7 +211,10 @@ export default function Packing() {
                         onPress={() => toggleItemChecked(item.id)}
                       />
                       <Text style={styles.itemText}>{item.item}</Text>
-                      <IconButton icon="delete" onPress={() => handleDeleteItem(item.id)} />
+                      <IconButton
+                        icon="delete"
+                        onPress={() => handleDeleteItem(item.id)}
+                      />
                     </View>
                   ))}
 
@@ -220,15 +233,16 @@ export default function Packing() {
               )}
             </ScrollView>
 
-            {/* FAB fixed outside ScrollView */}
-            <FAB
-              icon="plus"
-              style={styles.fab}
-              label="New List"
-              onPress={showDialog}
-              disabled={!selectedTripId}
-            />
+            {/* Shared FAB */}
+            {selectedTripId && (
+              <ReusableFab
+                icon="plus"
+                label="New List"
+                onPress={showDialog}
+              />
+            )}
 
+            {/* Dialogs */}
             <Portal>
               <Dialog visible={dialogVisible} onDismiss={hideDialog}>
                 <Dialog.Title>New Packing List</Dialog.Title>
@@ -240,7 +254,9 @@ export default function Packing() {
                     mode="outlined"
                     style={styles.input}
                   />
-                  {errorMsg ? <Text style={{ color: 'red' }}>{errorMsg}</Text> : null}
+                  {errorMsg ? (
+                    <Text style={styles.error}>{errorMsg}</Text>
+                  ) : null}
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={hideDialog}>Cancel</Button>
@@ -258,7 +274,9 @@ export default function Packing() {
                     mode="outlined"
                     style={styles.input}
                   />
-                  {errorMsg ? <Text style={{ color: 'red' }}>{errorMsg}</Text> : null}
+                  {errorMsg ? (
+                    <Text style={styles.error}>{errorMsg}</Text>
+                  ) : null}
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button onPress={hideRenameDialog}>Cancel</Button>
@@ -276,18 +294,10 @@ export default function Packing() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'pink' },
   container: { flex: 1, padding: 16 },
+  scrollArea: { flex: 1 },
   input: { marginVertical: 10 },
   activeListHeader: { marginBottom: 10 },
   itemRow: { flexDirection: 'row', alignItems: 'center' },
   itemText: { flex: 1, fontSize: 16 },
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 25, 
-  },
-  scrollArea: {
-    flex: 1,
-    marginBottom: 0,
-    marginTop: 0,
-  },
+  error: { color: 'red', marginTop: 4 },
 });

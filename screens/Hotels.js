@@ -20,6 +20,7 @@ import {
 } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+
 import {
   getHotelsForTrip,
   addHotel,
@@ -31,6 +32,7 @@ import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
 import ViewCard from '../components/ViewCard';
+import ReusableFab from '../components/ReusableFab';
 
 export default function Hotels() {
   const { selectedTripId, selectedTrip } = useTrip();
@@ -210,13 +212,13 @@ export default function Hotels() {
             </ScrollView>
 
             {selectedTripId && (
-              <FAB
-                icon="plus"
-                label="Add Hotel"
-                style={styles.fab}
-                onPress={() => setShowForm(true)}
-              />
-            )}
+  <ReusableFab
+    icon="plus"
+    label="Add Hotel"
+    onPress={() => setShowForm(true)}
+  />
+)}
+
 
             <Portal>
               <Modal
