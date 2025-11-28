@@ -10,7 +10,7 @@ export default function ViewCard({
   getDetail = () => '',
   getRight = () => '',
   getIcon = null,
-  deleteItem = null, // optional delete function
+  deleteItem = null, 
 }) {
   const iconKeywordMap = {
     hotel: 'bed',
@@ -78,7 +78,7 @@ export default function ViewCard({
           <Card key={item.id || index} style={styles.card}>
             <TouchableOpacity onPress={() => onPressItem(item)}>
               <View style={styles.cardContent}>
-                {/* Left icon */}
+                
                 <Avatar.Icon
                   icon={icon}
                   color={'#263041'}
@@ -86,7 +86,7 @@ export default function ViewCard({
                   size={40}
                 />
 
-                {/* Main text */}
+                
                 <View style={styles.textContainer}>
                   <View style={styles.titleRow}>
                     <Text style={styles.titleText}>{title}</Text>
@@ -99,12 +99,12 @@ export default function ViewCard({
                   ) : null}
                 </View>
 
-                {/* Top-right content (cost/label) */}
+                
                 {getRight(item) ? (
                   <Text style={styles.rightContent}>{getRight(item)}</Text>
                 ) : null}
 
-                {/* Bottom-right delete button */}
+                
                 {deleteItem && (
                   <IconButton
                     icon="delete"
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   avatarBackground: { backgroundColor: '#ece9e2' },
-  textContainer: { flex: 1, marginLeft: 12 },
+  textContainer: { flex: 1, marginLeft: 12,  paddingRight: 60 },
   titleRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
   titleText: { fontWeight: '650', fontSize: 16, color: '#263041', marginRight: 8 },
   subtitle1: { fontSize: 13, color: '#5c5f62', fontWeight: '400' },
