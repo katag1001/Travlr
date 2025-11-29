@@ -1,32 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
+import { Text, Button, TextInput, Dialog, Portal,IconButton } from 'react-native-paper';
 
 import Banner from '../components/Banner';
-import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import BudgetCard from '../components/BudgetCard';
-
+import ReusableFab from '../components/ReusableFab';
 import SpendView from './Spend';
 
-import {
-  getBudgets,
-  createBudget,
-  saveBudgets,
-  deleteBudget as removeBudget,
-} from '../storage/budgetStorage';
+import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
 
-export default function Budget() {
+export default function Budget({ navigation }) {
   const [budgets, setBudgets] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [budgetName, setBudgetName] = useState('');
   const [budgetTotal, setBudgetTotal] = useState('');
   const [editingBudget, setEditingBudget] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [activeBudget, setActiveBudget] = useState(null);
 
   const { selectedTripId, selectedTrip } = useTrip();
-  const [activeBudget, setActiveBudget] = useState(null);
 
   const loadBudgets = async () => {
     const all = await getBudgets();
@@ -67,14 +61,12 @@ export default function Budget() {
       return;
     }
     if (isNaN(total) || total <= 0) {
-      setErrorMsg('Total amount must be a positive number.');
+      setErrorMsg('Total amount must be positive.');
       return;
     }
 
     if (editingBudget) {
-      const updated = budgets.map(b =>
-        b.id === editingBudget.id ? { ...b, budgetName, total } : b
-      );
+      const updated = budgets.map(b => b.id === editingBudget.id ? { ...b, budgetName, total } : b);
       await saveBudgets(updated);
     } else {
       const newBudget = createBudget(budgetName, total, selectedTripId);
@@ -98,46 +90,58 @@ export default function Budget() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {selectedTrip && <Banner theme={selectedTrip.theme} />}
-        <TripSelector />
+
+        <View style={styles.backRow}>
+              <IconButton
+                icon="arrow-left"
+                size={26}
+                onPress={() => navigation.goBack()}
+              />
+              <Text style={styles.pageTitle}>Budget</Text>
+            </View>
 
         <ScrollView style={styles.scrollArea}>
-          {budgets.length > 0 && (
-            <BudgetCard 
-              budget={{
-                total: budgets.reduce((sum, b) => sum + b.total, 0),
-                spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
-              }} 
-              isTotal
-            />
-          )}
-
-          <FlatList
-            data={budgets}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
+          {budgets.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                No budgets yet — tap "+" to add one!
+              </Text>
+            </View>
+          ) : (
+            <>
               <BudgetCard
-                budget={item}
-                onEdit={() => showDialog(item)}
-                onDelete={() => handleDeleteBudget(item.id)}
-                onPress={() => setActiveBudget(item)}
+                budget={{
+                  total: budgets.reduce((sum, b) => sum + b.total, 0),
+                  spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
+                }}
+                isTotal
               />
-            )}
-            numColumns={1}
-            scrollEnabled={false}
-          />
+              <FlatList
+                data={budgets}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => (
+                  <BudgetCard
+                    budget={item}
+                    onEdit={() => showDialog(item)}
+                    onDelete={() => handleDeleteBudget(item.id)}
+                    onPress={() => setActiveBudget(item)}
+                  />
+                )}
+                scrollEnabled={false}
+              />
+            </>
+          )}
         </ScrollView>
 
-        <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Budget" />
+        {selectedTripId && (
+          <ReusableFab icon="plus" label="Add Budget" onPress={() => showDialog()} />
+        )}
 
         <Portal>
           <Dialog visible={dialogVisible} onDismiss={hideDialog}>
             <Dialog.Title>{editingBudget ? 'Edit Budget' : 'New Budget'}</Dialog.Title>
             <Dialog.Content>
-              <TextInput
-                label="Budget Name"
-                value={budgetName}
-                onChangeText={setBudgetName}
-              />
+              <TextInput label="Budget Name" value={budgetName} onChangeText={setBudgetName} />
               <TextInput
                 label="Total Amount"
                 value={budgetTotal}
@@ -152,32 +156,18 @@ export default function Budget() {
             </Dialog.Actions>
           </Dialog>
         </Portal>
-
-
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'pink',
-    bottom: 0,
-    marginBottom: 0,
-  },
-  scrollArea: {
-    flex: 1,
-    marginBottom: 0,
-    marginTop: 0,
-  },
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 0,
-  },
+  safeArea: { flex: 1, backgroundColor: 'pink' },
+  container: { flex: 1, padding: 16 },
+  scrollArea: { flex: 1 },
+  backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
+  fab: { position: 'absolute', right: 16, bottom: 16 },
+  emptyContainer: { marginTop: 50, alignItems: 'center', justifyContent: 'center', padding: 20 },
+  emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
 });

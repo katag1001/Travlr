@@ -6,6 +6,12 @@ export const TripProvider = ({ children }) => {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [selectedTrip, setSelectedTrip] = useState(null);
 
+  // Helper for selecting trips consistently
+  const selectTrip = (trip) => {
+    setSelectedTripId(trip?.id ?? null);
+    setSelectedTrip(trip ?? null);
+  };
+
   return (
     <TripContext.Provider
       value={{
@@ -13,6 +19,7 @@ export const TripProvider = ({ children }) => {
         setSelectedTripId,
         selectedTrip,
         setSelectedTrip,
+        selectTrip,
       }}
     >
       {children}

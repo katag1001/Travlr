@@ -16,10 +16,9 @@ import {
   Button,
   Modal,
   Portal,
-  FAB
+  IconButton
 } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
 
 import {
   getHotelsForTrip,
@@ -28,13 +27,12 @@ import {
   deleteHotel,
 } from '../storage/hotelStorage';
 
-import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
 
-export default function Hotels() {
+export default function Hotels({ navigation }) {
   const { selectedTripId, selectedTrip } = useTrip();
 
   const [hotels, setHotels] = useState([]);
@@ -182,9 +180,7 @@ export default function Hotels() {
       day: 'numeric',
     });
 
-    return `${fmt.format(s)}–${fmt.format(e)} · ${nights} ${
-      nights === 1 ? 'Night' : 'Nights'
-    }`;
+    return `${fmt.format(s)}–${fmt.format(e)} · ${nights} ${nights === 1 ? 'Night' : 'Nights'}`;
   };
 
   return (
@@ -195,31 +191,52 @@ export default function Hotels() {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
+
+            {/* Banner */}
             {selectedTrip && <Banner theme={selectedTrip.theme} />}
-            <TripSelector />
+
+           
+            <View style={styles.backRow}>
+              <IconButton
+                icon="arrow-left"
+                size={26}
+                onPress={() => navigation.goBack()}
+              />
+              <Text style={styles.pageTitle}>Hotels</Text>
+            </View>
 
             <ScrollView style={styles.scrollArea}>
-              <ViewCard
-                data={hotels}
-                onPressItem={handleEdit}
-                getIcon={() => 'bed'}
-                getTitle={(h) => h.hotelName || 'Unnamed Hotel'}
-                getSubtitle={(h) => h.hotelPlace}
-                getDetail={(h) => formatStayDetail(h.startDate, h.endDate)}
-                getRight={(h) => (h.cost ? `£${h.cost}` : '')}
-                deleteItem={(h) => handleDelete(h.id)}
-              />
+              
+              {hotels.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>
+                    No hotels yet — tap to add one!
+                  </Text>
+                </View>
+              ) : (
+                <ViewCard
+                  data={hotels}
+                  onPressItem={handleEdit}
+                  getIcon={() => 'bed'}
+                  getTitle={(h) => h.hotelName || 'Unnamed Hotel'}
+                  getSubtitle={(h) => h.hotelPlace}
+                  getDetail={(h) => formatStayDetail(h.startDate, h.endDate)}
+                  getRight={(h) => (h.cost ? `£${h.cost}` : '')}
+                  deleteItem={(h) => handleDelete(h.id)}
+                />
+              )}
             </ScrollView>
 
+            {/* FAB */}
             {selectedTripId && (
-  <ReusableFab
-    icon="plus"
-    label="Add Hotel"
-    onPress={() => setShowForm(true)}
-  />
-)}
+              <ReusableFab
+                icon="plus"
+                label="Add Hotel"
+                onPress={() => setShowForm(true)}
+              />
+            )}
 
-
+            {/* Modal Form */}
             <Portal>
               <Modal
                 visible={showForm}
@@ -308,6 +325,7 @@ export default function Hotels() {
                 <Button onPress={resetForm}>Cancel</Button>
               </Modal>
             </Portal>
+
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -324,15 +342,29 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  pageTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
   scrollArea: {
     flex: 1,
-    marginTop: 0,
-    marginBottom: 0,
   },
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 25,
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
   },
   modalContainer: {
     backgroundColor: 'white',

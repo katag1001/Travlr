@@ -30,13 +30,12 @@ import {
   deletePackingList,
 } from '../storage/packingStorage';
 
-import TripSelector from '../components/TripSelector';
 import { useTrip } from '../components/TripContext';
 import Banner from '../components/Banner';
 import ViewCard from '../components/ViewCard';
-import ReusableFab from '../components/ReusableFab';   // ← NEW SHARED FAB
+import ReusableFab from '../components/ReusableFab';
 
-export default function Packing() {
+export default function Packing({ navigation }) {
   const { selectedTripId, selectedTrip } = useTrip();
 
   const [packingLists, setPackingLists] = useState([]);
@@ -49,7 +48,6 @@ export default function Packing() {
   const [renameDialogVisible, setRenameDialogVisible] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Load lists on trip change
   useEffect(() => {
     if (selectedTripId) loadPackingLists(selectedTripId);
   }, [selectedTripId]);
@@ -174,12 +172,28 @@ export default function Packing() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
             {selectedTrip && <Banner theme={selectedTrip.theme} />}
-            <TripSelector />
+
+            
+            <View style={styles.backRow}>
+              <IconButton
+                icon="arrow-left"
+                size={26}
+                onPress={() => navigation.goBack()}
+              />
+              <Text style={styles.pageTitle}>Packing</Text>
+            </View>
 
             <ScrollView style={styles.scrollArea}>
               <Divider style={{ marginVertical: 10 }} />
 
-              {!activeList ? (
+              {/* EMPTY STATE */}
+              {packingLists.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>
+                    No lists yet — tap "+" to add one!
+                  </Text>
+                </View>
+              ) : !activeList ? (
                 <ViewCard
                   data={packingLists}
                   onPressItem={(item) => setActiveList(item)}
@@ -294,10 +308,31 @@ export default function Packing() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'pink' },
   container: { flex: 1, padding: 16 },
+  backRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  pageTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
   scrollArea: { flex: 1 },
   input: { marginVertical: 10 },
   activeListHeader: { marginBottom: 10 },
   itemRow: { flexDirection: 'row', alignItems: 'center' },
   itemText: { flex: 1, fontSize: 16 },
   error: { color: 'red', marginTop: 4 },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
 });

@@ -1,3 +1,5 @@
+// NOT IN USE ------------------
+//////////////////////////////////////////////
 import React from 'react';
 import { BottomNavigation } from 'react-native-paper';
 
