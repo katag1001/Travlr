@@ -93,7 +93,8 @@ export default function Itinerary({ navigation }) {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
-            {selectedTrip && <Banner theme={selectedTrip.theme} />}
+
+            {/*{selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
 
             {/* Back row */}
             <View style={styles.backRow}>

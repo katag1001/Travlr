@@ -89,7 +89,8 @@ export default function Budget({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {selectedTrip && <Banner theme={selectedTrip.theme} />}
+
+        {/*{selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
 
         <View style={styles.backRow}>
               <IconButton

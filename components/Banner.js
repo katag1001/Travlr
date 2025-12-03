@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import defaultImage from '../assets/images/banners/africa.png' 
+import defaultImage from '../assets/images/banners/travel.png' 
 
 const themeImageMap = {
   'South America': require('../assets/images/banners/south_america.png'),
@@ -8,7 +8,7 @@ const themeImageMap = {
   'Southeast Asia': require('../assets/images/banners/se_asia.png'),
   'East Asia': require('../assets/images/banners/east_asia.png'),
   'Oceania': require('../assets/images/banners/oceania.png'),
-  'Africa': require('../assets/images/banners/africa.png'),
+  'Africa': require('../assets/images/banners/travel.png'),
   'Middle East': require('../assets/images/banners/middle_east.png'),
   'Russia': require('../assets/images/banners/russia.png'),
   'Europe': require('../assets/images/banners/europe.png'),

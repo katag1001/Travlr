@@ -171,7 +171,8 @@ export default function Packing({ navigation }) {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
-            {selectedTrip && <Banner theme={selectedTrip.theme} />}
+
+            {/*{selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
 
             
             <View style={styles.backRow}>

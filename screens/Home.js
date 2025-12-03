@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  TouchableOpacity,
+
 } from 'react-native';
 
 import Background from '../components/Background';
@@ -21,6 +23,8 @@ import {
   Portal,
   Modal,
   TextInput,
+  Card,
+  IconButton,
 } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -161,7 +165,7 @@ export default function Home({ navigation }) {
 
             <ScrollView>
 
-              {/* Trip selector */}
+              {/* Trip selector 
               <TripSelector />
 
               {selectedTrip && (
@@ -184,7 +188,39 @@ export default function Home({ navigation }) {
                     Delete
                   </Button>
                 </View>
-              )}
+              )} */}
+
+
+              <Card style={styles.tripCard}>
+  <View style={styles.tripCardContent}>
+
+    {/* Trip Selector inside the same box */}
+    <View style={styles.tripSelectorContainer}>
+      <TripSelector />
+    </View>
+
+    {/* Edit/Delete Buttons — only if trip is selected */}
+    {selectedTrip && (
+      <View style={styles.iconActions}>
+        <IconButton
+          icon="pencil"
+          size={20}
+          iconColor="#263041"
+          onPress={() => openModalForEdit(selectedTrip)}
+        />
+
+        <IconButton
+          icon="delete"
+          size={20}
+          iconColor="red"
+          onPress={handleDeleteSelectedTrip}
+        />
+      </View>
+    )}
+
+  </View>
+</Card>
+
 
               {/* No trips case */}
               {trips.length === 0 ? (
@@ -358,4 +394,37 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover', 
   },
+
+  tripCard: {
+  marginTop: 12,
+  borderRadius: 10,
+  backgroundColor: '#f4f1ea',
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 2,
+  marginHorizontal: 4,
+},
+
+tripCardContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  padding: 16,
+  position: 'relative',
+},
+
+tripSelectorContainer: {
+  flex: 1,
+  marginRight: 50, // spacing so buttons don't overlap
+},
+
+iconActions: {
+  position: 'absolute',
+  right: 10,
+  top: 10,
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
 });

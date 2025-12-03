@@ -192,8 +192,8 @@ export default function Hotels({ navigation }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
 
-            {/* Banner */}
-            {selectedTrip && <Banner theme={selectedTrip.theme} />}
+            {/* Banner 
+            {selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
 
            
             <View style={styles.backRow}>

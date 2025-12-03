@@ -40,7 +40,7 @@ export default function TripSelector() {
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}
         anchor={
-          <Button mode="outlined" onPress={openMenu}>
+          <Button  onPress={openMenu}>
             {selectedTrip ? selectedTrip.tripName : 'Select Trip'}
           </Button>
         }
