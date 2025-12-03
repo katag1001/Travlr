@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  ImageBackground,
   View,
   StyleSheet,
   ScrollView,
@@ -9,6 +10,9 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+
+import Background from '../components/Background';
+
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -95,7 +99,7 @@ export default function Home({ navigation }) {
       return;
     }
 
-    // Compute theme automatically on save
+
     const autoTheme = getThemeFromTripName(tripName);
 
     const newTrip = {
@@ -141,6 +145,9 @@ export default function Home({ navigation }) {
   };
 
   return (
+    <Background theme={selectedTrip?.theme}>
+
+
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -149,8 +156,8 @@ export default function Home({ navigation }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
 
-            {/* Banner */}
-            {selectedTrip && <Banner theme={selectedTrip.theme} />}
+            {/* Banner 
+            {selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
 
             <ScrollView>
 
@@ -327,11 +334,12 @@ export default function Home({ navigation }) {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </Background>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: 'pink' },
+  safeArea: { flex: 1, },
   container: { flex: 1, padding: 16 },
   navButton: { marginVertical: 10, paddingVertical: 8 },
   modalContainer: {
@@ -345,5 +353,9 @@ const styles = StyleSheet.create({
   tripActionsRow: {
     flexDirection: 'row',
     marginTop: 10,
+  },
+    background: {
+    flex: 1,
+    resizeMode: 'cover', 
   },
 });

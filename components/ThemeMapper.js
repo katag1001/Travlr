@@ -1,19 +1,15 @@
 const themeKeywords = {
-  'North America': ['usa', 'canada', 'america', 'north'],
-  'South America': ['brazil', 'argentina', 'chile', 'south america'],
-  'Indian Subcontinent': ['india', 'pakistan', 'bangladesh', 'nepal', 'subcontinent'],
-  'Southeast Asia': ['thailand', 'vietnam', 'indonesia', 'malaysia', 'southeast'],
-  'East Asia': ['china', 'japan', 'korea', 'taiwan', 'east asia'],
-  'Oceania': ['australia', 'new zealand', 'oceania', 'fiji'],
   'Africa': ['egypt', 'kenya', 'south africa', 'morocco', 'africa'],
-  'Middle East': ['dubai', 'uae', 'iran', 'middle east', 'israel'],
-  'Russia': ['russia', 'siberia', 'moscow', 'st petersburg'],
-  'Europe': ['france', 'germany', 'italy', 'spain', 'uk', 'europe'],
   'Central Asia': ['kazakhstan', 'uzbekistan', 'turkmenistan', 'central asia'],
+  'Middle East': ['dubai', 'uae', 'iran', 'middle east', 'israel'],
+  'Europe': ['france', 'germany', 'italy', 'spain', 'uk', 'europe'],
+  'North America': ['usa', 'canada', 'america', 'north'],
+  'Southeast Asia': ['thailand', 'vietnam', 'indonesia', 'malaysia', 'southeast'],  
+  'South America': ['brazil', 'argentina', 'chile', 'south america'],
 };
 
 export function getThemeFromTripName(tripName) {
-  if (!tripName) return 'North America'; // default
+  if (!tripName) return 'Travel';
 
   const lowerName = tripName.toLowerCase();
 
@@ -23,5 +19,5 @@ export function getThemeFromTripName(tripName) {
     }
   }
 
-  return 'Africa';
+  return 'Travel';
 }
