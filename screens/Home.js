@@ -264,7 +264,13 @@ export default function Home({ navigation }) {
                       mode="contained"
                       style={styles.navButton}
                       disabled={!selectedTripId}
-                      onPress={() => navigation.navigate('Itinerary')}
+                      onPress={() => {
+  navigation.reset({
+    index: 0,
+    routes: [{ name: 'Itinerary' }],
+  });
+}}
+
                     >
                       Itinerary
                     </Button>
@@ -274,7 +280,7 @@ export default function Home({ navigation }) {
 
             </ScrollView>
 
-            {/* New Trip FAB */}
+{/* Add button -------------------------------------------------------------------------------- */}
             <ReusableFab
               icon="plus"
               label="New Trip"
@@ -283,8 +289,9 @@ export default function Home({ navigation }) {
                 setModalVisible(true);
               }}
             />
+{/* ------------------------------------------------------------------------------------------ */}
 
-            {/* Trip Modal */}
+{/* Trip Popup for add and edit ---------------------------------------------------------------*/}
             <Portal>
               <Modal
                 visible={modalVisible}
@@ -298,13 +305,10 @@ export default function Home({ navigation }) {
                   <TextInput
                     label="Trip Name"
                     value={tripName}
-                    onChangeText={setTripName} // theme not updated here
+                    onChangeText={setTripName}
                     mode="outlined"
                     style={{ marginBottom: 12 }}
                   />
-
-                  {/* Display theme only for editing existing trip */}
-                  {editingTrip && <Text style={{ marginBottom: 12 }}>Theme: {theme}</Text>}
 
                   <Button
                     mode="outlined"
@@ -365,6 +369,8 @@ export default function Home({ navigation }) {
                 </ScrollView>
               </Modal>
             </Portal>
+            
+{/* ------------------------------------------------------------------------------------------ */}
 
           </View>
         </TouchableWithoutFeedback>
@@ -377,7 +383,7 @@ export default function Home({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, },
   container: { flex: 1, padding: 16 },
-  navButton: { marginVertical: 10, paddingVertical: 8 },
+  navButton: { marginVertical: 10,  borderRadius: 10, paddingVertical: 8, backgroundColor: '#263041' },
   modalContainer: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -395,10 +401,13 @@ const styles = StyleSheet.create({
     resizeMode: 'cover', 
   },
 
+
+
+
   tripCard: {
   marginTop: 12,
   borderRadius: 10,
-  backgroundColor: '#f4f1ea',
+  backgroundColor: 'white',
   elevation: 2,
   shadowColor: '#000',
   shadowOffset: { width: 0, height: 1 },
@@ -416,13 +425,14 @@ tripCardContent: {
 
 tripSelectorContainer: {
   flex: 1,
-  marginRight: 50, // spacing so buttons don't overlap
+  marginRight: 50,
+
 },
 
 iconActions: {
   position: 'absolute',
-  right: 10,
-  top: 10,
+  right: 0,
+  bottom: 0,
   flexDirection: 'row',
   alignItems: 'center',
 },

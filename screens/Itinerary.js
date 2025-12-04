@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,12 +10,13 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Portal, Modal, Button, IconButton, Divider } from 'react-native-paper';
+import { Text, Portal, Modal, Button, IconButton } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
+
+import { useFocusEffect } from '@react-navigation/native';
 
 import { getItineraryForTrip, deleteItineraryEntry } from '../storage/itineraryStorage';
 import { useTrip } from '../components/TripContext';
-import Banner from '../components/Banner';
 import ViewCard from '../components/ViewCard';
 import ItineraryEntryForm from './ItineraryEntry';
 import ReusableFab from '../components/ReusableFab';
@@ -26,8 +27,17 @@ export default function Itinerary({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [itinerary, setItinerary] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
-  const [viewMode, setViewMode] = useState('calendar');
+  const [viewMode, setViewMode] = useState('calendar'); // default
   const [editingItem, setEditingItem] = useState(null);
+
+  // 🔥 Reset when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedDate('');
+      setViewMode('calendar');
+      setEditingItem(null);
+    }, [])
+  );
 
   useEffect(() => {
     if (selectedTripId) loadItinerary();
@@ -94,33 +104,32 @@ export default function Itinerary({ navigation }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
 
-            {/*{selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
-
             {/* Back row */}
             <View style={styles.backRow}>
               <IconButton
                 icon="arrow-left"
                 size={26}
-                onPress={() => navigation.goBack()}
+                onPress={() => navigation.navigate('Home')}
               />
               <Text style={styles.pageTitle}>Itinerary</Text>
             </View>
 
-            {/* EMPTY STATE */}
-            {itinerary.length === 0 && viewMode === 'calendar' && (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
-                  No itinerary yet — tap "+" to add one!
-                </Text>
-              </View>
-            )}
+
 
             {/* CALENDAR VIEW */}
-            {viewMode === 'calendar' && itinerary.length > 0 && (
+            {viewMode === 'calendar'  && (
               <Calendar
                 onDayPress={handleDaySelect}
-                minDate={selectedTrip ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0] : undefined}
-                maxDate={selectedTrip ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0] : undefined}
+                minDate={
+                  selectedTrip
+                    ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0]
+                    : undefined
+                }
+                maxDate={
+                  selectedTrip
+                    ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0]
+                    : undefined
+                }
                 style={styles.calendar}
                 theme={{
                   backgroundColor: 'pink',
