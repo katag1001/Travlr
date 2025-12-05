@@ -166,7 +166,7 @@ export default function Budget({ navigation }) {
                 onChangeText={setBudgetTotal}
                 keyboardType="numeric"
               />
-              {errorMsg ? <Text style={{ color: 'red' }}>{errorMsg}</Text> : null}
+              {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={hideDialog}>Cancel</Button>
@@ -190,7 +190,6 @@ const styles = StyleSheet.create({
   fab: { position: 'absolute', right: 16, bottom: 16 },
   emptyContainer: { marginTop: 50, alignItems: 'center', justifyContent: 'center', padding: 20 },
   emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
-  backgroundImage: {
-    flex: 1,
-  },
+  backgroundImage: {flex: 1,},
+  errorText: { color: 'red' },
 });

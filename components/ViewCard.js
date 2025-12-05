@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     padding: 18,
     position: 'relative',
   },
-  avatarBackground: { backgroundColor: '#ddf9fdff' },
+  avatarBackground: { backgroundColor: '#f9f1cb' },
   textContainer: { flex: 1, marginLeft: 12,  paddingRight: 60 },
   titleRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
   titleText: { fontWeight: '650', fontSize: 16, color: '#263041', marginRight: 8 },

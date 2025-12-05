@@ -18,7 +18,7 @@ import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import ItineraryEntryForm from './ItineraryEntry';
 import ReusableFab from '../components/ReusableFab';
-import BackgroundImage from '../assets/images/backgrounds/travel.png';
+import BackgroundImage from '../assets/images/backgrounds/general.png';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 

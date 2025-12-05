@@ -1,49 +1,27 @@
+/*REACT IMPORTS -----------------------------------------------------------------------------*/
+
 import React, { useEffect, useState } from 'react';
-import {
-  ImageBackground,
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  TouchableOpacity,
-
-} from 'react-native';
-
-import Background from '../components/Background';
-
-
+import {ImageBackground,View,StyleSheet,ScrollView,TouchableWithoutFeedback,Keyboard,KeyboardAvoidingView,Platform,Alert, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Text,
-  Button,
-  Portal,
-  Modal,
-  TextInput,
-  Card,
-  IconButton,
-  Menu,
-} from 'react-native-paper';
-
+import {Text,Button,Portal,Modal,TextInput,Card,IconButton,Menu,} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
 
-import Banner from '../components/Banner';
-import TripSelector from '../components/TripSelector';
-import ReusableFab from '../components/ReusableFab';
+/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
 import { useTrip } from '../components/TripContext';
-import {
-  getTrips,
-  addTrip,
-  updateTrip,
-  deleteTrip,
-} from '../storage/tripStorage';
-
+import {getTrips,addTrip,updateTrip,deleteTrip,} from '../storage/tripStorage';
 import { getThemeFromTripName } from '../components/ThemeMapper';
+
+/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+
+/*import Banner from '../components/Banner';*/
+import TripSelector from '../components/TripSelector';
+import ReusableFab from '../components/ReusableFab';
+import Background from '../components/Background';
+
+
+/*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function Home({ navigation }) {
   const { selectedTrip, selectedTripId, selectTrip } = useTrip();
@@ -60,8 +38,6 @@ export default function Home({ navigation }) {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
-
-  // Load trips from storage
   const loadTrips = async () => {
     const tr = await getTrips();
     setTrips(tr);
@@ -71,7 +47,6 @@ export default function Home({ navigation }) {
     loadTrips();
   }, []);
 
-  // Auto-select first trip if none selected
   useEffect(() => {
     if (trips.length > 0 && !selectedTripId) {
       selectTrip(trips[0]);
@@ -80,7 +55,9 @@ export default function Home({ navigation }) {
 
   const formatDate = (date) => {
     const d = new Date(date);
-    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    return `${String(d.getDate()).padStart(2, '0')}/${String(
+      d.getMonth() + 1
+    ).padStart(2, '0')}/${d.getFullYear()}`;
   };
 
   const resetForm = () => {
@@ -105,7 +82,6 @@ export default function Home({ navigation }) {
       alert('All fields are required.');
       return;
     }
-
 
     const autoTheme = getThemeFromTripName(tripName);
 
@@ -132,125 +108,108 @@ export default function Home({ navigation }) {
   const handleDeleteSelectedTrip = () => {
     if (!selectedTrip) return;
 
-    Alert.alert(
-      'Delete Trip',
-      'Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteTrip(selectedTrip.id);
-            const updated = await getTrips();
-            setTrips(updated);
-            selectTrip(updated[0] ?? null);
-          },
+    Alert.alert('Delete Trip', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteTrip(selectedTrip.id);
+          const updated = await getTrips();
+          setTrips(updated);
+          selectTrip(updated[0] ?? null);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
     <Background theme={selectedTrip?.theme}>
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+              {/* Banner */}
+              {/* {selectedTrip && <Banner theme={selectedTrip.theme} />} */}
 
+              <ScrollView>
+                {/* Trip selector */}
+                {/* <TripSelector /> */}
 
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.container}>
+                {/* Trip actions (commented out) */}
+                {/* {selectedTrip && (
+                  <View style={styles.tripActionsRow}>
+                    <Button
+                      mode="outlined"
+                      icon="pencil"
+                      onPress={() => openModalForEdit(selectedTrip)}
+                      style={styles.tripButtonMarginRight}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      mode="outlined"
+                      icon="delete"
+                      textColor="red"
+                      onPress={handleDeleteSelectedTrip}
+                    >
+                      Delete
+                    </Button>
+                  </View>
+                )} */}
 
-            {/* Banner 
-            {selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
+                <Card style={styles.tripCard}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.menuSpacer} />
 
-            <ScrollView>
+                    <Menu
+                      visible={menuVisible}
+                      onDismiss={() => setMenuVisible(false)}
+                      anchor={
+                        <IconButton
+                          icon="dots-vertical"
+                          onPress={() => setMenuVisible(true)}
+                          size={24}
+                        />
+                      }
+                    >
+                      <Menu.Item
+                        leadingIcon="pencil"
+                        onPress={() => {
+                          setMenuVisible(false);
+                          openModalForEdit(selectedTrip);
+                        }}
+                        title="Edit Trip"
+                      />
+                      <Menu.Item
+                        leadingIcon="delete"
+                        title="Delete Trip"
+                        titleStyle={styles.menuDeleteTitle}
+                        leadingIconColor="red"
+                        onPress={() => {
+                          setMenuVisible(false);
+                          handleDeleteSelectedTrip();
+                        }}
+                      />
+                    </Menu>
+                  </View>
 
-              {/* Trip selector 
-              <TripSelector />
+                  <View style={styles.tripSelectorCentered}>
+                    <TripSelector />
+                  </View>
+                </Card>
 
-              {selectedTrip && (
-                <View style={styles.tripActionsRow}>
-                  <Button
-                    mode="outlined"
-                    icon="pencil"
-                    onPress={() => openModalForEdit(selectedTrip)}
-                    style={{ marginRight: 10 }}
-                  >
-                    Edit
-                  </Button>
-
-                  <Button
-                    mode="outlined"
-                    icon="delete"
-                    textColor="red"
-                    onPress={handleDeleteSelectedTrip}
-                  >
-                    Delete
-                  </Button>
-                </View>
-              )} */}
-
-
-              <Card style={styles.tripCard}>
-  <View style={styles.cardHeader}>
-    <View style={{ flex: 1 }} />
-
-    {/* 3 dots menu */}
-    <Menu
-      visible={menuVisible}
-      onDismiss={() => setMenuVisible(false)}
-      anchor={
-        <IconButton
-          icon="dots-vertical"
-          onPress={() => setMenuVisible(true)}
-          size={24}
-        />
-      }
-    >
-      <Menu.Item
-        leadingIcon="pencil"
-        onPress={() => {
-          setMenuVisible(false);
-          openModalForEdit(selectedTrip);
-        }}
-        title="Edit Trip"
-      />
-
-      <Menu.Item
-        leadingIcon="delete"
-        title="Delete Trip"
-        titleStyle={{ color: "red" }}
-        leadingIconColor="red"
-        onPress={() => {
-          setMenuVisible(false);
-          handleDeleteSelectedTrip();
-        }}
-      />
-    </Menu>
-  </View>
-
-  {/* Center TripSelector */}
-  <View style={styles.tripSelectorCentered}>
-    <TripSelector />
-  </View>
-</Card>
-
-
-
-              {/* No trips case */}
-              {trips.length === 0 ? (
-                <View style={{ marginTop: 40, alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, opacity: 0.7 }}>
-                    No trips yet! Add a new trip to get started.
-                  </Text>
-                </View>
-              ) : (
-                <>
-                  {/* Navigation buttons */}
-                  <View style={{ marginTop: 20 }}>
+                {trips.length === 0 ? (
+                  <View style={styles.noTripsContainer}>
+                    <Text style={styles.noTripsText}>
+                      No trips yet! Add a new trip to get started.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.navButtonContainer}>
                     <Button
                       mode="contained"
                       style={styles.navButton}
@@ -259,7 +218,6 @@ export default function Home({ navigation }) {
                     >
                       Packing
                     </Button>
-
                     <Button
                       mode="contained"
                       style={styles.navButton}
@@ -268,7 +226,6 @@ export default function Home({ navigation }) {
                     >
                       Budget
                     </Button>
-
                     <Button
                       mode="contained"
                       style={styles.navButton}
@@ -277,131 +234,128 @@ export default function Home({ navigation }) {
                     >
                       Hotels
                     </Button>
-
                     <Button
                       mode="contained"
                       style={styles.navButton}
                       disabled={!selectedTripId}
                       onPress={() => {
-  navigation.reset({
-    index: 0,
-    routes: [{ name: 'Itinerary' }],
-  });
-}}
-
+                        navigation.reset({
+                          index: 0,
+                          routes: [{ name: 'Itinerary' }],
+                        });
+                      }}
                     >
                       Itinerary
                     </Button>
                   </View>
-                </>
-              )}
+                )}
+              </ScrollView>
 
-            </ScrollView>
-
-{/* Add button -------------------------------------------------------------------------------- */}
-            <ReusableFab
-              icon="plus"
-              label="New Trip"
-              onPress={() => {
-                resetForm();
-                setModalVisible(true);
-              }}
-            />
-{/* ------------------------------------------------------------------------------------------ */}
-
-{/* Trip Popup for add and edit ---------------------------------------------------------------*/}
-            <Portal>
-              <Modal
-                visible={modalVisible}
-                onDismiss={() => {
-                  setModalVisible(false);
+              <ReusableFab
+                icon="plus"
+                label="New Trip"
+                onPress={() => {
                   resetForm();
+                  setModalVisible(true);
                 }}
-                contentContainerStyle={styles.modalContainer}
-              >
-                <ScrollView>
-                  <TextInput
-                    label="Trip Name"
-                    value={tripName}
-                    onChangeText={setTripName}
-                    mode="outlined"
-                    style={{ marginBottom: 12 }}
-                  />
+              />
 
-                  <Button
-                    mode="outlined"
-                    icon="calendar"
-                    onPress={() => setShowStartPicker(true)}
-                    style={styles.dateButton}
-                  >
-                    {startDate ? `Start: ${startDate}` : 'Select Start Date'}
-                  </Button>
-
-                  {showStartPicker && (
-                    <DateTimePicker
-                      mode="date"
-                      value={new Date()}
-                      onChange={(e, d) => {
-                        setShowStartPicker(false);
-                        if (d) setStartDate(formatDate(d));
-                      }}
+              <Portal>
+                <Modal
+                  visible={modalVisible}
+                  onDismiss={() => {
+                    setModalVisible(false);
+                    resetForm();
+                  }}
+                  contentContainerStyle={styles.modalContainer}
+                >
+                  <ScrollView>
+                    <TextInput
+                      label="Trip Name"
+                      value={tripName}
+                      onChangeText={setTripName}
+                      mode="outlined"
+                      style={styles.modalTextInput}
                     />
-                  )}
 
-                  <Button
-                    mode="outlined"
-                    icon="calendar"
-                    onPress={() => setShowEndPicker(true)}
-                    style={styles.dateButton}
-                  >
-                    {endDate ? `End: ${endDate}` : 'Select End Date'}
-                  </Button>
+                    <Button
+                      mode="outlined"
+                      icon="calendar"
+                      onPress={() => setShowStartPicker(true)}
+                      style={styles.dateButton}
+                    >
+                      {startDate ? `Start: ${startDate}` : 'Select Start Date'}
+                    </Button>
 
-                  {showEndPicker && (
-                    <DateTimePicker
-                      mode="date"
-                      value={new Date()}
-                      onChange={(e, d) => {
-                        setShowEndPicker(false);
-                        if (d) setEndDate(formatDate(d));
+                    {showStartPicker && (
+                      <DateTimePicker
+                        mode="date"
+                        value={new Date()}
+                        onChange={(e, d) => {
+                          setShowStartPicker(false);
+                          if (d) setStartDate(formatDate(d));
+                        }}
+                      />
+                    )}
+
+                    <Button
+                      mode="outlined"
+                      icon="calendar"
+                      onPress={() => setShowEndPicker(true)}
+                      style={styles.dateButton}
+                    >
+                      {endDate ? `End: ${endDate}` : 'Select End Date'}
+                    </Button>
+
+                    {showEndPicker && (
+                      <DateTimePicker
+                        mode="date"
+                        value={new Date()}
+                        onChange={(e, d) => {
+                          setShowEndPicker(false);
+                          if (d) setEndDate(formatDate(d));
+                        }}
+                      />
+                    )}
+
+                    <Button
+                      mode="contained"
+                      onPress={handleSaveTrip}
+                      style={styles.button}
+                    >
+                      {editingTrip ? 'Update Trip' : 'Save Trip'}
+                    </Button>
+
+                    <Button
+                      onPress={() => {
+                        setModalVisible(false);
+                        resetForm();
                       }}
-                    />
-                  )}
-
-                  <Button
-                    mode="contained"
-                    onPress={handleSaveTrip}
-                    style={styles.button}
-                  >
-                    {editingTrip ? 'Update Trip' : 'Save Trip'}
-                  </Button>
-
-                  <Button
-                    onPress={() => {
-                      setModalVisible(false);
-                      resetForm();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </ScrollView>
-              </Modal>
-            </Portal>
-            
-{/* ------------------------------------------------------------------------------------------ */}
-
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+                      style={styles.button}
+                    >
+                      Cancel
+                    </Button>
+                  </ScrollView>
+                </Modal>
+              </Portal>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </Background>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, },
+  safeArea: { flex: 1 },
+  flex: { flex: 1 },
   container: { flex: 1, padding: 16 },
-  navButton: { marginVertical: 10,  borderRadius: 10, paddingVertical: 8, backgroundColor: '#263041' },
+  navButton: {
+    marginVertical: 10,
+    borderRadius: 10,
+    paddingVertical: 8,
+    backgroundColor: '#263041',
+  },
   modalContainer: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -410,63 +364,31 @@ const styles = StyleSheet.create({
   },
   dateButton: { marginVertical: 8 },
   button: { marginVertical: 10 },
-  tripActionsRow: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-    background: {
-    flex: 1,
-    resizeMode: 'cover', 
-  },
-
-
-
-
+  tripActionsRow: { flexDirection: 'row', marginTop: 10 },
+  background: { flex: 1, resizeMode: 'cover' },
   tripCard: {
-  marginTop: 12,
-  borderRadius: 10,
-  backgroundColor: 'white',
-  elevation: 2,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.1,
-  shadowRadius: 2,
-  marginHorizontal: 4,
-},
+    marginTop: 12,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    marginHorizontal: 4,
+  },
+  tripCardContent: { flexDirection: 'row', alignItems: 'center', padding: 16, position: 'relative' },
+  tripSelectorContainer: { flex: 1, marginRight: 50 },
+  iconActions: { position: 'absolute', right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center' },
+  cardHeader: { width: '100%', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' },
+  tripSelectorCentered: { paddingVertical: 10, alignItems: 'center', justifyContent: 'center' },
 
-tripCardContent: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  padding: 16,
-  position: 'relative',
-},
-
-tripSelectorContainer: {
-  flex: 1,
-  marginRight: 50,
-
-},
-
-iconActions: {
-  position: 'absolute',
-  right: 0,
-  bottom: 0,
-  flexDirection: 'row',
-  alignItems: 'center',
-},
-
-cardHeader: {
-  width: "100%",
-  flexDirection: "row",
-  justifyContent: "flex-end",
-  alignItems: "center",
-},
-
-tripSelectorCentered: {
-  paddingVertical: 10,
-  alignItems: "center",
-  justifyContent: "center",
-},
-
-
+  // EXTRACTED INLINE STYLES
+  menuSpacer: { flex: 1 },
+  tripButtonMarginRight: { marginRight: 10 },
+  menuDeleteTitle: { color: 'red' },
+  noTripsContainer: { marginTop: 40, alignItems: 'center' },
+  noTripsText: { fontSize: 18, opacity: 0.7 },
+  navButtonContainer: { marginTop: 20 },
+  modalTextInput: { marginBottom: 12 },
 });
