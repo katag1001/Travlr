@@ -40,9 +40,20 @@ export default function TripSelector() {
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}
         anchor={
-          <Button  onPress={openMenu}>
-            {selectedTrip ? selectedTrip.tripName : 'Select Trip'}
-          </Button>
+          <Button
+  mode="contained-tonal"
+  onPress={openMenu}
+  style={{ 
+    width: "100%", 
+    borderRadius: 10, 
+    backgroundColor: "white", 
+    elevation: 0 
+  }}
+  labelStyle={{ color: "#263041", fontSize: 18 }}
+>
+  {selectedTrip ? selectedTrip.tripName : 'Select Trip'}
+</Button>
+
         }
       >
         {trips.map((trip) => (

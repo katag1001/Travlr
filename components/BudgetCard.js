@@ -22,7 +22,7 @@ export default function BudgetCard({
 
     let series;
     if (isEmpty) {
-      series = [{ value: 1, color: '#cccccc' }];
+      series = [{ value: 1, color: 'white' }];
     } else if (isOverspent) {
       series = [{ value: 1, color: 'red' }];
     } else {

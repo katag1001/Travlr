@@ -1,25 +1,26 @@
+/*REACT IMPORTS -----------------------------------------------------------------------------*/
+
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-  Alert,
+import {View, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback,Keyboard,ScrollView,Alert, ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Portal, Modal, Button, IconButton } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
-
 import { useFocusEffect } from '@react-navigation/native';
 
+/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
+
 import { getItineraryForTrip, deleteItineraryEntry } from '../storage/itineraryStorage';
+
+/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+
 import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import ItineraryEntryForm from './ItineraryEntry';
 import ReusableFab from '../components/ReusableFab';
+import BackgroundImage from '../assets/images/backgrounds/travel.png';
+
+/*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function Itinerary({ navigation }) {
   const { selectedTripId, selectedTrip } = useTrip();
@@ -27,7 +28,7 @@ export default function Itinerary({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [itinerary, setItinerary] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
-  const [viewMode, setViewMode] = useState('calendar'); // default
+  const [viewMode, setViewMode] = useState('calendar'); 
   const [editingItem, setEditingItem] = useState(null);
 
   // 🔥 Reset when screen is focused
@@ -96,6 +97,12 @@ export default function Itinerary({ navigation }) {
   };
 
   return (
+    <ImageBackground
+            source={BackgroundImage} 
+            style={styles.backgroundImage}
+            resizeMode="cover"
+          > 
+
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -132,8 +139,8 @@ export default function Itinerary({ navigation }) {
                 }
                 style={styles.calendar}
                 theme={{
-                  backgroundColor: 'pink',
-                  calendarBackground: 'pink',
+                  backgroundColor: 'white',
+                  calendarBackground: 'white',
                   todayTextColor: '#222',
                   dayTextColor: '#222',
                   textDisabledColor: '#999',
@@ -215,11 +222,13 @@ export default function Itinerary({ navigation }) {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
+
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: 'pink' },
+  safeArea: { flex: 1, },
   container: { flex: 1, padding: 16 },
   backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
@@ -228,4 +237,7 @@ const styles = StyleSheet.create({
   modalContainer: { backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 8 },
   emptyContainer: { marginTop: 50, alignItems: 'center', justifyContent: 'center', padding: 20 },
   emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
+       backgroundImage: {
+    flex: 1,
+  },
 });

@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 12,
     borderRadius: 10,
-    backgroundColor: '#f4f1ea',
+    backgroundColor: 'white',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     padding: 18,
     position: 'relative',
   },
-  avatarBackground: { backgroundColor: '#ece9e2' },
+  avatarBackground: { backgroundColor: '#ddf9fdff' },
   textContainer: { flex: 1, marginLeft: 12,  paddingRight: 60 },
   titleRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
   titleText: { fontWeight: '650', fontSize: 16, color: '#263041', marginRight: 8 },

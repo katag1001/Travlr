@@ -1,17 +1,23 @@
+/*REACT IMPORTS -----------------------------------------------------------------------------*/
+
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, ImageBackground, } from 'react-native';
 import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
+
+import { getSpendsForBudget, addSpend, updateSpend,deleteSpend, createSpend} from '../storage/budgetStorage';
+
+
+/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+
 import ViewCard from '../components/ViewCard';
-import {
-  getSpendsForBudget,
-  addSpend,
-  updateSpend,
-  deleteSpend,
-  createSpend
-} from '../storage/budgetStorage';
+import BackgroundImage from '../assets/images/backgrounds/general.png';
+
+
+/*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function Spend({ budget, onBack }) {
   const { id: budgetId, budgetName, tripId } = budget;
@@ -85,6 +91,12 @@ export default function Spend({ budget, onBack }) {
   };
 
   return (
+<ImageBackground
+        source={BackgroundImage} 
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      > 
+
     <SafeAreaView style={styles.safeArea}>
       <Button onPress={onBack} mode="contained" style={{ marginBottom: 10 }}>
         ← Back to Budgets
@@ -144,13 +156,14 @@ export default function Spend({ budget, onBack }) {
         </Dialog>
       </Portal>
     </SafeAreaView>
+    </ImageBackground>
+
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'pink',
     padding: 16,
   },
   fab: {
@@ -163,5 +176,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
+  },
+   backgroundImage: {
+    flex: 1,
   },
 });

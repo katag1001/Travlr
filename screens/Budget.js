@@ -1,15 +1,26 @@
+/*REACT IMPORTS -----------------------------------------------------------------------------*/
+
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, ScrollView, ImageBackground, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, TextInput, Dialog, Portal,IconButton } from 'react-native-paper';
 
-import Banner from '../components/Banner';
+/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
+
+import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
+import SpendView from './Spend';
+
+/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+
+/* import Banner from '../components/Banner';*/
 import { useTrip } from '../components/TripContext';
 import BudgetCard from '../components/BudgetCard';
 import ReusableFab from '../components/ReusableFab';
-import SpendView from './Spend';
 
-import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
+import BackgroundImage from '../assets/images/backgrounds/general.png';
+
+
+/*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function Budget({ navigation }) {
   const [budgets, setBudgets] = useState([]);
@@ -87,6 +98,12 @@ export default function Budget({ navigation }) {
   }
 
   return (
+<ImageBackground
+        source={BackgroundImage} 
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      > 
+
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
 
@@ -159,11 +176,13 @@ export default function Budget({ navigation }) {
         </Portal>
       </View>
     </SafeAreaView>
+
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: 'pink' },
+  safeArea: { flex: 1, },
   container: { flex: 1, padding: 16 },
   scrollArea: { flex: 1 },
   backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
@@ -171,4 +190,7 @@ const styles = StyleSheet.create({
   fab: { position: 'absolute', right: 16, bottom: 16 },
   emptyContainer: { marginTop: 50, alignItems: 'center', justifyContent: 'center', padding: 20 },
   emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
+  backgroundImage: {
+    flex: 1,
+  },
 });

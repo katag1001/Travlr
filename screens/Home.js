@@ -25,6 +25,7 @@ import {
   TextInput,
   Card,
   IconButton,
+  Menu,
 } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -57,6 +58,8 @@ export default function Home({ navigation }) {
   const [endDate, setEndDate] = useState('');
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+
 
   // Load trips from storage
   const loadTrips = async () => {
@@ -192,34 +195,49 @@ export default function Home({ navigation }) {
 
 
               <Card style={styles.tripCard}>
-  <View style={styles.tripCardContent}>
+  <View style={styles.cardHeader}>
+    <View style={{ flex: 1 }} />
 
-    {/* Trip Selector inside the same box */}
-    <View style={styles.tripSelectorContainer}>
-      <TripSelector />
-    </View>
-
-    {/* Edit/Delete Buttons — only if trip is selected */}
-    {selectedTrip && (
-      <View style={styles.iconActions}>
+    {/* 3 dots menu */}
+    <Menu
+      visible={menuVisible}
+      onDismiss={() => setMenuVisible(false)}
+      anchor={
         <IconButton
-          icon="pencil"
-          size={20}
-          iconColor="#263041"
-          onPress={() => openModalForEdit(selectedTrip)}
+          icon="dots-vertical"
+          onPress={() => setMenuVisible(true)}
+          size={24}
         />
+      }
+    >
+      <Menu.Item
+        leadingIcon="pencil"
+        onPress={() => {
+          setMenuVisible(false);
+          openModalForEdit(selectedTrip);
+        }}
+        title="Edit Trip"
+      />
 
-        <IconButton
-          icon="delete"
-          size={20}
-          iconColor="red"
-          onPress={handleDeleteSelectedTrip}
-        />
-      </View>
-    )}
+      <Menu.Item
+        leadingIcon="delete"
+        title="Delete Trip"
+        titleStyle={{ color: "red" }}
+        leadingIconColor="red"
+        onPress={() => {
+          setMenuVisible(false);
+          handleDeleteSelectedTrip();
+        }}
+      />
+    </Menu>
+  </View>
 
+  {/* Center TripSelector */}
+  <View style={styles.tripSelectorCentered}>
+    <TripSelector />
   </View>
 </Card>
+
 
 
               {/* No trips case */}
@@ -436,5 +454,19 @@ iconActions: {
   flexDirection: 'row',
   alignItems: 'center',
 },
+
+cardHeader: {
+  width: "100%",
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  alignItems: "center",
+},
+
+tripSelectorCentered: {
+  paddingVertical: 10,
+  alignItems: "center",
+  justifyContent: "center",
+},
+
 
 });

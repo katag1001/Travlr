@@ -16,10 +16,6 @@ export const addTrip = async (trip) => {
   await saveTrips(updatedTrips);
   console.log('✅ Trip saved successfully:', trip);
 
-  /*Taking out for now to change way itineraries are added 
-  const itineraryEntries = generateItinerary(trip);
-  await addItineraryEntries(itineraryEntries); */
-
   // ADDING AUTOMATIC BUDGETS HERE
   const existingBudgets = await getBudgets();
 
@@ -70,11 +66,6 @@ export const deleteTrip = async (tripId) => {
   await AsyncStorage.setItem('HOTELS', JSON.stringify(remainingHotels));
   console.log("hotels deleted")
 
-  // Delete associated flights
-  const allFlights = await getFlights();
-  const remainingFlights = allFlights.filter(f => f.tripId !== tripId);
-  await AsyncStorage.setItem('FLIGHTS', JSON.stringify(remainingFlights));
-  console.log("fligths deleted")
 
   // Delete associated BUDGET
   const allBudgets = await getBudgets();
@@ -82,35 +73,12 @@ export const deleteTrip = async (tripId) => {
   await AsyncStorage.setItem('BUDGETS', JSON.stringify(remainingBudgets));
   console.log("budget deleted")
 
-  // Delete associated BUDGET
+  // Delete associated Spend
   const allSpend = await getSpends();
   const remainingSpend = allSpend.filter(s => s.tripId !== tripId);
-  await AsyncStorage.setItem('SPEND', JSON.stringify(remainingSpend));
-  console.log("spend deleted")
+  await AsyncStorage.setItem('SPENDS', JSON.stringify(remainingSpend));
+  console.log("spends deleted")
 
 };
 
 
-// HELPER FUNCTIONS FOR OTHER PAGE FUNCTIONS ----------------------------------------------------------------
-
-/* generate itinerary for the trip dates
-const generateItinerary = (trip) => {
-  const { id: tripId, startDate, endDate } = trip;
-
-  const [sd, sm, sy] = startDate.split('/').map(Number);
-  const [ed, em, ey] = endDate.split('/').map(Number);
-  const start = new Date(sy, sm - 1, sd);
-  const end = new Date(ey, em - 1, ed);
-
-  const entries = [];
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    entries.push({
-      id: uuidv4(),
-      tripId,
-      date: d.toISOString(),
-      day: '',
-      night: '',
-    });
-  }
-  return entries;
-}; */

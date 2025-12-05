@@ -1,36 +1,24 @@
+/*REACT IMPORTS -----------------------------------------------------------------------------*/
+
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Keyboard,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert
-} from 'react-native';
+import { View, StyleSheet, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ScrollView, Alert, ImageBackground,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Text,
-  TextInput,
-  Button,
-  Modal,
-  Portal,
-  IconButton
-} from 'react-native-paper';
+import { Text, TextInput, Button, Modal,Portal,IconButton} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import {
-  getHotelsForTrip,
-  addHotel,
-  updateHotel,
-  deleteHotel,
-} from '../storage/hotelStorage';
+/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
+
+import { getHotelsForTrip, addHotel, updateHotel, deleteHotel, } from '../storage/hotelStorage';
+
+/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
 
 import { useTrip } from '../components/TripContext';
-import Banner from '../components/Banner';
+/* import Banner from '../components/Banner';*/
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
+import BackgroundImage from '../assets/images/backgrounds/general.png';
+
+/*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function Hotels({ navigation }) {
   const { selectedTripId, selectedTrip } = useTrip();
@@ -184,6 +172,12 @@ export default function Hotels({ navigation }) {
   };
 
   return (
+    <ImageBackground
+            source={BackgroundImage} 
+            style={styles.backgroundImage}
+            resizeMode="cover"
+          > 
+
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -330,13 +324,14 @@ export default function Hotels({ navigation }) {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f2f1ec',
+
   },
   container: {
     flex: 1,
@@ -386,5 +381,8 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginVertical: 10,
+  },
+     backgroundImage: {
+    flex: 1,
   },
 });
