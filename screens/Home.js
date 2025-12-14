@@ -161,7 +161,7 @@ export default function Home({ navigation }) {
                   </View>
                 )} */}
 
-                <TripSelectorCard onEdit={(trip) => openModalForEdit(trip)} />
+                
 
 
                 {trips.length === 0 ? (
@@ -172,6 +172,7 @@ export default function Home({ navigation }) {
                   </View>
                 ) : (
                   <View style={styles.navButtonContainer}>
+                    <TripSelectorCard onEdit={(trip) => openModalForEdit(trip)} />
                     <Button
                       mode="contained"
                       style={styles.navButton}

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Keyboard, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Card, Menu, IconButton, Text } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity, Text, Alert, Dimensions } from 'react-native';
+import { Card, IconButton } from 'react-native-paper';
 import { getTrips, deleteTrip } from '../storage/tripStorage';
 import { useTrip } from './TripContext';
 
 export default function TripSelectorCard({ onEdit }) {
   const [trips, setTrips] = useState([]);
-  const [menuVisible, setMenuVisible] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const { selectedTrip, selectedTripId, selectTrip } = useTrip();
 
@@ -24,10 +24,13 @@ export default function TripSelectorCard({ onEdit }) {
   }, [selectedTripId]);
 
   const toggleDropdown = () => {
-    Keyboard.dismiss();
-    // Always close menu when opening dropdown
-    if (menuVisible) setMenuVisible(false);
+    if (menuVisible) return;
     setDropdownVisible(!dropdownVisible);
+  };
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+    setDropdownVisible(false); // close trip selector if menu opens
   };
 
   const handleSelectTrip = (trip) => {
@@ -53,69 +56,80 @@ export default function TripSelectorCard({ onEdit }) {
         },
       ]
     );
+    setMenuVisible(false);
   };
 
   return (
-    <Card style={styles.card}>
-      {/* Header with Edit/Delete Menu */}
-      {selectedTrip && (
-        <View style={styles.cardHeader}>
-          <View style={{ flex: 1 }} />
-          <Menu
-            visible={menuVisible}
-            onDismiss={() => setMenuVisible(false)}
-            anchor={
-              <IconButton
-                icon="dots-vertical"
-                onPress={() => setMenuVisible(true)}
-                size={24}
-              />
-            }
-          >
-            <Menu.Item
-              leadingIcon="pencil"
-              title="Edit Trip"
-              onPress={() => {
-                setMenuVisible(false);
-                if (onEdit) onEdit(selectedTrip);
-              }}
-            />
-            <Menu.Item
-              leadingIcon="delete"
-              title="Delete Trip"
-              leadingIconColor="red"
-              titleStyle={{ color: 'red' }}
-              onPress={() => {
-                setMenuVisible(false);
-                handleDeleteTrip(selectedTrip);
-              }}
-            />
-          </Menu>
-        </View>
-      )}
-
-      {/* Touchable Card Body as Trip Selector */}
-      <TouchableOpacity onPress={toggleDropdown} style={styles.selectorContainer}>
-        <Text style={styles.tripName}>
-          {selectedTrip ? selectedTrip.tripName : 'Select Trip'}
-        </Text>
-      </TouchableOpacity>
-
-      {/* Dropdown Menu inside the card */}
-      {dropdownVisible && (
-        <View style={styles.dropdown}>
-          {trips.map((trip) => (
-            <TouchableOpacity
-              key={trip.id}
-              onPress={() => handleSelectTrip(trip)}
-              style={styles.dropdownItem}
-            >
-              <Text style={styles.dropdownText}>{trip.tripName}</Text>
+    <View style={{ position: 'relative' }}>
+      <Card style={styles.card}>
+        {/* Header with three dots */}
+        {selectedTrip && (
+          <View style={styles.cardHeader}>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity onPress={toggleMenu}>
+              <IconButton icon="dots-vertical" size={24} />
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
+        )}
+
+        {/* Trip selector */}
+        <TouchableOpacity
+          onPress={toggleDropdown}
+          style={styles.selectorContainer}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.tripName}>
+            {selectedTrip ? selectedTrip.tripName : 'Select Trip'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Trip selector dropdown */}
+        {dropdownVisible && (
+          <View style={styles.dropdown}>
+            {trips.map((trip) => (
+              <TouchableOpacity
+                key={trip.id}
+                onPress={() => handleSelectTrip(trip)}
+                style={styles.dropdownItem}
+              >
+                <Text style={styles.dropdownText}>{trip.tripName}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </Card>
+
+      {/* Overlay + menu */}
+      {menuVisible && (
+        <>
+          {/* Full-screen transparent overlay */}
+          <TouchableOpacity
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={() => setMenuVisible(false)}
+          />
+
+          {/* Absolute-positioned menu dropdown */}
+          <View style={styles.menuDropdown}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                if (onEdit) onEdit(selectedTrip);
+                setMenuVisible(false);
+              }}
+            >
+              <Text>Edit Trip</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => handleDeleteTrip(selectedTrip)}
+            >
+              <Text style={{ color: 'red' }}>Delete Trip</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
-    </Card>
+    </View>
   );
 }
 
@@ -125,14 +139,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'white',
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
     marginHorizontal: 4,
   },
   cardHeader: {
-    width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
@@ -159,5 +168,31 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 16,
     color: '#263041',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    backgroundColor: 'transparent',
+    zIndex: 999,
+  },
+  menuDropdown: {
+    position: 'absolute',
+    top: 40,
+    right: 8,
+    backgroundColor: 'white',
+    borderRadius: 6,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    zIndex: 1000,
+  },
+  menuItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
 });
