@@ -30,7 +30,7 @@ export default function TripSelectorCard({ onEdit }) {
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
-    setDropdownVisible(false); 
+    setDropdownVisible(false);
   };
 
   const handleSelectTrip = (trip) => {
@@ -41,7 +41,7 @@ export default function TripSelectorCard({ onEdit }) {
   const handleDeleteTrip = (trip) => {
     Alert.alert(
       'Delete Trip',
-      `Are you sure you want to delete ${trip.tripName}?`,
+      `Are you sure you want to delete ${String(trip?.tripName ?? '')}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -62,22 +62,17 @@ export default function TripSelectorCard({ onEdit }) {
   return (
     <View style={{ position: 'relative' }}>
       <Card style={styles.card}>
-
         {/* 3 dots dropdown menu */}
         {selectedTrip && (
-
           <View style={styles.cardHeader}>
-  <View style={{ flex: 1 }} /> {/* spacer to push text to center */}
-
-  <Text style={styles.headerText}>Current Trip</Text>
-
-  <View style={{ flex: 1, alignItems: 'flex-end' }}>
-    <TouchableOpacity onPress={toggleMenu}>
-      <IconButton icon="dots-vertical" size={24} />
-    </TouchableOpacity>
-  </View>
-</View>
-
+            <View style={{ flex: 1 }} /> {/* spacer to push text to center */}
+            <Text style={styles.headerText}>Current Trip</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <TouchableOpacity onPress={toggleMenu}>
+                <IconButton icon="dots-vertical" size={24} />
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
 
         {/* Trip selector menu */}
@@ -87,8 +82,10 @@ export default function TripSelectorCard({ onEdit }) {
           activeOpacity={0.8}
         >
           <Text style={styles.tripName}>
-            {selectedTrip ? selectedTrip.tripName : 'Select Trip'}
-          </Text>
+  {selectedTrip?.tripName ? String(selectedTrip.tripName) : 'Add a new trip to get started!'}
+</Text>
+
+
         </TouchableOpacity>
 
         {/* Trip selector dropdown */}
@@ -100,7 +97,9 @@ export default function TripSelectorCard({ onEdit }) {
                 onPress={() => handleSelectTrip(trip)}
                 style={styles.dropdownItem}
               >
-                <Text style={styles.dropdownText}>{trip.tripName}</Text>
+                <Text style={styles.dropdownText}>
+                  {String(trip?.tripName ?? '')}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -155,6 +154,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingTop: 4,
+  },
+  headerText: {
+    fontSize: 16,
+    color: '#263041',
+    textAlign: 'center',
   },
   selectorContainer: {
     paddingVertical: 16,
