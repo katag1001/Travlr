@@ -32,6 +32,7 @@ export const addHotel = async (Hotel) => {
     await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
 
     const budgetId = await getBudgetIdByName('Accommodation', Hotel.tripId);
+    console.log('DEBUG budgetId for Accommodation:', budgetId);
     if (budgetId) {
       const isoDate = fixDate(Hotel.startDate);
       const hotelTitle = `Accomodation: ${Hotel.hotelName}`;
@@ -43,6 +44,7 @@ export const addHotel = async (Hotel) => {
         Hotel.tripId
       );
       await addSpend(newSpend);
+      console.log('✅ Added spend for hotel:', newSpend);
     }
 
 

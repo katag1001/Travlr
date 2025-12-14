@@ -129,7 +129,9 @@ export const deleteSpend = async (spendId) => {
 
 export const getBudgetIdByName = async (budgetName, tripId) => {
   const budgets = await getBudgets();
+  console.log('DEBUG budgets for trip:', tripId, budgets);
   const budget = budgets.find(b => b.budgetName === budgetName && b.tripId === tripId);
+  console.log('DEBUG found budget:', budget);
   return budget ? budget.id : null;
 };
 

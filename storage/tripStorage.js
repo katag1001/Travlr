@@ -2,7 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addItineraryEntries, getItineraries, updateItineraryEntry } from './itineraryStorage';
 import { getPackingLists, updatePackingList } from './packingStorage';
-import { createBudget, getBudgets, saveBudgets } from './budgetStorage';
+import { createBudget, getBudgets, saveBudgets, getSpends, } from './budgetStorage';
 import { getHotels } from './hotelStorage';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,7 +20,7 @@ export const addTrip = async (trip) => {
   const existingBudgets = await getBudgets();
 
   const newBudgets = [
-    createBudget('Accomodation', 0, trip.id),
+    createBudget('Accommodation', 0, trip.id),
     createBudget('Flights', 0, trip.id),
   ];
 
@@ -74,11 +74,12 @@ export const deleteTrip = async (tripId) => {
   await AsyncStorage.setItem('BUDGETS', JSON.stringify(remainingBudgets));
   console.log("budget deleted")
 
-  /* Delete associated Spend
-  const allSpend = await getSpends();
-  const remainingSpend = allSpend.filter(s => s.tripId !== tripId);
-  await AsyncStorage.setItem('SPENDS', JSON.stringify(remainingSpend));
-  console.log("spends deleted")*/
+  // Delete associated BUDGET
+  const allSpends = await getSpends();
+  const remainingSpends = allSpends.filter(b => b.tripId !== tripId);
+  await AsyncStorage.setItem('SPENDS', JSON.stringify(remainingSpends));
+  console.log("spends deleted")
+
 
   const updatedTrips = await getTrips();
   console.log('📘 Updated trips after deletion:', updatedTrips);
