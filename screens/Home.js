@@ -16,7 +16,7 @@ import { getThemeFromTripName } from '../components/ThemeMapper';
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
 
 /*import Banner from '../components/Banner';*/
-import TripSelector from '../components/TripSelector';
+import TripSelectorCard from '../components/TripSelector';
 import ReusableFab from '../components/ReusableFab';
 import Background from '../components/Background';
 
@@ -161,46 +161,8 @@ export default function Home({ navigation }) {
                   </View>
                 )} */}
 
-                <Card style={styles.tripCard}>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.menuSpacer} />
+                <TripSelectorCard onEdit={(trip) => openModalForEdit(trip)} />
 
-                    <Menu
-                      visible={menuVisible}
-                      onDismiss={() => setMenuVisible(false)}
-                      anchor={
-                        <IconButton
-                          icon="dots-vertical"
-                          onPress={() => setMenuVisible(true)}
-                          size={24}
-                        />
-                      }
-                    >
-                      <Menu.Item
-                        leadingIcon="pencil"
-                        onPress={() => {
-                          setMenuVisible(false);
-                          openModalForEdit(selectedTrip);
-                        }}
-                        title="Edit Trip"
-                      />
-                      <Menu.Item
-                        leadingIcon="delete"
-                        title="Delete Trip"
-                        titleStyle={styles.menuDeleteTitle}
-                        leadingIconColor="red"
-                        onPress={() => {
-                          setMenuVisible(false);
-                          handleDeleteSelectedTrip();
-                        }}
-                      />
-                    </Menu>
-                  </View>
-
-                  <View style={styles.tripSelectorCentered}>
-                    <TripSelector />
-                  </View>
-                </Card>
 
                 {trips.length === 0 ? (
                   <View style={styles.noTripsContainer}>
