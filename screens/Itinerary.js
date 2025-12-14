@@ -31,7 +31,7 @@ export default function Itinerary({ navigation }) {
   const [viewMode, setViewMode] = useState('calendar'); 
   const [editingItem, setEditingItem] = useState(null);
 
-  // 🔥 Reset when screen is focused
+
   useFocusEffect(
     useCallback(() => {
       setSelectedDate('');

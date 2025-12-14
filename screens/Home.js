@@ -214,9 +214,14 @@ export default function Home({ navigation }) {
                       mode="contained"
                       style={styles.navButton}
                       disabled={!selectedTripId}
-                      onPress={() => navigation.navigate('Packing')}
+                      onPress={() => {
+                        navigation.reset({
+                          index: 0,
+                          routes: [{ name: 'Itinerary' }],
+                        });
+                      }}
                     >
-                      Packing
+                      Itinerary
                     </Button>
                     <Button
                       mode="contained"
@@ -234,18 +239,14 @@ export default function Home({ navigation }) {
                     >
                       Hotels
                     </Button>
-                    <Button
+
+                     <Button
                       mode="contained"
                       style={styles.navButton}
                       disabled={!selectedTripId}
-                      onPress={() => {
-                        navigation.reset({
-                          index: 0,
-                          routes: [{ name: 'Itinerary' }],
-                        });
-                      }}
+                      onPress={() => navigation.navigate('Packing')}
                     >
-                      Itinerary
+                      Packing
                     </Button>
                   </View>
                 )}

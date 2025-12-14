@@ -1,26 +1,31 @@
-/*REACT IMPORTS -----------------------------------------------------------------------------*/
+/* REACT IMPORTS ----------------------------------------------------------------------------- */
 
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ScrollView, ImageBackground, } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, StyleSheet, FlatList, ScrollView, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, TextInput, Dialog, Portal,IconButton } from 'react-native-paper';
+import { Text, Button, TextInput, Dialog, Portal, IconButton } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
 
-/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
+/* FUNCTION IMPORTS ----------------------------------------------------------------------------- */
 
-import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
+import {
+  getBudgets,
+  createBudget,
+  saveBudgets,
+  deleteBudget as removeBudget
+} from '../storage/budgetStorage';
+
 import SpendView from './Spend';
 
-/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+/* COMPONENT IMPORTS ----------------------------------------------------------------------------- */
 
-/* import Banner from '../components/Banner';*/
 import { useTrip } from '../components/TripContext';
 import BudgetCard from '../components/BudgetCard';
 import ReusableFab from '../components/ReusableFab';
 
 import BackgroundImage from '../assets/images/backgrounds/general.png';
 
-
-/*MAIN FUNCTION -----------------------------------------------------------------------------*/
+/* MAIN FUNCTION ----------------------------------------------------------------------------- */
 
 export default function Budget({ navigation }) {
   const [budgets, setBudgets] = useState([]);
@@ -31,17 +36,33 @@ export default function Budget({ navigation }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [activeBudget, setActiveBudget] = useState(null);
 
-  const { selectedTripId, selectedTrip } = useTrip();
+  const { selectedTripId } = useTrip();
+
+  /* LOAD BUDGETS ----------------------------------------------------------------------------- */
 
   const loadBudgets = async () => {
     const all = await getBudgets();
-    const filtered = selectedTripId ? all.filter(b => b.tripId === selectedTripId) : [];
+    const filtered = selectedTripId
+      ? all.filter(b => b.tripId === selectedTripId)
+      : [];
     setBudgets(filtered);
   };
 
+  /* 🔁 REFRESH EVERY TIME SCREEN IS OPENED */
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedTripId) {
+        loadBudgets();
+      }
+    }, [selectedTripId])
+  );
+
+  /* ALSO REFRESH WHEN TRIP CHANGES */
   useEffect(() => {
     if (selectedTripId) loadBudgets();
   }, [selectedTripId]);
+
+  /* DIALOG HANDLING ----------------------------------------------------------------------------- */
 
   const showDialog = (budget = null) => {
     setEditingBudget(budget);
@@ -64,6 +85,8 @@ export default function Budget({ navigation }) {
     setErrorMsg('');
   };
 
+  /* SAVE / DELETE ----------------------------------------------------------------------------- */
+
   const handleSaveBudget = async () => {
     const total = parseFloat(budgetTotal);
 
@@ -77,7 +100,9 @@ export default function Budget({ navigation }) {
     }
 
     if (editingBudget) {
-      const updated = budgets.map(b => b.id === editingBudget.id ? { ...b, budgetName, total } : b);
+      const updated = budgets.map(b =>
+        b.id === editingBudget.id ? { ...b, budgetName, total } : b
+      );
       await saveBudgets(updated);
     } else {
       const newBudget = createBudget(budgetName, total, selectedTripId);
@@ -93,103 +118,140 @@ export default function Budget({ navigation }) {
     loadBudgets();
   };
 
-  if (activeBudget) {
-    return <SpendView budget={activeBudget} onBack={() => setActiveBudget(null)} />;
-  }
+  /* SPEND VIEW ----------------------------------------------------------------------------- */
+
+if (activeBudget) {
+  return (
+    <SpendView
+      budget={activeBudget}
+      onBack={() => {
+        setActiveBudget(null);
+        loadBudgets(); // 
+      }}
+    />
+  );
+}
+
+  /* RENDER ----------------------------------------------------------------------------- */
 
   return (
-<ImageBackground
-        source={BackgroundImage} 
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      > 
+    <ImageBackground
+      source={BackgroundImage}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
 
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+          {/* HEADER */}
+          <View style={styles.backRow}>
+            <IconButton
+              icon="arrow-left"
+              size={26}
+              onPress={() => navigation.goBack()}
+            />
+            <Text style={styles.pageTitle}>Budget</Text>
+          </View>
 
-        {/*{selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
+          <ScrollView style={styles.scrollArea}>
+            {budgets.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>
+                  No budgets yet — tap "+" to add one!
+                </Text>
+              </View>
+            ) : (
+              <>
+                {/* TOTAL CARD */}
+                <BudgetCard
+                  budget={{
+                    total: budgets.reduce((sum, b) => sum + b.total, 0),
+                    spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
+                  }}
+                  isTotal
+                />
 
-        <View style={styles.backRow}>
-              <IconButton
-                icon="arrow-left"
-                size={26}
-                onPress={() => navigation.goBack()}
-              />
-              <Text style={styles.pageTitle}>Budget</Text>
-            </View>
+                {/* BUDGET LIST */}
+                <FlatList
+                  data={budgets}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => (
+                    <BudgetCard
+                      budget={item}
+                      onEdit={() => showDialog(item)}
+                      onDelete={() => handleDeleteBudget(item.id)}
+                      onPress={() => setActiveBudget(item)}
+                    />
+                  )}
+                  scrollEnabled={false}
+                />
+              </>
+            )}
+          </ScrollView>
 
-        <ScrollView style={styles.scrollArea}>
-          {budgets.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                No budgets yet — tap "+" to add one!
-              </Text>
-            </View>
-          ) : (
-            <>
-              <BudgetCard
-                budget={{
-                  total: budgets.reduce((sum, b) => sum + b.total, 0),
-                  spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
-                }}
-                isTotal
-              />
-              <FlatList
-                data={budgets}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                  <BudgetCard
-                    budget={item}
-                    onEdit={() => showDialog(item)}
-                    onDelete={() => handleDeleteBudget(item.id)}
-                    onPress={() => setActiveBudget(item)}
-                  />
-                )}
-                scrollEnabled={false}
-              />
-            </>
+          {/* FAB */}
+          {selectedTripId && (
+            <ReusableFab
+              icon="plus"
+              label="Add Budget"
+              onPress={() => showDialog()}
+            />
           )}
-        </ScrollView>
 
-        {selectedTripId && (
-          <ReusableFab icon="plus" label="Add Budget" onPress={() => showDialog()} />
-        )}
+          {/* DIALOG */}
+          <Portal>
+            <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+              <Dialog.Title>
+                {editingBudget ? 'Edit Budget' : 'New Budget'}
+              </Dialog.Title>
+              <Dialog.Content>
+                <TextInput
+                  label="Budget Name"
+                  value={budgetName}
+                  onChangeText={setBudgetName}
+                />
+                <TextInput
+                  label="Total Amount"
+                  value={budgetTotal}
+                  onChangeText={setBudgetTotal}
+                  keyboardType="numeric"
+                />
+                {errorMsg ? (
+                  <Text style={styles.errorText}>{errorMsg}</Text>
+                ) : null}
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={hideDialog}>Cancel</Button>
+                <Button onPress={handleSaveBudget}>Save</Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
 
-        <Portal>
-          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-            <Dialog.Title>{editingBudget ? 'Edit Budget' : 'New Budget'}</Dialog.Title>
-            <Dialog.Content>
-              <TextInput label="Budget Name" value={budgetName} onChangeText={setBudgetName} />
-              <TextInput
-                label="Total Amount"
-                value={budgetTotal}
-                onChangeText={setBudgetTotal}
-                keyboardType="numeric"
-              />
-              {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={hideDialog}>Cancel</Button>
-              <Button onPress={handleSaveBudget}>Save</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
-      </View>
-    </SafeAreaView>
-
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
 
+/* STYLES ----------------------------------------------------------------------------- */
+
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, },
+  safeArea: { flex: 1 },
   container: { flex: 1, padding: 16 },
   scrollArea: { flex: 1 },
   backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
-  fab: { position: 'absolute', right: 16, bottom: 16 },
-  emptyContainer: { marginTop: 50, alignItems: 'center', justifyContent: 'center', padding: 20 },
-  emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
-  backgroundImage: {flex: 1,},
-  errorText: { color: 'red' },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center'
+  },
+  backgroundImage: { flex: 1 },
+  errorText: { color: 'red' }
 });
