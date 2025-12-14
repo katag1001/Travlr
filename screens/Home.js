@@ -132,38 +132,9 @@ export default function Home({ navigation }) {
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-              {/* Banner */}
-              {/* {selectedTrip && <Banner theme={selectedTrip.theme} />} */}
-
+              
               <ScrollView>
-                {/* Trip selector */}
-                {/* <TripSelector /> */}
-
-                {/* Trip actions (commented out) */}
-                {/* {selectedTrip && (
-                  <View style={styles.tripActionsRow}>
-                    <Button
-                      mode="outlined"
-                      icon="pencil"
-                      onPress={() => openModalForEdit(selectedTrip)}
-                      style={styles.tripButtonMarginRight}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      mode="outlined"
-                      icon="delete"
-                      textColor="red"
-                      onPress={handleDeleteSelectedTrip}
-                    >
-                      Delete
-                    </Button>
-                  </View>
-                )} */}
-
                 
-
-
                 {trips.length === 0 ? (
                   <View style={styles.noTripsContainer}>
                     <Text style={styles.noTripsText}>

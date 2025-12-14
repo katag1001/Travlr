@@ -30,7 +30,7 @@ export default function TripSelectorCard({ onEdit }) {
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
-    setDropdownVisible(false); // close trip selector if menu opens
+    setDropdownVisible(false); 
   };
 
   const handleSelectTrip = (trip) => {
@@ -41,7 +41,7 @@ export default function TripSelectorCard({ onEdit }) {
   const handleDeleteTrip = (trip) => {
     Alert.alert(
       'Delete Trip',
-      `Are you sure you want to delete "${trip.tripName}"?`,
+      `Are you sure you want to delete ${trip.tripName}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -62,17 +62,25 @@ export default function TripSelectorCard({ onEdit }) {
   return (
     <View style={{ position: 'relative' }}>
       <Card style={styles.card}>
-        {/* Header with three dots */}
+
+        {/* 3 dots dropdown menu */}
         {selectedTrip && (
+
           <View style={styles.cardHeader}>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity onPress={toggleMenu}>
-              <IconButton icon="dots-vertical" size={24} />
-            </TouchableOpacity>
-          </View>
+  <View style={{ flex: 1 }} /> {/* spacer to push text to center */}
+
+  <Text style={styles.headerText}>Current Trip</Text>
+
+  <View style={{ flex: 1, alignItems: 'flex-end' }}>
+    <TouchableOpacity onPress={toggleMenu}>
+      <IconButton icon="dots-vertical" size={24} />
+    </TouchableOpacity>
+  </View>
+</View>
+
         )}
 
-        {/* Trip selector */}
+        {/* Trip selector menu */}
         <TouchableOpacity
           onPress={toggleDropdown}
           style={styles.selectorContainer}
