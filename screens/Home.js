@@ -1,28 +1,31 @@
 /*REACT IMPORTS -----------------------------------------------------------------------------*/
-
 import React, { useEffect, useState } from 'react';
-import {ImageBackground,View,StyleSheet,ScrollView,TouchableWithoutFeedback,Keyboard,KeyboardAvoidingView,Platform,Alert, } from 'react-native';
+import {
+  ImageBackground,
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {Text,Button,Portal,Modal,TextInput,Card,IconButton,Menu,} from 'react-native-paper';
+import { Text, Button, Portal, Modal, TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
 
-/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
-
+/*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 import { useTrip } from '../components/TripContext';
-import {getTrips,addTrip,updateTrip,deleteTrip,} from '../storage/tripStorage';
+import { getTrips, addTrip, updateTrip } from '../storage/tripStorage';
 import { getThemeFromTripName } from '../components/ThemeMapper';
 
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
-
-/*import Banner from '../components/Banner';*/
 import TripSelectorCard from '../components/TripSelector';
 import ReusableFab from '../components/ReusableFab';
 import Background from '../components/Background';
 
-
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
-
 export default function Home({ navigation }) {
   const { selectedTrip, selectedTripId, selectTrip } = useTrip();
 
@@ -36,7 +39,6 @@ export default function Home({ navigation }) {
   const [endDate, setEndDate] = useState('');
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
 
   const loadTrips = async () => {
     const tr = await getTrips();
@@ -50,6 +52,8 @@ export default function Home({ navigation }) {
   useEffect(() => {
     if (trips.length > 0 && !selectedTripId) {
       selectTrip(trips[0]);
+    } else if (trips.length === 0) {
+      selectTrip(null); // no trips available
     }
   }, [trips]);
 
@@ -95,32 +99,20 @@ export default function Home({ navigation }) {
 
     if (editingTrip) {
       await updateTrip(newTrip);
+      selectTrip(newTrip); // update selected trip immediately
     } else {
       await addTrip(newTrip);
       selectTrip(newTrip);
     }
 
-    loadTrips();
+    await loadTrips(); // refresh trips list
     setModalVisible(false);
     resetForm();
   };
 
-  const handleDeleteSelectedTrip = () => {
-    if (!selectedTrip) return;
-
-    Alert.alert('Delete Trip', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteTrip(selectedTrip.id);
-          const updated = await getTrips();
-          setTrips(updated);
-          selectTrip(updated[0] ?? null);
-        },
-      },
-    ]);
+  const handleTripsUpdated = (updatedTrips) => {
+    setTrips(updatedTrips);
+    selectTrip(updatedTrips[0] ?? null);
   };
 
   return (
@@ -132,9 +124,7 @@ export default function Home({ navigation }) {
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-              
               <ScrollView>
-                
                 {trips.length === 0 ? (
                   <View style={styles.noTripsContainer}>
                     <Text style={styles.noTripsText}>
@@ -143,7 +133,12 @@ export default function Home({ navigation }) {
                   </View>
                 ) : (
                   <View style={styles.navButtonContainer}>
-                    <TripSelectorCard onEdit={(trip) => openModalForEdit(trip)} />
+                    <TripSelectorCard
+                      trips={trips}
+                      selectedTrip={selectedTrip}
+                      onEdit={openModalForEdit}
+                      onTripsChange={handleTripsUpdated}
+                    />
                     <Button
                       mode="contained"
                       style={styles.navButton}
@@ -173,8 +168,7 @@ export default function Home({ navigation }) {
                     >
                       Hotels
                     </Button>
-
-                     <Button
+                    <Button
                       mode="contained"
                       style={styles.navButton}
                       disabled={!selectedTripId}
@@ -299,29 +293,6 @@ const styles = StyleSheet.create({
   },
   dateButton: { marginVertical: 8 },
   button: { marginVertical: 10 },
-  tripActionsRow: { flexDirection: 'row', marginTop: 10 },
-  background: { flex: 1, resizeMode: 'cover' },
-  tripCard: {
-    marginTop: 12,
-    borderRadius: 10,
-    backgroundColor: 'white',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    marginHorizontal: 4,
-  },
-  tripCardContent: { flexDirection: 'row', alignItems: 'center', padding: 16, position: 'relative' },
-  tripSelectorContainer: { flex: 1, marginRight: 50 },
-  iconActions: { position: 'absolute', right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center' },
-  cardHeader: { width: '100%', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' },
-  tripSelectorCentered: { paddingVertical: 10, alignItems: 'center', justifyContent: 'center' },
-
-  // EXTRACTED INLINE STYLES
-  menuSpacer: { flex: 1 },
-  tripButtonMarginRight: { marginRight: 10 },
-  menuDeleteTitle: { color: 'red' },
   noTripsContainer: { marginTop: 40, alignItems: 'center' },
   noTripsText: { fontSize: 18, opacity: 0.7 },
   navButtonContainer: { marginTop: 20 },

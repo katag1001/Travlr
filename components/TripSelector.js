@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert, Dimensions } from 'react-native';
 import { Card, IconButton } from 'react-native-paper';
-import { getTrips, deleteTrip } from '../storage/tripStorage';
+import { deleteTrip } from '../storage/tripStorage';
 import { useTrip } from './TripContext';
 
-export default function TripSelectorCard({ onEdit }) {
-  const [trips, setTrips] = useState([]);
+export default function TripSelectorCard({ trips: propTrips = [], onEdit, onTripsChange }) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
   const { selectedTrip, selectedTripId, selectTrip } = useTrip();
+  const [trips, setTrips] = useState(propTrips);
 
+  // Sync local trips with props from Home
   useEffect(() => {
-    const loadTrips = async () => {
-      const tr = await getTrips();
-      setTrips(tr);
-
-      if (tr.length > 0 && !selectedTripId) {
-        selectTrip(tr[0]);
-      }
-    };
-    loadTrips();
-  }, [selectedTripId]);
+    setTrips(propTrips);
+  }, [propTrips]);
 
   const toggleDropdown = () => {
     if (menuVisible) return;
@@ -34,24 +27,32 @@ export default function TripSelectorCard({ onEdit }) {
   };
 
   const handleSelectTrip = (trip) => {
+    if (trip && trip.id === selectedTripId) {
+      setDropdownVisible(false);
+      return;
+    }
     selectTrip(trip);
     setDropdownVisible(false);
   };
 
   const handleDeleteTrip = (trip) => {
+    if (!trip) return;
     Alert.alert(
       'Delete Trip',
-      `Are you sure you want to delete ${String(trip?.tripName ?? '')}?`,
+      `Are you sure you want to delete ${trip.tripName}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
-            await deleteTrip(trip.id);
-            const updated = await getTrips();
+            const updated = (await deleteTrip(trip.id)) || [];
             setTrips(updated);
             selectTrip(updated[0] ?? null);
+
+            if (onTripsChange) {
+              onTripsChange(updated); // notify Home of updated trips
+            }
           },
         },
       ]
@@ -62,34 +63,36 @@ export default function TripSelectorCard({ onEdit }) {
   return (
     <View style={{ position: 'relative' }}>
       <Card style={styles.card}>
-        {/* 3 dots dropdown menu */}
         {selectedTrip && (
           <View style={styles.cardHeader}>
-            <View style={{ flex: 1 }} /> {/* spacer to push text to center */}
-            <Text style={styles.headerText}>Current Trip</Text>
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-              <TouchableOpacity onPress={toggleMenu}>
-                <IconButton icon="dots-vertical" size={24} />
-              </TouchableOpacity>
-            </View>
-          </View>
+    <View style={{ flex: 1 }} />
+    <View style={{ alignItems: 'center', flex: 2 }}>
+      <Text style={styles.headerText}>Current Trip</Text>
+      <Text style={styles.datesText}>
+        {selectedTrip.startDate && selectedTrip.endDate
+          ? `${selectedTrip.startDate} - ${selectedTrip.endDate}`
+          : ''}
+      </Text>
+    </View>
+    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+      <TouchableOpacity onPress={toggleMenu}>
+        <IconButton icon="dots-vertical" size={24} />
+      </TouchableOpacity>
+    </View>
+  </View>
         )}
 
-        {/* Trip selector menu */}
         <TouchableOpacity
           onPress={toggleDropdown}
           style={styles.selectorContainer}
           activeOpacity={0.8}
         >
           <Text style={styles.tripName}>
-  {selectedTrip?.tripName ? String(selectedTrip.tripName) : 'Add a new trip to get started!'}
-</Text>
-
-
+            {selectedTrip?.tripName || 'Select a Trip'}
+          </Text>
         </TouchableOpacity>
 
-        {/* Trip selector dropdown */}
-        {dropdownVisible && (
+        {dropdownVisible && trips.length > 0 && (
           <View style={styles.dropdown}>
             {trips.map((trip) => (
               <TouchableOpacity
@@ -98,7 +101,7 @@ export default function TripSelectorCard({ onEdit }) {
                 style={styles.dropdownItem}
               >
                 <Text style={styles.dropdownText}>
-                  {String(trip?.tripName ?? '')}
+                  {trip.tripName || 'Unnamed Trip'}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -106,17 +109,13 @@ export default function TripSelectorCard({ onEdit }) {
         )}
       </Card>
 
-      {/* Overlay + menu */}
       {menuVisible && (
         <>
-          {/* Full-screen transparent overlay */}
           <TouchableOpacity
             style={styles.overlay}
             activeOpacity={1}
             onPress={() => setMenuVisible(false)}
           />
-
-          {/* Absolute-positioned menu dropdown */}
           <View style={styles.menuDropdown}>
             <TouchableOpacity
               style={styles.menuItem}
@@ -207,4 +206,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  datesText: {
+  fontSize: 12,
+  color: '#888', // subtle gray
+  marginTop: 2,
+},
+
 });
