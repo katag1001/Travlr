@@ -1,8 +1,8 @@
 /*REACT IMPORTS -----------------------------------------------------------------------------*/
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Platform, ImageBackground, } from 'react-native';
-import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper';
+import { View, StyleSheet, Platform, ImageBackground, ScrollView} from 'react-native';
+import { Text, Button, TextInput, Dialog, Portal, FAB, Modal } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -122,42 +122,81 @@ export default function Spend({ budget, onBack }) {
       <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
 
       <Portal>
-        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-          <Dialog.Title>{editingSpend ? 'Edit Spend' : 'New Spend'}</Dialog.Title>
-          <Dialog.Content>
-            <TextInput label="Spend Name" value={spendName} onChangeText={setSpendName} />
-            <TextInput
-              label="Amount"
-              value={spendAmount}
-              onChangeText={setSpendAmount}
-              keyboardType="numeric"
-            />
+  <Modal
+    visible={dialogVisible}
+    onDismiss={hideDialog}
+    contentContainerStyle={styles.modalContainer}
+  >
+    <ScrollView>
+      <Text style={styles.modalHeading}>
+        {editingSpend ? 'Edit Spend' : 'New Spend'}
+      </Text>
 
-            <Button icon="calendar" mode="outlined" onPress={() => setShowDatePicker(true)}>
-              {spendDate.toLocaleDateString()}
-            </Button>
+      <TextInput
+        label="Spend Name"
+        value={spendName}
+        onChangeText={setSpendName}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
 
-            {showDatePicker && (
-              <DateTimePicker
-                value={spendDate}
-                mode="date"
-                display="default"
-                onChange={onDateChange}
-              />
-            )}
-          </Dialog.Content>
+      <TextInput
+        label="Amount"
+        value={spendAmount}
+        onChangeText={setSpendAmount}
+        keyboardType="numeric"
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
 
-          <Dialog.Actions>
-            <Button onPress={hideDialog}>Cancel</Button>
-            {editingSpend && (
-              <Button onPress={() => handleDeleteSpend(editingSpend.id)}>
-                Delete
-              </Button>
-            )}
-            <Button onPress={handleSaveSpend}>Save</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <Button
+        icon="calendar"
+        mode="contained"
+        style={styles.dateButton}
+        onPress={() => setShowDatePicker(true)}
+      >
+        {spendDate.toLocaleDateString()}
+      </Button>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={spendDate}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+        />
+      )}
+
+      {/* Buttons */}
+      <Button
+        mode="contained"
+        onPress={handleSaveSpend}
+        style={styles.modalButton}
+      >
+        {editingSpend ? 'Update Spend' : 'Save Spend'}
+      </Button>
+
+      {editingSpend && (
+        <Button
+          mode="contained"
+          onPress={() => handleDeleteSpend(editingSpend.id)}
+          style={styles.modalButton}
+        >
+          Delete
+        </Button>
+      )}
+
+      <Button
+        mode="contained"
+        onPress={hideDialog}
+        style={styles.modalButton}
+      >
+        Cancel
+      </Button>
+    </ScrollView>
+  </Modal>
+</Portal>
+
       </View>
     </SafeAreaView>
     </ImageBackground>
