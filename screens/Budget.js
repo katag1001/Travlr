@@ -3,8 +3,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, FlatList, ScrollView, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, TextInput, Dialog, Portal, IconButton } from 'react-native-paper';
+import { Text, Button, TextInput, Dialog, Portal, IconButton, Modal} from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+
+import styles from './Stylesheet';
 
 /* FUNCTION IMPORTS ----------------------------------------------------------------------------- */
 
@@ -227,33 +229,53 @@ if (activeBudget) {
 
         {/* DIALOG */}
         <Portal>
-          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-            <Dialog.Title>
-              {editingBudget ? 'Edit Budget' : 'New Budget'}
-            </Dialog.Title>
-            <Dialog.Content>
-              <TextInput
-                label="Budget Name"
-                value={budgetName}
-                onChangeText={setBudgetName}
-                disabled={editingBudget && isProtectedBudget(editingBudget)}
-              />
-              <TextInput
-                label="Total Amount"
-                value={budgetTotal}
-                onChangeText={setBudgetTotal}
-                keyboardType="numeric"
-              />
-              {errorMsg ? (
-                <Text style={styles.errorText}>{errorMsg}</Text>
-              ) : null}
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={hideDialog}>Cancel</Button>
-              <Button onPress={handleSaveBudget}>Save</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
+  <Modal
+    visible={dialogVisible}
+    onDismiss={hideDialog}
+    contentContainerStyle={styles.modalContainer}
+  >
+    <ScrollView>
+      <TextInput
+        label="Budget Name"
+        value={budgetName}
+        onChangeText={setBudgetName}
+        mode="outlined"
+        style={styles.modalTextInput}
+        disabled={editingBudget && isProtectedBudget(editingBudget)}
+      />
+
+      <TextInput
+        label="Total Amount"
+        value={budgetTotal}
+        onChangeText={setBudgetTotal}
+        keyboardType="numeric"
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
+
+      {errorMsg ? (
+        <Text style={styles.errorText}>{errorMsg}</Text>
+      ) : null}
+
+      <Button
+        mode="contained"
+        onPress={handleSaveBudget}
+        style={styles.modalButton}
+      >
+        {editingBudget ? 'Update Budget' : 'Save Budget'}
+      </Button>
+
+      <Button
+        mode="contained"
+        onPress={hideDialog}
+        style={styles.modalButton}
+      >
+        Cancel
+      </Button>
+    </ScrollView>
+  </Modal>
+</Portal>
+
 
       </View>
     </SafeAreaView>
@@ -262,25 +284,4 @@ if (activeBudget) {
 
 }
 
-/* STYLES ----------------------------------------------------------------------------- */
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  container: { flex: 1, padding: 16 },
-  scrollArea: { flex: 1 },
-  backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
-  emptyContainer: {
-    marginTop: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center'
-  },
-  backgroundImage: { flex: 1 },
-  errorText: { color: 'red' }
-});

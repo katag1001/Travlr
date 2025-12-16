@@ -25,6 +25,12 @@ const styles = StyleSheet.create({
     marginBottom: 15 },
   modalNotes: { marginBottom: 10, 
     height: 80 },
+  dateButton: { 
+    marginVertical: 8, 
+    backgroundColor: '#263041', 
+    borderRadius: 10, 
+    color: 'white'
+},
 
   // ------------------ Home ------------------
   button: { 
@@ -42,12 +48,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#263041',
   },
   
-  dateButton: { 
-    marginVertical: 8, 
-    backgroundColor: '#263041', 
-    borderRadius: 10, 
-    color: 'white'
-},
   
   noTripsContainer: { marginTop: 40, alignItems: 'center' },
   noTripsText: { fontSize: 18, opacity: 0.7 },
