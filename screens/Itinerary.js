@@ -8,6 +8,8 @@ import { Text, Portal, Modal, Button, IconButton } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
 import { useFocusEffect } from '@react-navigation/native';
 
+import styles from './Stylesheet';
+
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
 import { getItineraryForTrip, deleteItineraryEntry } from '../storage/itineraryStorage';
@@ -238,18 +240,4 @@ export default function Itinerary({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, },
-  container: { flex: 1, padding: 16 },
-  backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
-  scrollArea: { flex: 1 },
-  calendar: { borderRadius: 10, elevation: 2 },
-  modalContainer: { backgroundColor: 'white', padding: 20, margin: 20, borderRadius: 8 },
-  emptyContainer: { marginTop: 50, alignItems: 'center', justifyContent: 'center', padding: 20 },
-  emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
-       backgroundImage: {
-    flex: 1,
-  },
-  backToCalendarButton: { marginBottom: 10 },
-});
+

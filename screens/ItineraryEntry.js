@@ -1,20 +1,18 @@
+/*REACT IMPORTS -----------------------------------------------------------------------------*/
+
 import React, { useState, useEffect } from 'react';
 import { View, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import {
-  addItineraryEntry,
-  updateItineraryEntry,
-} from '../storage/itineraryStorage';
+import styles from './Stylesheet';
 
-import {
-  getBudgets,
-  createSpend,
-  addSpend,
-  updateSpend,
-  deleteSpend,
-} from '../storage/budgetStorage';
+/*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
+
+import {addItineraryEntry,updateItineraryEntry} from '../storage/itineraryStorage';
+import {getBudgets,createSpend,addSpend,updateSpend,deleteSpend,} from '../storage/budgetStorage';
+
+/*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function ItineraryEntryForm({
   tripId,
@@ -259,10 +257,4 @@ export default function ItineraryEntryForm({
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: 10 },
-  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
-  input: { marginBottom: 10 },
-  notes: { marginBottom: 10, height: 80 },
-  button: { marginTop: 10 },
-});
+

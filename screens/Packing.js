@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal,} from 'react-native-paper';
 import { v4 as uuidv4 } from 'uuid';
 
+import styles from './Stylesheet';
+
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
 import { getPackingListsForTrip, addPackingList, updatePackingList, deletePackingList,} from '../storage/packingStorage';
@@ -304,41 +306,4 @@ export default function Packing({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, },
-  container: { flex: 1, padding: 16 },
-  backRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  pageTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  scrollArea: { flex: 1 },
-  input: { marginVertical: 10 },
-  activeListHeader: { marginBottom: 10 },
-  itemRow: { flexDirection: 'row', alignItems: 'center' },
-  itemText: { flex: 1, fontSize: 16 },
-  error: { color: 'red', marginTop: 4 },
-  emptyContainer: {
-    marginTop: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
 
-   backgroundImage: {
-    flex: 1,
-  },
-  keyboardContainer: { flex: 1 },
-divider: { marginVertical: 10 },
-activeListContainer: { flex: 1 },
-});

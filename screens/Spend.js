@@ -6,6 +6,8 @@ import { Text, Button, TextInput, Dialog, Portal, FAB } from 'react-native-paper
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import styles from './Stylesheet';
+
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
 import { getSpendsForBudget, addSpend, updateSpend,deleteSpend, createSpend} from '../storage/budgetStorage';
@@ -98,6 +100,7 @@ export default function Spend({ budget, onBack }) {
       > 
 
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
       <Button onPress={onBack} mode="contained" style={styles.backButton}>
         ← Back to Budgets
       </Button>
@@ -155,30 +158,9 @@ export default function Spend({ budget, onBack }) {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+      </View>
     </SafeAreaView>
     </ImageBackground>
 
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    padding: 16,
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-   backgroundImage: {
-    flex: 1,
-  },
-  backButton: { marginBottom: 10 },
-});

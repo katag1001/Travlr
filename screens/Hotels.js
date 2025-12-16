@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextInput, Button, Modal,Portal,IconButton} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+import styles from './Stylesheet';
+
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
 import { getHotelsForTrip, addHotel, updateHotel, deleteHotel, } from '../storage/hotelStorage';
@@ -334,62 +336,4 @@ console.log(
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  backRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  pageTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  scrollArea: {
-    flex: 1,
-  },
-  emptyContainer: {
-    marginTop: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    padding: 20,
-    margin: 20,
-    borderRadius: 8,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  input: {
-    marginBottom: 10,
-  },
-  dateButton: {
-    marginBottom: 10,
-    justifyContent: 'flex-start',
-  },
-  submitButton: {
-    marginVertical: 10,
-  },
-     backgroundImage: {
-    flex: 1,
-  },
-  keyboardAvoiding: { 
-    flex: 1 },
-});
+

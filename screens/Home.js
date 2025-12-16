@@ -1,19 +1,12 @@
 /*REACT IMPORTS -----------------------------------------------------------------------------*/
 import React, { useEffect, useState } from 'react';
-import {
-  ImageBackground,
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import {ImageBackground, View,StyleSheet,ScrollView,TouchableWithoutFeedback,Keyboard,KeyboardAvoidingView,Platform,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Portal, Modal, TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
+
+import styles from './Stylesheet';
 
 /*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 import { useTrip } from '../components/TripContext';
@@ -275,26 +268,4 @@ export default function Home({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  flex: { flex: 1 },
-  container: { flex: 1, padding: 16 },
-  navButton: {
-    marginVertical: 10,
-    borderRadius: 10,
-    paddingVertical: 8,
-    backgroundColor: '#263041',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    margin: 20,
-  },
-  dateButton: { marginVertical: 8 },
-  button: { marginVertical: 10 },
-  noTripsContainer: { marginTop: 40, alignItems: 'center' },
-  noTripsText: { fontSize: 18, opacity: 0.7 },
-  navButtonContainer: { marginTop: 20 },
-  modalTextInput: { marginBottom: 12 },
-});
+

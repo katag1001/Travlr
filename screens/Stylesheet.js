@@ -1,0 +1,70 @@
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  // ------------------ Budget ------------------
+  safeArea: { flex: 1 },
+  container: { flex: 1, padding: 16 },
+  scrollArea: { flex: 1 },
+  backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
+  backgroundImage: { flex: 1 },
+  errorText: { color: 'red' },
+
+  // ------------------ Home ------------------
+  flex: { flex: 1 },
+  navButton: {
+    marginVertical: 10,
+    borderRadius: 10,
+    paddingVertical: 8,
+    backgroundColor: '#263041',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    margin: 20,
+  },
+  dateButton: { marginVertical: 8 },
+  button: { marginVertical: 10, marginTop: 10 },
+  noTripsContainer: { marginTop: 40, alignItems: 'center' },
+  noTripsText: { fontSize: 18, opacity: 0.7 },
+  navButtonContainer: { marginTop: 20 },
+  modalTextInput: { marginBottom: 12 },
+
+  // ------------------ Hotels ------------------
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  input: { marginBottom: 10 },
+  submitButton: { marginVertical: 10 },
+  keyboardAvoiding: { flex: 1 },
+
+  // ------------------ Itinerary ------------------
+  calendar: { borderRadius: 10, elevation: 2 },
+  backToCalendarButton: { marginBottom: 10 },
+
+  // ------------------ ItineraryEntry ------------------
+  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  notes: { marginBottom: 10, height: 80 },
+
+  // ------------------ Packing ------------------
+  activeListHeader: { marginBottom: 10 },
+  itemRow: { flexDirection: 'row', alignItems: 'center' },
+  itemText: { flex: 1, fontSize: 16 },
+  error: { color: 'red', marginTop: 4 },
+  keyboardContainer: { flex: 1 },
+  divider: { marginVertical: 10 },
+  activeListContainer: { flex: 1 },
+
+  // ------------------ Spend ------------------
+  fab: { position: 'absolute', right: 20, bottom: 20 },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
+  backButton: { marginBottom: 10 },
+});
+
+export default styles;
