@@ -11,7 +11,6 @@ export default function TripSelectorCard({ trips: propTrips = [], onEdit, onTrip
   const { selectedTrip, selectedTripId, selectTrip } = useTrip();
   const [trips, setTrips] = useState(propTrips);
 
-  // Sync local trips with props from Home
   useEffect(() => {
     setTrips(propTrips);
   }, [propTrips]);
@@ -51,7 +50,7 @@ export default function TripSelectorCard({ trips: propTrips = [], onEdit, onTrip
             selectTrip(updated[0] ?? null);
 
             if (onTripsChange) {
-              onTripsChange(updated); // notify Home of updated trips
+              onTripsChange(updated);
             }
           },
         },
@@ -61,25 +60,25 @@ export default function TripSelectorCard({ trips: propTrips = [], onEdit, onTrip
   };
 
   return (
-    <View style={{ position: 'relative' }}>
+    <View style={styles.container}>
       <Card style={styles.card}>
         {selectedTrip && (
           <View style={styles.cardHeader}>
-    <View style={{ flex: 1 }} />
-    <View style={{ alignItems: 'center', flex: 2 }}>
-      <Text style={styles.headerText}>Current Trip</Text>
-      <Text style={styles.datesText}>
-        {selectedTrip.startDate && selectedTrip.endDate
-          ? `${selectedTrip.startDate} - ${selectedTrip.endDate}`
-          : ''}
-      </Text>
-    </View>
-    <View style={{ flex: 1, alignItems: 'flex-end' }}>
-      <TouchableOpacity onPress={toggleMenu}>
-        <IconButton icon="dots-vertical" size={24} />
-      </TouchableOpacity>
-    </View>
-  </View>
+            <View style={styles.flex1} />
+            <View style={styles.flex2Center}>
+              <Text style={styles.headerText}>Current Trip</Text>
+              <Text style={styles.datesText}>
+                {selectedTrip.startDate && selectedTrip.endDate
+                  ? `${selectedTrip.startDate} - ${selectedTrip.endDate}`
+                  : ''}
+              </Text>
+            </View>
+            <View style={styles.flex1End}>
+              <TouchableOpacity onPress={toggleMenu}>
+                <IconButton icon="dots-vertical" size={24} />
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
 
         <TouchableOpacity
@@ -130,7 +129,7 @@ export default function TripSelectorCard({ trips: propTrips = [], onEdit, onTrip
               style={styles.menuItem}
               onPress={() => handleDeleteTrip(selectedTrip)}
             >
-              <Text style={{ color: 'red' }}>Delete Trip</Text>
+              <Text style={styles.deleteText}>Delete Trip</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -140,12 +139,17 @@ export default function TripSelectorCard({ trips: propTrips = [], onEdit, onTrip
 }
 
 const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+  },
   card: {
     marginTop: 12,
+    marginBottom: 12,
     borderRadius: 10,
     backgroundColor: 'white',
     elevation: 2,
     marginHorizontal: 4,
+    paddingBottom: 8,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -153,6 +157,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 8,
     paddingTop: 4,
+  },
+  flex1: {
+    flex: 1,
+  },
+  flex2Center: {
+    flex: 2,
+    alignItems: 'center',
+  },
+  flex1End: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   headerText: {
     fontSize: 16,
@@ -165,7 +180,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tripName: {
-    fontSize: 18,
+    fontSize: 25,
     color: '#263041',
   },
   dropdown: {
@@ -206,10 +221,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  deleteText: {
+    color: 'red',
+  },
   datesText: {
-  fontSize: 12,
-  color: '#888', // subtle gray
-  marginTop: 2,
-},
-
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
+  },
 });

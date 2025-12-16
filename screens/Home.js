@@ -176,7 +176,7 @@ export default function Home({ navigation }) {
                   setModalVisible(true);
                 }}
               />
-
+              {/* Popup Modal --------------------------------------------------------------- */}
               <Portal>
                 <Modal
                   visible={modalVisible}
@@ -196,7 +196,7 @@ export default function Home({ navigation }) {
                     />
 
                     <Button
-                      mode="outlined"
+                      mode="contained"
                       icon="calendar"
                       onPress={() => setShowStartPicker(true)}
                       style={styles.dateButton}
@@ -216,7 +216,7 @@ export default function Home({ navigation }) {
                     )}
 
                     <Button
-                      mode="outlined"
+                      mode="contained"
                       icon="calendar"
                       onPress={() => setShowEndPicker(true)}
                       style={styles.dateButton}
@@ -238,20 +238,22 @@ export default function Home({ navigation }) {
                     <Button
                       mode="contained"
                       onPress={handleSaveTrip}
-                      style={styles.button}
+                      style={styles.modalButton}
                     >
                       {editingTrip ? 'Update Trip' : 'Save Trip'}
                     </Button>
 
                     <Button
+                      mode="contained"
                       onPress={() => {
                         setModalVisible(false);
                         resetForm();
                       }}
-                      style={styles.button}
+                      style={styles.modalButton}
                     >
                       Cancel
                     </Button>
+
                   </ScrollView>
                 </Modal>
               </Portal>

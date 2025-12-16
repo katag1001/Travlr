@@ -1,7 +1,54 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  // ------------------ Budget ------------------
+
+  // ------------------ Modal ------------------
+
+  modalContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    margin: 20,},
+  modalTextInput: { 
+    marginBottom: 12 },
+  modalTitle: { 
+    fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  modalButton: { 
+    backgroundColor: 'pink', 
+    borderRadius: 10, 
+    marginVertical: 10, 
+    marginTop: 10, 
+    textColor: 'white' },
+
+  // ------------------ Home ------------------
+  button: { 
+    backgroundColor: '#263041', 
+    borderRadius: 10, 
+    marginVertical: 10, 
+    marginTop: 10, 
+    color: 'white' },
+  
+  flex: { flex: 1 },
+  navButton: {
+    marginVertical: 10,
+    borderRadius: 10,
+    paddingVertical: 8,
+    backgroundColor: '#263041',
+  },
+  
+  dateButton: { 
+    marginVertical: 8, 
+    backgroundColor: '#263041', 
+    borderRadius: 10, 
+    color: 'white'
+},
+  
+  noTripsContainer: { marginTop: 40, alignItems: 'center' },
+  noTripsText: { fontSize: 18, opacity: 0.7 },
+  navButtonContainer: { marginTop: 20 },
+  
+
+    // ------------------ Budget ------------------
   safeArea: { flex: 1 },
   container: { flex: 1, padding: 16 },
   scrollArea: { flex: 1 },
@@ -17,29 +64,9 @@ const styles = StyleSheet.create({
   backgroundImage: { flex: 1 },
   errorText: { color: 'red' },
 
-  // ------------------ Home ------------------
-  flex: { flex: 1 },
-  navButton: {
-    marginVertical: 10,
-    borderRadius: 10,
-    paddingVertical: 8,
-    backgroundColor: '#263041',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    margin: 20,
-  },
-  dateButton: { marginVertical: 8 },
-  button: { marginVertical: 10, marginTop: 10 },
-  noTripsContainer: { marginTop: 40, alignItems: 'center' },
-  noTripsText: { fontSize: 18, opacity: 0.7 },
-  navButtonContainer: { marginTop: 20 },
-  modalTextInput: { marginBottom: 12 },
 
   // ------------------ Hotels ------------------
-  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  
   input: { marginBottom: 10 },
   submitButton: { marginVertical: 10 },
   keyboardAvoiding: { flex: 1 },
