@@ -152,8 +152,8 @@ export default function ItineraryEntryForm({
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalHeading}>
         {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
       </Text>
 
@@ -164,7 +164,7 @@ export default function ItineraryEntryForm({
         placeholder="Title (e.g. Visit Eiffel Tower)"
         value={form.title}
         onChangeText={text => setForm({ ...form, title: text })}
-        style={styles.input}
+        style={styles.modalTextInput}
       />
 
       {/* Budget Selector */}
@@ -243,14 +243,19 @@ export default function ItineraryEntryForm({
         onChangeText={text => setForm({ ...form, notes: text })}
         multiline
         numberOfLines={3}
-        style={styles.notes}
+        style={styles.modalNotes}
       />
 
-      <Button mode="contained" onPress={handleSave} style={styles.button}>
+      <Button 
+      mode="contained" 
+      onPress={handleSave} 
+      style={styles.modalButton}>
         {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
       </Button>
 
-      <Button onPress={resetForm} style={styles.button}>
+      <Button 
+      mode="contained" 
+      onPress={resetForm} style={styles.modalButton}>
         Cancel
       </Button>
     </View>

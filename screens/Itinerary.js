@@ -199,23 +199,23 @@ export default function Itinerary({ navigation }) {
             )}
 
             {/* FAB */}
-            {selectedTripId && (
-              <ReusableFab
-                icon="plus"
-                label="Add Item"
-                onPress={() => {
-                  setEditingItem(null);
-                  setModalVisible(true);
-                }}
-              />
-            )}
+{selectedTripId && viewMode === 'day' && (
+  <ReusableFab
+    icon="plus"
+    label="Add Item"
+    onPress={() => {
+      setEditingItem(null);
+      setModalVisible(true);
+    }}
+  />
+)}
+
 
             {/* MODAL */}
             <Portal>
               <Modal
                 visible={modalVisible}
                 onDismiss={() => setModalVisible(false)}
-                contentContainerStyle={styles.modalContainer}
               >
                 <ItineraryEntryForm
                   tripId={selectedTripId}

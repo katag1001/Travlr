@@ -19,6 +19,12 @@ const styles = StyleSheet.create({
     marginVertical: 10, 
     marginTop: 10, 
     textColor: 'white' },
+  modalHeading: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    marginBottom: 15 },
+  modalNotes: { marginBottom: 10, 
+    height: 80 },
 
   // ------------------ Home ------------------
   button: { 
@@ -75,9 +81,7 @@ const styles = StyleSheet.create({
   calendar: { borderRadius: 10, elevation: 2 },
   backToCalendarButton: { marginBottom: 10 },
 
-  // ------------------ ItineraryEntry ------------------
-  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
-  notes: { marginBottom: 10, height: 80 },
+
 
   // ------------------ Packing ------------------
   activeListHeader: { marginBottom: 10 },
