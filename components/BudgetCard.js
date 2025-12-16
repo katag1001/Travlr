@@ -62,7 +62,7 @@ export default function BudgetCard({
             <Text style={styles.subCardTitle}>{budget.budgetName}</Text>
             <View style={styles.subActionButtons}>
               <Button compact onPress={onEdit}>Edit</Button>
-              {budget.budgetName !== 'Accomodation' && budget.budgetName !== 'Flights' && (
+              {budget.budgetName !== 'Accommodation' && budget.budgetName !== 'Flights' && (
                 <Button compact icon="delete" onPress={onDelete} />
               )}
             </View>

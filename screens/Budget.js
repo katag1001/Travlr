@@ -192,18 +192,25 @@ if (activeBudget) {
 
                 {/* BUDGET LIST */}
                 <FlatList
-                  data={budgets}
-                  keyExtractor={item => item.id}
-                  renderItem={({ item }) => (
-                    <BudgetCard
-                      budget={item}
-                      onEdit={() => showDialog(item)}
-                      onDelete={() => handleDeleteBudget(item.id)}
-                      onPress={() => setActiveBudget(item)}
-                    />
-                  )}
-                  scrollEnabled={false}
-                />
+  data={budgets}
+  keyExtractor={item => item.id}
+  renderItem={({ item }) => {
+    const protectedBudget = isProtectedBudget(item);
+
+    return (
+      <BudgetCard
+        budget={item}
+        onEdit={() => showDialog(item)}
+        onDelete={
+          protectedBudget ? undefined : () => handleDeleteBudget(item.id)
+        }
+        onPress={() => setActiveBudget(item)}
+      />
+    );
+  }}
+  scrollEnabled={false}
+/>
+
               </>
             )}
           </ScrollView>
