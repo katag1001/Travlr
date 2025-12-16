@@ -154,110 +154,112 @@ if (activeBudget) {
   /* Main view ----------------------------------------------------------------------------- */
 
   return (
-    <ImageBackground
-      source={BackgroundImage}
-      style={styles.backgroundImage}
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
+  <ImageBackground
+    source={BackgroundImage}
+    style={styles.backgroundImage}
+    resizeMode="cover"
+  >
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
 
-          {/* HEADER */}
-          <View style={styles.backRow}>
-            <IconButton
-              icon="arrow-left"
-              size={26}
-              onPress={() => navigation.goBack()}
-            />
-            <Text style={styles.pageTitle}>Budget</Text>
-          </View>
+        {/* HEADER */}
+        <View style={styles.backRow}>
+          <IconButton
+            icon="arrow-left"
+            size={26}
+            onPress={() => navigation.goBack()}
+          />
+          <Text style={styles.pageTitle}>Budget</Text>
+        </View>
 
-          <ScrollView style={styles.scrollArea}>
-            {budgets.length === 0 ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
-                  No budgets yet — tap "+" to add one!
-                </Text>
-              </View>
-            ) : (
-              <>
-                {/* TOTAL CARD */}
-                <BudgetCard
-                  budget={{
-                    total: budgets.reduce((sum, b) => sum + b.total, 0),
-                    spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
-                  }}
-                  isTotal
-                />
+        {/* TOTAL CARD (STATIC) */}
+        {budgets.length > 0 && (
+          <BudgetCard
+            budget={{
+              total: budgets.reduce((sum, b) => sum + b.total, 0),
+              spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
+            }}
+            isTotal
+          />
+        )}
 
-                {/* BUDGET LIST */}
-                <FlatList
-  data={budgets}
-  keyExtractor={item => item.id}
-  renderItem={({ item }) => {
-    const protectedBudget = isProtectedBudget(item);
+        {/* SCROLLING BUDGET LIST */}
+        <ScrollView style={styles.scrollArea}>
+          {budgets.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                No budgets yet — tap "+" to add one!
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={budgets}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => {
+                const protectedBudget = isProtectedBudget(item);
 
-    return (
-      <BudgetCard
-        budget={item}
-        onEdit={() => showDialog(item)}
-        onDelete={
-          protectedBudget ? undefined : () => handleDeleteBudget(item.id)
-        }
-        onPress={() => setActiveBudget(item)}
-      />
-    );
-  }}
-  scrollEnabled={false}
-/>
-
-              </>
-            )}
-          </ScrollView>
-
-          {/* FAB */}
-          {selectedTripId && (
-            <ReusableFab
-              icon="plus"
-              label="Add Budget"
-              onPress={() => showDialog()}
+                return (
+                  <BudgetCard
+                    budget={item}
+                    onEdit={() => showDialog(item)}
+                    onDelete={
+                      protectedBudget
+                        ? undefined
+                        : () => handleDeleteBudget(item.id)
+                    }
+                    onPress={() => setActiveBudget(item)}
+                  />
+                );
+              }}
+              scrollEnabled={false}
             />
           )}
+        </ScrollView>
 
-          {/* DIALOG */}
-          <Portal>
-            <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-              <Dialog.Title>
-                {editingBudget ? 'Edit Budget' : 'New Budget'}
-              </Dialog.Title>
-              <Dialog.Content>
-                <TextInput
-                  label="Budget Name"
-                  value={budgetName}
-                  onChangeText={setBudgetName}
-                  disabled={editingBudget && isProtectedBudget(editingBudget)}
-                />
-                <TextInput
-                  label="Total Amount"
-                  value={budgetTotal}
-                  onChangeText={setBudgetTotal}
-                  keyboardType="numeric"
-                />
-                {errorMsg ? (
-                  <Text style={styles.errorText}>{errorMsg}</Text>
-                ) : null}
-              </Dialog.Content>
-              <Dialog.Actions>
-                <Button onPress={hideDialog}>Cancel</Button>
-                <Button onPress={handleSaveBudget}>Save</Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal>
+        {/* FAB */}
+        {selectedTripId && (
+          <ReusableFab
+            icon="plus"
+            label="Add Budget"
+            onPress={() => showDialog()}
+          />
+        )}
 
-        </View>
-      </SafeAreaView>
-    </ImageBackground>
-  );
+        {/* DIALOG */}
+        <Portal>
+          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+            <Dialog.Title>
+              {editingBudget ? 'Edit Budget' : 'New Budget'}
+            </Dialog.Title>
+            <Dialog.Content>
+              <TextInput
+                label="Budget Name"
+                value={budgetName}
+                onChangeText={setBudgetName}
+                disabled={editingBudget && isProtectedBudget(editingBudget)}
+              />
+              <TextInput
+                label="Total Amount"
+                value={budgetTotal}
+                onChangeText={setBudgetTotal}
+                keyboardType="numeric"
+              />
+              {errorMsg ? (
+                <Text style={styles.errorText}>{errorMsg}</Text>
+              ) : null}
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>Cancel</Button>
+              <Button onPress={handleSaveBudget}>Save</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
+      </View>
+    </SafeAreaView>
+  </ImageBackground>
+);
+
 }
 
 /* STYLES ----------------------------------------------------------------------------- */
