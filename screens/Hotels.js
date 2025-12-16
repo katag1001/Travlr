@@ -186,9 +186,9 @@ console.log(
 
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  style={styles.keyboardAvoiding}
+>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
 
@@ -337,7 +337,6 @@ console.log(
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-
   },
   container: {
     flex: 1,
@@ -391,4 +390,6 @@ const styles = StyleSheet.create({
      backgroundImage: {
     flex: 1,
   },
+  keyboardAvoiding: { 
+    flex: 1 },
 });

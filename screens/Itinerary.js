@@ -166,9 +166,9 @@ export default function Itinerary({ navigation }) {
             {/* DAY VIEW */}
             {viewMode === 'day' && (
               <>
-                <Button onPress={handleBackToCalendar} style={{ marginBottom: 10 }}>
-                  Back to Calendar
-                </Button>
+                <Button onPress={handleBackToCalendar} style={styles.backToCalendarButton}>
+  Back to Calendar
+</Button>
 
                 {filteredItinerary.length === 0 ? (
                   <View style={styles.emptyContainer}>
@@ -251,4 +251,5 @@ const styles = StyleSheet.create({
        backgroundImage: {
     flex: 1,
   },
+  backToCalendarButton: { marginBottom: 10 },
 });

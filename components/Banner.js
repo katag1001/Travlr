@@ -1,3 +1,8 @@
+/* NOT IN USE -------------------------------------
+------------------------------------------------------------------------
+----------------------------------------------------------------------------------------*/
+
+
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import defaultImage from '../assets/images/banners/travel.png' 

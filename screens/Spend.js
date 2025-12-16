@@ -98,7 +98,7 @@ export default function Spend({ budget, onBack }) {
       > 
 
     <SafeAreaView style={styles.safeArea}>
-      <Button onPress={onBack} mode="contained" style={{ marginBottom: 10 }}>
+      <Button onPress={onBack} mode="contained" style={styles.backButton}>
         ← Back to Budgets
       </Button>
 
@@ -147,7 +147,7 @@ export default function Spend({ budget, onBack }) {
           <Dialog.Actions>
             <Button onPress={hideDialog}>Cancel</Button>
             {editingSpend && (
-              <Button onPress={() => handleDeleteSpend(editingSpend.id)} color="red">
+              <Button onPress={() => handleDeleteSpend(editingSpend.id)}>
                 Delete
               </Button>
             )}
@@ -180,4 +180,5 @@ const styles = StyleSheet.create({
    backgroundImage: {
     flex: 1,
   },
+  backButton: { marginBottom: 10 },
 });

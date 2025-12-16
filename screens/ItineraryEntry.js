@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Alert, TouchableOpacity } from 'react-native';
+import { View, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -154,8 +154,8 @@ export default function ItineraryEntryForm({
   };
 
   return (
-    <View>
-      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>
+    <View style={styles.container}>
+      <Text style={styles.heading}>
         {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
       </Text>
 
@@ -166,7 +166,7 @@ export default function ItineraryEntryForm({
         placeholder="Title (e.g. Visit Eiffel Tower)"
         value={form.title}
         onChangeText={text => setForm({ ...form, title: text })}
-        style={{ marginBottom: 10 }}
+        style={styles.input}
       />
 
       {/* Budget Selector */}
@@ -175,7 +175,7 @@ export default function ItineraryEntryForm({
           visible={showBudgetMenu}
           onDismiss={() => setShowBudgetMenu(false)}
           anchor={
-            <Button mode="outlined" onPress={() => setShowBudgetMenu(true)}>
+            <Button mode="outlined" onPress={() => setShowBudgetMenu(true)} style={styles.input}>
               {selectedBudgetId
                 ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
                 : 'Select Budget (optional)'}
@@ -212,7 +212,7 @@ export default function ItineraryEntryForm({
           value={form.time}
           editable={false}
           pointerEvents="none"
-          style={{ marginBottom: 10 }}
+          style={styles.input}
         />
       </TouchableOpacity>
 
@@ -233,7 +233,7 @@ export default function ItineraryEntryForm({
         value={form.cost}
         onChangeText={text => setForm({ ...form, cost: text })}
         keyboardType="numeric"
-        style={{ marginBottom: 10 }}
+        style={styles.input}
       />
 
       {/* Notes */}
@@ -245,16 +245,24 @@ export default function ItineraryEntryForm({
         onChangeText={text => setForm({ ...form, notes: text })}
         multiline
         numberOfLines={3}
-        style={{ marginBottom: 10, height: 80 }}
+        style={styles.notes}
       />
 
-      <Button mode="contained" onPress={handleSave} style={{ marginTop: 10 }}>
+      <Button mode="contained" onPress={handleSave} style={styles.button}>
         {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
       </Button>
 
-      <Button onPress={resetForm} style={{ marginTop: 10 }}>
+      <Button onPress={resetForm} style={styles.button}>
         Cancel
       </Button>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { padding: 10 },
+  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  input: { marginBottom: 10 },
+  notes: { marginBottom: 10, height: 80 },
+  button: { marginTop: 10 },
+});

@@ -159,9 +159,10 @@ export default function Packing({ navigation }) {
       
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  style={styles.keyboardContainer}
+>
+
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
 
@@ -178,7 +179,8 @@ export default function Packing({ navigation }) {
             </View>
 
             <ScrollView style={styles.scrollArea}>
-              <Divider style={{ marginVertical: 10 }} />
+              <Divider style={styles.divider} />
+
 
               {/* EMPTY STATE */}
               {packingLists.length === 0 ? (
@@ -199,7 +201,8 @@ export default function Packing({ navigation }) {
                   deleteItem={(pl) => handleDeleteList(pl.id)}
                 />
               ) : (
-                <View style={{ flex: 1 }}>
+                <View style={styles.activeListContainer}>
+
                   <Card
                     style={styles.activeListHeader}
                     onPress={showRenameDialog}
@@ -335,4 +338,7 @@ const styles = StyleSheet.create({
    backgroundImage: {
     flex: 1,
   },
+  keyboardContainer: { flex: 1 },
+divider: { marginVertical: 10 },
+activeListContainer: { flex: 1 },
 });
