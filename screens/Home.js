@@ -136,12 +136,7 @@ export default function Home({ navigation }) {
                       mode="contained"
                       style={styles.navButton}
                       disabled={!selectedTripId}
-                      onPress={() => {
-                        navigation.reset({
-                          index: 0,
-                          routes: [{ name: 'Itinerary' }],
-                        });
-                      }}
+                      onPress={() => navigation.navigate('Itinerary')}
                     >
                       Itinerary
                     </Button>
