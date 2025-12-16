@@ -38,7 +38,12 @@ export default function Budget({ navigation }) {
 
   const { selectedTripId } = useTrip();
 
-  /* LOAD BUDGETS ----------------------------------------------------------------------------- */
+
+  const PROTECTED_BUDGET_NAMES = ['Flights', 'Accommodation'];
+
+  const isProtectedBudget = (budget) =>
+  PROTECTED_BUDGET_NAMES.includes(budget?.budgetName);
+
 
   const loadBudgets = async () => {
     const all = await getBudgets();
@@ -48,7 +53,6 @@ export default function Budget({ navigation }) {
     setBudgets(filtered);
   };
 
-  /* 🔁 REFRESH EVERY TIME SCREEN IS OPENED */
   useFocusEffect(
     useCallback(() => {
       if (selectedTripId) {
@@ -57,12 +61,11 @@ export default function Budget({ navigation }) {
     }, [selectedTripId])
   );
 
-  /* ALSO REFRESH WHEN TRIP CHANGES */
+  
   useEffect(() => {
     if (selectedTripId) loadBudgets();
   }, [selectedTripId]);
 
-  /* DIALOG HANDLING ----------------------------------------------------------------------------- */
 
   const showDialog = (budget = null) => {
     setEditingBudget(budget);
@@ -88,35 +91,51 @@ export default function Budget({ navigation }) {
   /* SAVE / DELETE ----------------------------------------------------------------------------- */
 
   const handleSaveBudget = async () => {
-    const total = parseFloat(budgetTotal);
+  const total = parseFloat(budgetTotal);
 
-    if (!budgetName.trim()) {
-      setErrorMsg('Budget name is required.');
-      return;
-    }
-    if (isNaN(total) || total <= 0) {
-      setErrorMsg('Total amount must be positive.');
-      return;
-    }
+  if (!budgetName.trim()) {
+    setErrorMsg('Budget name is required.');
+    return;
+  }
+  if (isNaN(total) || total <= 0) {
+    setErrorMsg('Total amount must be positive.');
+    return;
+  }
 
-    if (editingBudget) {
-      const updated = budgets.map(b =>
-        b.id === editingBudget.id ? { ...b, budgetName, total } : b
-      );
-      await saveBudgets(updated);
-    } else {
-      const newBudget = createBudget(budgetName, total, selectedTripId);
-      await saveBudgets([...budgets, newBudget]);
-    }
+  if (editingBudget) {
+    const updated = budgets.map(b => {
+      if (b.id !== editingBudget.id) return b;
 
-    hideDialog();
-    loadBudgets();
-  };
+      // 🔒 Protect name for Flights & Accommodation
+      if (isProtectedBudget(b)) {
+        return { ...b, total };
+      }
+
+      return { ...b, budgetName, total };
+    });
+
+    await saveBudgets(updated);
+  } else {
+    const newBudget = createBudget(budgetName, total, selectedTripId);
+    await saveBudgets([...budgets, newBudget]);
+  }
+
+  hideDialog();
+  loadBudgets();
+};
+
 
   const handleDeleteBudget = async (id) => {
-    await removeBudget(id);
-    loadBudgets();
-  };
+  const budget = budgets.find(b => b.id === id);
+
+  if (isProtectedBudget(budget)) {
+    return;
+  }
+
+  await removeBudget(id);
+  loadBudgets();
+};
+
 
   /* SPEND VIEW ----------------------------------------------------------------------------- */
 
@@ -132,7 +151,7 @@ if (activeBudget) {
   );
 }
 
-  /* RENDER ----------------------------------------------------------------------------- */
+  /* Main view ----------------------------------------------------------------------------- */
 
   return (
     <ImageBackground
@@ -209,6 +228,7 @@ if (activeBudget) {
                   label="Budget Name"
                   value={budgetName}
                   onChangeText={setBudgetName}
+                  disabled={editingBudget && isProtectedBudget(editingBudget)}
                 />
                 <TextInput
                   label="Total Amount"
