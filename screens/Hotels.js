@@ -240,93 +240,110 @@ console.log(
 
             {/* Modal Form */}
             <Portal>
-              <Modal
-                visible={showForm}
-                onDismiss={resetForm}
-                contentContainerStyle={styles.modalContainer}
-              >
-                <Text style={styles.modalTitle}>
-                  {isEditing ? 'Edit Hotel' : 'Add Hotel'}
-                </Text>
+  <Modal
+    visible={showForm}
+    onDismiss={resetForm}
+    contentContainerStyle={styles.modalContainer}
+  >
+    <ScrollView>
+      <Text style={styles.modalHeading}>
+        {isEditing ? 'Edit Hotel' : 'Add Hotel'}
+      </Text>
 
-                <TextInput
-                  label="Hotel Name"
-                  value={form.hotelName}
-                  onChangeText={(t) => setForm({ ...form, hotelName: t })}
-                  style={styles.input}
-                />
+      <TextInput
+        label="Hotel Name"
+        value={form.hotelName}
+        onChangeText={(t) => setForm({ ...form, hotelName: t })}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
 
-                <TextInput
-                  label="Hotel Place"
-                  value={form.hotelPlace}
-                  onChangeText={(t) => setForm({ ...form, hotelPlace: t })}
-                  style={styles.input}
-                />
 
-                <TextInput
-                  label="Hotel Address"
-                  value={form.hotelAddress}
-                  onChangeText={(t) => setForm({ ...form, hotelAddress: t })}
-                  style={styles.input}
-                />
 
-                <TextInput
-                  label="Cost"
-                  keyboardType="numeric"
-                  value={form.cost}
-                  onChangeText={(t) => setForm({ ...form, cost: t })}
-                  style={styles.input}
-                />
+      <TextInput
+        label="Hotel Address (optional)"
+        value={form.hotelAddress}
+        onChangeText={(t) => setForm({ ...form, hotelAddress: t })}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
 
-                <Button
-                  mode="outlined"
-                  onPress={() => setShowStartPicker(true)}
-                  style={styles.dateButton}
-                >
-                  {form.startDate
-                    ? `Start: ${form.startDate}`
-                    : 'Select Start Date'}
-                </Button>
+      <TextInput
+        label="Extra Details (optional)"
+        value={form.hotelPlace}
+        onChangeText={(t) => setForm({ ...form, hotelPlace: t })}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
 
-                <Button
-                  mode="outlined"
-                  onPress={() => setShowEndPicker(true)}
-                  style={styles.dateButton}
-                >
-                  {form.endDate ? `End: ${form.endDate}` : 'Select End Date'}
-                </Button>
+      <TextInput
+        label="Cost"
+        keyboardType="numeric"
+        value={form.cost}
+        onChangeText={(t) => setForm({ ...form, cost: t })}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
 
-                {showStartPicker && (
-                  <DateTimePicker
-                    value={tripStart || new Date()}
-                    mode="date"
-                    onChange={onStartDateChange}
-                    minimumDate={tripStart}
-                    maximumDate={tripEnd}
-                  />
-                )}
+      <Button
+        mode="contained"
+        icon="calendar"
+        style={styles.dateButton}
+        onPress={() => setShowStartPicker(true)}
+        
+      >
+        {form.startDate ? `Start: ${form.startDate}` : 'Select Start Date'}
+      </Button>
 
-                {showEndPicker && (
-                  <DateTimePicker
-                    value={tripEnd || new Date()}
-                    mode="date"
-                    onChange={onEndDateChange}
-                    minimumDate={tripStart}
-                    maximumDate={tripEnd}
-                  />
-                )}
+      <Button
+        mode="contained"
+        icon="calendar"
+        style={styles.dateButton}
+        onPress={() => setShowEndPicker(true)}
+        
+      >
+        {form.endDate ? `End: ${form.endDate}` : 'Select End Date'}
+      </Button>
 
-                <Button
-                  mode="contained"
-                  onPress={handleSubmit}
-                  style={styles.submitButton}
-                >
-                  {isEditing ? 'Update Hotel' : 'Save Hotel'}
-                </Button>
+      {showStartPicker && (
+        <DateTimePicker
+          value={tripStart || new Date()}
+          mode="date"
+          onChange={onStartDateChange}
+          minimumDate={tripStart}
+          maximumDate={tripEnd}
+        />
+      )}
 
-                <Button onPress={resetForm}>Cancel</Button>
-              </Modal>
-            </Portal>
+      {showEndPicker && (
+        <DateTimePicker
+          value={tripEnd || new Date()}
+          mode="date"
+          onChange={onEndDateChange}
+          minimumDate={tripStart}
+          maximumDate={tripEnd}
+        />
+      )}
+
+      <Button
+        mode="contained"
+        onPress={handleSubmit}
+        style={styles.modalButton}
+      >
+        {isEditing ? 'Update Hotel' : 'Save Hotel'}
+      </Button>
+
+      <Button
+        mode="contained"
+        onPress={resetForm}
+        style={styles.modalButton}
+      >
+        Cancel
+      </Button>
+    </ScrollView>
+  </Modal>
+</Portal>
+
 
           </View>
         </TouchableWithoutFeedback>

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import {View,StyleSheet,Keyboard,TouchableWithoutFeedback,KeyboardAvoidingView,Platform,ScrollView, ImageBackground,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal,} from 'react-native-paper';
+import { Text, Button, Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal, Modal} from 'react-native-paper';
 import { v4 as uuidv4 } from 'uuid';
 
 import styles from './Stylesheet';
@@ -257,46 +257,81 @@ export default function Packing({ navigation }) {
 
             {/* Dialogs */}
             <Portal>
-              <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-                <Dialog.Title>New Packing List</Dialog.Title>
-                <Dialog.Content>
-                  <TextInput
-                    label="List Name (Type)"
-                    value={newTypeName}
-                    onChangeText={setNewTypeName}
-                    mode="outlined"
-                    style={styles.input}
-                  />
-                  {errorMsg ? (
-                    <Text style={styles.error}>{errorMsg}</Text>
-                  ) : null}
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideDialog}>Cancel</Button>
-                  <Button onPress={handleCreateList}>Save</Button>
-                </Dialog.Actions>
-              </Dialog>
+  {/* New Packing List Modal */}
+  <Modal
+    visible={dialogVisible}
+    onDismiss={hideDialog}
+    contentContainerStyle={styles.modalContainer}
+  >
+    <ScrollView>
+      <Text style={styles.modalHeading}>New Packing List</Text>
 
-              <Dialog visible={renameDialogVisible} onDismiss={hideRenameDialog}>
-                <Dialog.Title>Rename List</Dialog.Title>
-                <Dialog.Content>
-                  <TextInput
-                    label="List Name"
-                    value={newTypeName}
-                    onChangeText={setNewTypeName}
-                    mode="outlined"
-                    style={styles.input}
-                  />
-                  {errorMsg ? (
-                    <Text style={styles.error}>{errorMsg}</Text>
-                  ) : null}
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={hideRenameDialog}>Cancel</Button>
-                  <Button onPress={handleRenameList}>Save</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
+      <TextInput
+        label="List Name"
+        value={newTypeName}
+        onChangeText={setNewTypeName}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
+
+      {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
+
+      <Button
+        mode="contained"
+        onPress={handleCreateList}
+        style={styles.modalButton}
+      >
+        Save
+      </Button>
+
+      <Button
+        mode="contained"
+        onPress={hideDialog}
+        style={styles.modalButton}
+      >
+        Cancel
+      </Button>
+    </ScrollView>
+  </Modal>
+
+  {/* Rename List Modal */}
+  <Modal
+    visible={renameDialogVisible}
+    onDismiss={hideRenameDialog}
+    contentContainerStyle={styles.modalContainer}
+  >
+    <ScrollView>
+      <Text style={styles.modalHeading}>Rename List</Text>
+
+      <TextInput
+        label="List Name"
+        value={newTypeName}
+        onChangeText={setNewTypeName}
+        mode="outlined"
+        style={styles.modalTextInput}
+      />
+
+      {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
+
+      <Button
+        mode="contained"
+        onPress={handleRenameList}
+        style={styles.modalButton}
+      >
+        Save
+      </Button>
+
+      <Button
+        mode="contained"
+        onPress={hideRenameDialog}
+        style={styles.modalButton}
+      >
+        Cancel
+      </Button>
+    </ScrollView>
+  </Modal>
+</Portal>
+
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
