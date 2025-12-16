@@ -192,7 +192,7 @@ export default function Packing({ navigation }) {
                 {packingLists.length === 0 ? (
                   <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>
-                      No lists yet — tap "+" to add one!
+                      No lists yet — tap to add one!
                     </Text>
                   </View>
                 ) : !activeList ? (
@@ -209,8 +209,13 @@ export default function Packing({ navigation }) {
                 ) : (
                   <View style={styles.activeListContainer}>
                     {/* Back Button above the Card */}
-                    <View style={styles.activeBackButton}>
-                      <Button onPress={() => setActiveList(null)}>Back to lists</Button>
+                    <View>
+                      <Button 
+                      mode="contained" 
+                      style={styles.internalBack}
+                      onPress={() => setActiveList(null)}>
+                        Back to lists
+                      </Button>
                     </View>
 
                     {/* Active List using ViewCard */}

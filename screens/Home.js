@@ -46,7 +46,7 @@ export default function Home({ navigation }) {
     if (trips.length > 0 && !selectedTripId) {
       selectTrip(trips[0]);
     } else if (trips.length === 0) {
-      selectTrip(null); // no trips available
+      selectTrip(null);
     }
   }, [trips]);
 
@@ -119,8 +119,8 @@ export default function Home({ navigation }) {
             <View style={styles.container}>
               <ScrollView>
                 {trips.length === 0 ? (
-                  <View style={styles.noTripsContainer}>
-                    <Text style={styles.noTripsText}>
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>
                       No trips yet! Add a new trip to get started.
                     </Text>
                   </View>

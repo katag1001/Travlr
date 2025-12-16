@@ -2,9 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Platform, ImageBackground, ScrollView} from 'react-native';
-import { Text, Button, TextInput, Dialog, Portal, FAB, Modal } from 'react-native-paper';
+import { Text, Button, TextInput, Portal, FAB, Modal, IconButton} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 import styles from './Stylesheet';
 
@@ -22,6 +25,8 @@ import BackgroundImage from '../assets/images/backgrounds/general.png';
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
 export default function Spend({ budget, onBack }) {
+  const navigation = useNavigation();
+  
   const { id: budgetId, budgetName, tripId } = budget;
 
   const [spends, setSpends] = useState([]);
@@ -101,11 +106,25 @@ export default function Spend({ budget, onBack }) {
 
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-      <Button onPress={onBack} mode="contained" style={styles.backButton}>
-        ← Back to Budgets
+
+                {/* HEADER */}
+        <View style={styles.backRow}>
+          <IconButton
+            icon="arrow-left"
+            size={26}
+            onPress={() => navigation.navigate('Home')}
+          />
+          <Text style={styles.pageTitle}>Budget</Text>
+        </View>
+
+
+      <Button onPress={onBack} 
+      mode="contained" 
+      style={styles.internalBack}>
+        Back to budgets
       </Button>
 
-      <Text style={styles.title}>{budgetName}</Text>
+      <Text style={styles.pageSubtitle}>Spends for {budgetName}</Text>
 
       {spends.length > 0 ? (
         <ViewCard
@@ -116,7 +135,9 @@ export default function Spend({ budget, onBack }) {
           getRight={s => `£${s.spend.toFixed(2)}`}
         />
       ) : (
-        <Text>No spends yet.</Text>
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No spends yet.</Text>
+      </View>
       )}
 
       <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />

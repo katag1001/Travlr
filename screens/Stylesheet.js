@@ -2,6 +2,32 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
 
+// ------------------ Universal ------------------
+    pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
+
+    emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  emptyText: { 
+    fontSize: 25, 
+    color: 'black', 
+    textAlign: 'center' },
+  
+  internalBack: { marginBottom: 10 },
+
+  pageSubtitle: { 
+    fontSize: 20, 
+    fontWeight: 'bold', 
+    marginBottom: 15, 
+    textAlign: 'center', 
+    color: 'green'
+  },
+
+  fab: { position: 'absolute', right: 20, bottom: 20 },
+
   // ------------------ Modal ------------------
 
   modalContainer: {
@@ -59,14 +85,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   scrollArea: { flex: 1 },
   backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
-  emptyContainer: {
-    marginTop: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
+
+
   backgroundImage: { flex: 1 },
   errorText: { color: 'red' },
 
@@ -79,7 +99,7 @@ const styles = StyleSheet.create({
 
   // ------------------ Itinerary ------------------
   calendar: { borderRadius: 10, elevation: 2 },
-  backToCalendarButton: { marginBottom: 10 },
+
 
 
 
@@ -92,10 +112,7 @@ const styles = StyleSheet.create({
   divider: { marginVertical: 10 },
   activeListContainer: { flex: 1 },
 
-  // ------------------ Spend ------------------
-  fab: { position: 'absolute', right: 20, bottom: 20 },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
-  backButton: { marginBottom: 10 },
+
 });
 
 export default styles;

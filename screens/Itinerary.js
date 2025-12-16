@@ -168,8 +168,8 @@ export default function Itinerary({ navigation }) {
             {/* DAY VIEW */}
             {viewMode === 'day' && (
               <>
-                <Button onPress={handleBackToCalendar} style={styles.backToCalendarButton}>
-  Back to Calendar
+                <Button onPress={handleBackToCalendar} style={styles.internalBack}>
+  Back to calendar
 </Button>
 
                 {filteredItinerary.length === 0 ? (
