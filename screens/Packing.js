@@ -1,26 +1,21 @@
 /*REACT IMPORTS -----------------------------------------------------------------------------*/
-
 import React, { useEffect, useState } from 'react';
-import {View,StyleSheet,Keyboard,TouchableWithoutFeedback,KeyboardAvoidingView,Platform,ScrollView, ImageBackground,} from 'react-native';
+import {View,StyleSheet,Keyboard,TouchableWithoutFeedback,KeyboardAvoidingView,Platform,ScrollView,ImageBackground,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Card,TextInput,Checkbox,IconButton,Divider,Dialog,Portal, Modal} from 'react-native-paper';
+import {Text,Button,Card,TextInput,Checkbox,IconButton,Portal,Modal,} from 'react-native-paper';
 import { v4 as uuidv4 } from 'uuid';
 
 import styles from './Stylesheet';
 
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
-
-import { getPackingListsForTrip, addPackingList, updatePackingList, deletePackingList,} from '../storage/packingStorage';
+import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
 
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
-
 import { useTrip } from '../components/TripContext';
-/* import Banner from '../components/Banner';*/
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
 
 import BackgroundImage from '../assets/images/backgrounds/general.png';
-
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 export default function Packing({ navigation }) {
@@ -34,6 +29,8 @@ export default function Packing({ navigation }) {
 
   const [dialogVisible, setDialogVisible] = useState(false);
   const [renameDialogVisible, setRenameDialogVisible] = useState(false);
+  const [newItemDialogVisible, setNewItemDialogVisible] = useState(false);
+
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
@@ -45,6 +42,7 @@ export default function Packing({ navigation }) {
     setPackingLists(lists);
   };
 
+  /*----------------------------------- List Handlers -----------------------------------*/
   const handleCreateList = async () => {
     const trimmed = newTypeName.trim();
     if (!trimmed) {
@@ -85,6 +83,7 @@ export default function Packing({ navigation }) {
     loadPackingLists(selectedTripId);
   };
 
+  /*----------------------------------- Item Handlers -----------------------------------*/
   const handleAddItemToActive = async () => {
     if (!activeList || !newItemName.trim()) return;
 
@@ -99,6 +98,7 @@ export default function Packing({ navigation }) {
     await updatePackingList(updatedList);
     setActiveList(updatedList);
     setNewItemName('');
+    hideNewItemDialog();
     loadPackingLists(selectedTripId);
   };
 
@@ -125,7 +125,7 @@ export default function Packing({ navigation }) {
     loadPackingLists(selectedTripId);
   };
 
-  // ————— Dialog Helpers —————
+  /*----------------------------------- Dialog Helpers -----------------------------------*/
   const showDialog = () => {
     setNewTypeName('');
     setErrorMsg('');
@@ -151,194 +151,237 @@ export default function Packing({ navigation }) {
     setErrorMsg('');
   };
 
+  const showNewItemDialog = () => {
+    setNewItemName('');
+    setErrorMsg('');
+    setNewItemDialogVisible(true);
+  };
+
+  const hideNewItemDialog = () => {
+    setNewItemDialogVisible(false);
+    setNewItemName('');
+    setErrorMsg('');
+  };
+
   return (
     <ImageBackground
-        source={BackgroundImage} 
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      > 
-
-      
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-  style={styles.keyboardContainer}
->
-
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.container}>
-
-            {/*{selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
-
-            
-            <View style={styles.backRow}>
-              <IconButton
-                icon="arrow-left"
-                size={26}
-                onPress={() => navigation.goBack()}
-              />
-              <Text style={styles.pageTitle}>Packing</Text>
-            </View>
-
-            <ScrollView style={styles.scrollArea}>
-              <Divider style={styles.divider} />
-
-
-              {/* EMPTY STATE */}
-              {packingLists.length === 0 ? (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>
-                    No lists yet — tap "+" to add one!
-                  </Text>
-                </View>
-              ) : !activeList ? (
-                <ViewCard
-                  data={packingLists}
-                  onPressItem={(item) => setActiveList(item)}
-                  getIcon={() => 'briefcase'}
-                  getTitle={(pl) => pl.type}
-                  getSubtitle={() => ''}
-                  getDetail={(pl) => `${pl.items.length} items`}
-                  getRight={() => ''}
-                  deleteItem={(pl) => handleDeleteList(pl.id)}
+      source={BackgroundImage}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardContainer}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+              {/* Back Row with Page Title */}
+              <View style={styles.backRow}>
+                <IconButton
+                  icon="arrow-left"
+                  size={26}
+                  onPress={() => navigation.goBack()}
                 />
-              ) : (
-                <View style={styles.activeListContainer}>
+                <Text style={styles.pageTitle}>Packing</Text>
+              </View>
 
-                  <Card
-                    style={styles.activeListHeader}
-                    onPress={showRenameDialog}
-                  >
-                    <Card.Title
-                      title={`${activeList.type}`}
-                      right={() => (
-                        <Button onPress={() => setActiveList(null)}>Back</Button>
-                      )}
-                    />
-                  </Card>
+              <ScrollView style={styles.scrollArea}>
 
-                  {activeList.items.map((item) => (
-                    <View key={item.id} style={styles.itemRow}>
-                      <Checkbox
-                        status={item.checked ? 'checked' : 'unchecked'}
-                        onPress={() => toggleItemChecked(item.id)}
-                      />
-                      <Text style={styles.itemText}>{item.item}</Text>
-                      <IconButton
-                        icon="delete"
-                        onPress={() => handleDeleteItem(item.id)}
-                      />
-                    </View>
-                  ))}
-
-                  <TextInput
-                    label="New Item"
-                    value={newItemName}
-                    onChangeText={setNewItemName}
-                    mode="outlined"
-                    style={styles.input}
+                {/* EMPTY STATE */}
+                {packingLists.length === 0 ? (
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>
+                      No lists yet — tap "+" to add one!
+                    </Text>
+                  </View>
+                ) : !activeList ? (
+                  <ViewCard
+                    data={packingLists}
+                    onPressItem={(item) => setActiveList(item)}
+                    getIcon={() => 'briefcase'}
+                    getTitle={(pl) => pl.type}
+                    getSubtitle={() => ''}
+                    getDetail={(pl) => `${pl.items.length} items`}
+                    getRight={() => ''}
+                    deleteItem={(pl) => handleDeleteList(pl.id)}
                   />
+                ) : (
+                  <View style={styles.activeListContainer}>
+                    {/* Back Button above the Card */}
+                    <View style={styles.activeBackButton}>
+                      <Button onPress={() => setActiveList(null)}>Back to lists</Button>
+                    </View>
 
-                  <Button mode="contained" onPress={handleAddItemToActive}>
-                    Add Item
-                  </Button>
-                </View>
+                    {/* Active List using ViewCard */}
+                    <ViewCard
+                      data={[activeList]}
+                      onPressItem={() => {}}
+                      getIcon={() => 'briefcase'}
+                      getTitle={(pl) => pl.type}
+                      getSubtitle={() => ''}
+                      getDetail={(pl) => `${pl.items.length} items`}
+                      getRight={() => ''}
+                      deleteItem={() => {}}
+                    />
+
+                    {activeList.items.map((item) => (
+                      <View key={item.id} style={styles.itemRow}>
+                        <Checkbox
+                          status={item.checked ? 'checked' : 'unchecked'}
+                          onPress={() => toggleItemChecked(item.id)}
+                        />
+                        <Text style={styles.itemText}>{item.item}</Text>
+                        <IconButton
+                          icon="delete"
+                          onPress={() => handleDeleteItem(item.id)}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </ScrollView>
+
+              {/* Shared FAB */}
+              {selectedTripId && !activeList && (
+                <ReusableFab
+                  icon="plus"
+                  label="New List"
+                  onPress={showDialog}
+                />
               )}
-            </ScrollView>
 
-            {/* Shared FAB */}
-            {selectedTripId && (
-              <ReusableFab
-                icon="plus"
-                label="New List"
-                onPress={showDialog}
-              />
-            )}
+              {selectedTripId && activeList && (
+                <ReusableFab
+                  icon="plus"
+                  label="New Item"
+                  onPress={showNewItemDialog}
+                />
+              )}
 
-            {/* Dialogs */}
-            <Portal>
-  {/* New Packing List Modal */}
-  <Modal
-    visible={dialogVisible}
-    onDismiss={hideDialog}
-    contentContainerStyle={styles.modalContainer}
-  >
-    <ScrollView>
-      <Text style={styles.modalHeading}>New Packing List</Text>
+              {/* Dialogs */}
+              <Portal>
+                {/* New Packing List Modal */}
+                <Modal
+                  visible={dialogVisible}
+                  onDismiss={hideDialog}
+                  contentContainerStyle={styles.modalContainer}
+                >
+                  <ScrollView>
+                    <Text style={styles.modalHeading}>New Packing List</Text>
 
-      <TextInput
-        label="List Name"
-        value={newTypeName}
-        onChangeText={setNewTypeName}
-        mode="outlined"
-        style={styles.modalTextInput}
-      />
+                    <TextInput
+                      label="List Name"
+                      value={newTypeName}
+                      onChangeText={setNewTypeName}
+                      mode="outlined"
+                      style={styles.modalTextInput}
+                    />
 
-      {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
+                    {errorMsg ? (
+                      <Text style={styles.errorText}>{errorMsg}</Text>
+                    ) : null}
 
-      <Button
-        mode="contained"
-        onPress={handleCreateList}
-        style={styles.modalButton}
-      >
-        Save
-      </Button>
+                    <Button
+                      mode="contained"
+                      onPress={handleCreateList}
+                      style={styles.modalButton}
+                    >
+                      Save
+                    </Button>
 
-      <Button
-        mode="contained"
-        onPress={hideDialog}
-        style={styles.modalButton}
-      >
-        Cancel
-      </Button>
-    </ScrollView>
-  </Modal>
+                    <Button
+                      mode="contained"
+                      onPress={hideDialog}
+                      style={styles.modalButton}
+                    >
+                      Cancel
+                    </Button>
+                  </ScrollView>
+                </Modal>
 
-  {/* Rename List Modal */}
-  <Modal
-    visible={renameDialogVisible}
-    onDismiss={hideRenameDialog}
-    contentContainerStyle={styles.modalContainer}
-  >
-    <ScrollView>
-      <Text style={styles.modalHeading}>Rename List</Text>
+                {/* Rename List Modal */}
+                <Modal
+                  visible={renameDialogVisible}
+                  onDismiss={hideRenameDialog}
+                  contentContainerStyle={styles.modalContainer}
+                >
+                  <ScrollView>
+                    <Text style={styles.modalHeading}>Rename List</Text>
 
-      <TextInput
-        label="List Name"
-        value={newTypeName}
-        onChangeText={setNewTypeName}
-        mode="outlined"
-        style={styles.modalTextInput}
-      />
+                    <TextInput
+                      label="List Name"
+                      value={newTypeName}
+                      onChangeText={setNewTypeName}
+                      mode="outlined"
+                      style={styles.modalTextInput}
+                    />
 
-      {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
+                    {errorMsg ? (
+                      <Text style={styles.errorText}>{errorMsg}</Text>
+                    ) : null}
 
-      <Button
-        mode="contained"
-        onPress={handleRenameList}
-        style={styles.modalButton}
-      >
-        Save
-      </Button>
+                    <Button
+                      mode="contained"
+                      onPress={handleRenameList}
+                      style={styles.modalButton}
+                    >
+                      Save
+                    </Button>
 
-      <Button
-        mode="contained"
-        onPress={hideRenameDialog}
-        style={styles.modalButton}
-      >
-        Cancel
-      </Button>
-    </ScrollView>
-  </Modal>
-</Portal>
+                    <Button
+                      mode="contained"
+                      onPress={hideRenameDialog}
+                      style={styles.modalButton}
+                    >
+                      Cancel
+                    </Button>
+                  </ScrollView>
+                </Modal>
 
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+                {/* New Item Modal */}
+                <Modal
+                  visible={newItemDialogVisible}
+                  onDismiss={hideNewItemDialog}
+                  contentContainerStyle={styles.modalContainer}
+                >
+                  <ScrollView>
+                    <Text style={styles.modalHeading}>New Item</Text>
 
+                    <TextInput
+                      label="Item Name"
+                      value={newItemName}
+                      onChangeText={setNewItemName}
+                      mode="outlined"
+                      style={styles.modalTextInput}
+                    />
+
+                    {errorMsg ? (
+                      <Text style={styles.errorText}>{errorMsg}</Text>
+                    ) : null}
+
+                    <Button
+                      mode="contained"
+                      onPress={handleAddItemToActive}
+                      style={styles.modalButton}
+                    >
+                      Save
+                    </Button>
+
+                    <Button
+                      mode="contained"
+                      onPress={hideNewItemDialog}
+                      style={styles.modalButton}
+                    >
+                      Cancel
+                    </Button>
+                  </ScrollView>
+                </Modal>
+              </Portal>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
-
-
