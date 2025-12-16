@@ -173,7 +173,10 @@ export default function ItineraryEntryForm({
           visible={showBudgetMenu}
           onDismiss={() => setShowBudgetMenu(false)}
           anchor={
-            <Button mode="outlined" onPress={() => setShowBudgetMenu(true)} style={styles.input}>
+            <Button 
+              mode="contained" 
+              onPress={() => setShowBudgetMenu(true)} 
+              style={styles.modalButton}>
               {selectedBudgetId
                 ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
                 : 'Select Budget (optional)'}

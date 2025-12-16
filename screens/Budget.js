@@ -235,6 +235,10 @@ if (activeBudget) {
     contentContainerStyle={styles.modalContainer}
   >
     <ScrollView>
+      <Text style={styles.modalHeading}>
+        {editingBudget ? 'Edit Budget' : 'New Budget'}
+      </Text>
+      
       <TextInput
         label="Budget Name"
         value={budgetName}

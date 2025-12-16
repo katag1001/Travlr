@@ -96,40 +96,49 @@ export default function Hotels({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    const { hotelName, startDate, endDate, cost } = form;
+  const { hotelName, startDate, endDate, cost } = form;
 
+  if (!hotelName || !startDate || !endDate) {
+    Alert.alert('Hotel name and dates are required.');
+    return;
+  }
 
-    if (!hotelName || !startDate || !endDate) {
-      Alert.alert('Hotel name and dates are required.');
-      return;
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+
+  // Check if end date is after start date
+  if (end <= start) {
+    Alert.alert('End date must be after start date.');
+    return;
+  }
+
+  const newHotel = {
+    ...form,
+    id: isEditing ? form.id : Date.now().toString(),
+    tripId: selectedTripId,
+    cost: parseFloat(cost) || 0,
+  };
+
+  console.log(
+    isEditing ? '✏️ Updating hotel' : '➕ Adding hotel',
+    newHotel.id
+  );
+
+  try {
+    if (isEditing) {
+      await updateHotel(newHotel);
+    } else {
+      await addHotel(newHotel);
     }
 
-    const newHotel = {
-  ...form,
-  id: isEditing ? form.id : Date.now().toString(),
-  tripId: selectedTripId,
-  cost: parseFloat(cost) || 0,
+    resetForm();
+    loadHotels();
+  } catch (err) {
+    console.error('💥 Failed to save hotel:', err);
+    Alert.alert('Error', 'Failed to save hotel. Check console for details.');
+  }
 };
 
-console.log(
-  isEditing ? '✏️ Updating hotel' : '➕ Adding hotel',
-  newHotel.id
-);
-
-    try {
-      if (isEditing) {
-        await updateHotel(newHotel);
-      } else {
-        await addHotel(newHotel);
-      }
-
-      resetForm();
-      loadHotels();
-    } catch (err) {
-      console.error('💥 Failed to save hotel:', err);
-      Alert.alert('Error', 'Failed to save hotel. Check console for details.');
-    }
-  };
 
   const handleEdit = (hotel) => {
     setForm({
@@ -247,7 +256,7 @@ console.log(
   >
     <ScrollView>
       <Text style={styles.modalHeading}>
-        {isEditing ? 'Edit Hotel' : 'Add Hotel'}
+        {isEditing ? 'Edit Hotel' : 'New Hotel'}
       </Text>
 
       <TextInput
