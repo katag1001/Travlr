@@ -96,17 +96,23 @@ export default function Hotels({ navigation }) {
   const handleSubmit = async () => {
     const { hotelName, startDate, endDate, cost } = form;
 
+
     if (!hotelName || !startDate || !endDate) {
       Alert.alert('Hotel name and dates are required.');
       return;
     }
 
     const newHotel = {
-      id: isEditing ? form.id : Date.now().toString(),
-      tripId: selectedTripId,
-      ...form,
-      cost: parseFloat(cost) || 0,
-    };
+  ...form,
+  id: isEditing ? form.id : Date.now().toString(),
+  tripId: selectedTripId,
+  cost: parseFloat(cost) || 0,
+};
+
+console.log(
+  isEditing ? '✏️ Updating hotel' : '➕ Adding hotel',
+  newHotel.id
+);
 
     try {
       if (isEditing) {

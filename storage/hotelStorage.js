@@ -26,13 +26,24 @@ const fixDate = (ddmmyyyy) => {
 };
 
 export const addHotel = async (Hotel) => {
+
+  
   try {
+
     const all = await getHotels();
+  
+  
+    const exists = all.some(h => h.id === Hotel.id);
+  if (exists) {
+    console.warn('Hotel already exists, refusing to add:', Hotel.id);
+    return;
+  }
+
     const updated = [...all, Hotel];
     await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(updated));
 
     const budgetId = await getBudgetIdByName('Accommodation', Hotel.tripId);
-    console.log('DEBUG budgetId for Accommodation:', budgetId);
+    
     if (budgetId) {
       const isoDate = fixDate(Hotel.startDate);
       const hotelTitle = `Accomodation: ${Hotel.hotelName}`;
@@ -91,6 +102,7 @@ export const deleteHotel = async (listId) => {
   const all = await getHotels();
   const filtered = all.filter(pl => pl.id !== listId);
   await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(filtered));
+  
 };
 
 
