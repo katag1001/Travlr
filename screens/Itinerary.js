@@ -31,6 +31,11 @@ export default function Itinerary({ navigation }) {
   const [viewMode, setViewMode] = useState('calendar'); 
   const [editingItem, setEditingItem] = useState(null);
 
+  const formatCalendarDate = (dateStr) => {
+  const date = parseDate(dateStr);
+  return date ? date.toISOString().split('T')[0] : undefined;
+};
+
 
   useFocusEffect(
     useCallback(() => {
@@ -124,33 +129,39 @@ export default function Itinerary({ navigation }) {
 
 
             {/* CALENDAR VIEW */}
-            {viewMode === 'calendar'  && (
-              <Calendar
-                onDayPress={handleDaySelect}
-                minDate={
-                  selectedTrip
-                    ? parseDate(selectedTrip.startDate)?.toISOString().split('T')[0]
-                    : undefined
-                }
-                maxDate={
-                  selectedTrip
-                    ? parseDate(selectedTrip.endDate)?.toISOString().split('T')[0]
-                    : undefined
-                }
-                style={styles.calendar}
-                theme={{
-                  backgroundColor: 'white',
-                  calendarBackground: 'white',
-                  todayTextColor: '#222',
-                  dayTextColor: '#222',
-                  textDisabledColor: '#999',
-                  arrowColor: 'black',
-                  textDayFontSize: 16,
-                  textMonthFontSize: 22,
-                  textDayHeaderFontSize: 14,
-                }}
-              />
-            )}
+            {viewMode === 'calendar' && (
+  <Calendar
+    current={
+      selectedTrip
+        ? formatCalendarDate(selectedTrip.startDate)
+        : undefined
+    }
+    onDayPress={handleDaySelect}
+    minDate={
+      selectedTrip
+        ? formatCalendarDate(selectedTrip.startDate)
+        : undefined
+    }
+    maxDate={
+      selectedTrip
+        ? formatCalendarDate(selectedTrip.endDate)
+        : undefined
+    }
+    style={styles.calendar}
+    theme={{
+      backgroundColor: 'white',
+      calendarBackground: 'white',
+      todayTextColor: '#222',
+      dayTextColor: '#222',
+      textDisabledColor: '#999',
+      arrowColor: 'black',
+      textDayFontSize: 16,
+      textMonthFontSize: 22,
+      textDayHeaderFontSize: 14,
+    }}
+  />
+)}
+
 
             {/* DAY VIEW */}
             {viewMode === 'day' && (
