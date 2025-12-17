@@ -35,10 +35,10 @@ export default function BudgetCard({
     return (
       <Card style={[styles.totalCard, styles.totalCardWrapper]}>
         <Card.Title title="Total Budget" titleStyle={styles.totalCardTitle} />
-                  <View style={styles.totalSubRow}>
-            <Text style={styles.totalSubText}>Remaining: £{remaining.toFixed(2)}</Text>
-            <Text style={styles.totalSubText}>Total Spent: £{spent.toFixed(2)}</Text>
-          </View>
+        <View style={styles.totalSubRow}>
+          <Text style={styles.totalSubText}>Remaining: £{remaining.toFixed(2)}</Text>
+          <Text style={styles.totalSubText}>Total Spent: £{spent.toFixed(2)}</Text>
+        </View>
         <Card.Content style={{ alignItems: 'center' }}>
           <View style={styles.totalChartWrapper}>
             <PieChart widthAndHeight={widthAndHeight} series={series} cover={0.6} />
@@ -46,7 +46,6 @@ export default function BudgetCard({
               <Text style={styles.totalCenterText}>£{total.toFixed(2)}</Text>
             </View>
           </View>
-
         </Card.Content>
       </Card>
     );
@@ -54,6 +53,14 @@ export default function BudgetCard({
     const isOverspent = spent > total;
     const progress = Math.min(spent / total, 1);
     const percentSpent = ((spent / total) * 100).toFixed(1);
+
+    // Determine progress bar color
+    let progressColor = '#6200ee'; // default color
+    if (isOverspent) {
+      progressColor = 'red';
+    } else if (percentSpent > 80) {
+      progressColor = 'orange';
+    }
 
     return (
       <Card style={styles.subCard} onPress={onPress}>
@@ -71,7 +78,7 @@ export default function BudgetCard({
           <Text style={styles.subTitle}>Spend: £{spent.toFixed(2)} ({percentSpent}%)</Text>
           <ProgressBar 
             progress={progress} 
-            color={isOverspent ? 'red' : '#6200ee'} 
+            color={progressColor} 
             style={styles.subProgressBar} 
           />
         </Card.Content>
@@ -88,7 +95,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   totalCard: {
-    flex: 1,
     marginHorizontal: 4,
     paddingVertical: 8,
   },

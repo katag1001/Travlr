@@ -6,7 +6,7 @@ import { Text, Button, Portal, Modal, TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
 
-import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, navButtonText} from './Stylesheet';
 
 /*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 import { useTrip } from '../components/TripContext';
@@ -136,6 +136,7 @@ export default function Home({ navigation }) {
                     <Button
                       mode="contained"
                       style={styles.navButton}
+                      textColor={navButtonText}
                       disabled={!selectedTripId}
                       onPress={() => navigation.navigate('Itinerary')}
                     >
@@ -144,6 +145,7 @@ export default function Home({ navigation }) {
                     <Button
                       mode="contained"
                       style={styles.navButton}
+                      textColor={navButtonText}
                       disabled={!selectedTripId}
                       onPress={() => navigation.navigate('Budget')}
                     >
@@ -152,6 +154,7 @@ export default function Home({ navigation }) {
                     <Button
                       mode="contained"
                       style={styles.navButton}
+                      textColor={navButtonText}
                       disabled={!selectedTripId}
                       onPress={() => navigation.navigate('Hotels')}
                     >
@@ -160,6 +163,7 @@ export default function Home({ navigation }) {
                     <Button
                       mode="contained"
                       style={styles.navButton}
+                      textColor={navButtonText}
                       disabled={!selectedTripId}
                       onPress={() => navigation.navigate('Packing')}
                     >
@@ -178,7 +182,7 @@ export default function Home({ navigation }) {
                 }}
               />
 
-              
+
               {/* Popup Modal --------------------------------------------------------------- */}
               <Portal>
                 <Modal

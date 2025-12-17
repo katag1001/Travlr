@@ -170,7 +170,9 @@ if (activeBudget) {
         </View>
 
         {/* TOTAL CARD (STATIC) */}
+        {/* <View style={styles.totalCardContainer}>*/}
         {budgets.length > 0 && (
+        
           <BudgetCard
             budget={{
               total: budgets.reduce((sum, b) => sum + b.total, 0),
@@ -178,7 +180,9 @@ if (activeBudget) {
             }}
             isTotal
           />
+          
         )}
+        {/* </View>*/}
 
         {/* SCROLLING BUDGET LIST */}
         <ScrollView style={styles.scrollArea}>

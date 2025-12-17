@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {Text,Button,Card,TextInput,Checkbox,IconButton,Portal,Modal,} from 'react-native-paper';
 import { v4 as uuidv4 } from 'uuid';
 
-import styles, { modalButtonText } from './Stylesheet';
+import styles, { modalButtonText, backButtonText } from './Stylesheet';
 
 /*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
@@ -214,6 +214,7 @@ export default function Packing({ navigation }) {
                       <Button 
                       mode="contained" 
                       style={styles.internalBack}
+                      textColor={backButtonText}
                       onPress={() => setActiveList(null)}>
                         Back to lists
                       </Button>

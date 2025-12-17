@@ -7,7 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
-import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
+import styles, { modalButtonText, backButtonText, modalDateButtonText, } from './Stylesheet';
 
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
@@ -119,7 +119,9 @@ export default function Spend({ budget, onBack }) {
 
       <Button onPress={onBack} 
       mode="contained" 
-      style={styles.internalBack}>
+      style={styles.internalBack}
+      textColor={backButtonText}
+      >
         Back to budgets
       </Button>
 

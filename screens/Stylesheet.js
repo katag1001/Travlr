@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native';
 
 export const modalButtonText = 'pink';
 export const modalDateButtonText = 'orange';
-export const fabButtonText = 'orange';
 export const navButtonText = 'pink';
+export const backButtonText = 'pink';
 
 const styles = StyleSheet.create({
 
@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
   internalBack: { 
     marginBottom: 10,
     color: 'pink', 
-    backgroundColor: 'green'},
+    backgroundColor: 'green',
+    borderRadius: 3,},
 
   pageSubtitle: { 
     fontSize: 20, 
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   scrollArea: { flex: 1 },
   backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  totalCardContainer: { marginBottom: 10, height: 'auto'},
 
 
   backgroundImage: { flex: 1 },
@@ -108,10 +110,12 @@ const styles = StyleSheet.create({
   keyboardAvoiding: { flex: 1 },
 
   // ------------------ Itinerary ------------------
-  calendar: { borderRadius: 10, elevation: 2 },
-
-
-
+  calendar: { 
+    borderRadius: 10, 
+    elevation: 2,
+    padding: 25,
+    marginTop: 100,},
+    
 
   // ------------------ Packing ------------------
   activeListHeader: { marginBottom: 10 },

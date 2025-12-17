@@ -8,7 +8,7 @@ import { Text, Portal, Modal, Button, IconButton } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
 import { useFocusEffect } from '@react-navigation/native';
 
-import styles from './Stylesheet';
+import styles, { backButtonText } from './Stylesheet';
 
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
@@ -132,6 +132,13 @@ export default function Itinerary({ navigation }) {
 
             {/* CALENDAR VIEW */}
             {viewMode === 'calendar' && (
+  <View>
+
+  <Text 
+    style={styles.pageSubtitle}>
+    Select a date to view or add itinerary items.
+  </Text>
+  
   <Calendar
     current={
       selectedTrip
@@ -161,16 +168,23 @@ export default function Itinerary({ navigation }) {
       textMonthFontSize: 22,
       textDayHeaderFontSize: 14,
     }}
+    
   />
+  </View>
 )}
 
 
             {/* DAY VIEW */}
             {viewMode === 'day' && (
               <>
-                <Button onPress={handleBackToCalendar} style={styles.internalBack}>
-  Back to calendar
-</Button>
+              <Button 
+               onPress={handleBackToCalendar} 
+               mode="contained"
+               style={styles.internalBack}
+               textColor={backButtonText}
+               >
+                Back to calendar
+              </Button>
 
                 {filteredItinerary.length === 0 ? (
                   <View style={styles.emptyContainer}>
