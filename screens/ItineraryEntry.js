@@ -5,12 +5,16 @@ import { View, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import styles from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
 
 /*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
 import {addItineraryEntry,updateItineraryEntry} from '../storage/itineraryStorage';
 import {getBudgets,createSpend,addSpend,updateSpend,deleteSpend,} from '../storage/budgetStorage';
+
+/*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+
+import TextInputBox from '../components/TextInputBox';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
@@ -157,15 +161,15 @@ export default function ItineraryEntryForm({
         {isEditing ? 'Edit Itinerary Entry' : 'New Itinerary Entry'}
       </Text>
 
-      {/* Title */}
-      <TextInput
-        label="Title"
-        mode="outlined"
-        placeholder="Title (e.g. Visit Eiffel Tower)"
-        value={form.title}
-        onChangeText={text => setForm({ ...form, title: text })}
-        style={styles.modalTextInput}
-      />
+{/* Title */}
+<TextInputBox
+  label="Title"
+  placeholder="Title (e.g. Visit Eiffel Tower)"
+  value={form.title}
+  onChangeText={text => setForm({ ...form, title: text })}
+  style={styles.modalTextInput} // optional, for extra spacing or custom overrides
+/>
+
 
       {/* Budget Selector */}
       <View>
@@ -176,7 +180,9 @@ export default function ItineraryEntryForm({
             <Button 
               mode="contained" 
               onPress={() => setShowBudgetMenu(true)} 
-              style={styles.modalButton}>
+              style={styles.modalButton}
+              textColor={modalButtonText}
+                >
               {selectedBudgetId
                 ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
                 : 'Select Budget (optional)'}
@@ -204,18 +210,18 @@ export default function ItineraryEntryForm({
         </Menu>
       </View>
 
-      {/* Time Picker */}
-      <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-        <TextInput
-          label="Time (optional)"
-          mode="outlined"
-          placeholder="Select time"
-          value={form.time}
-          editable={false}
-          pointerEvents="none"
-          style={styles.input}
-        />
-      </TouchableOpacity>
+{/* Time Picker */}
+<TouchableOpacity onPress={() => setShowTimePicker(true)}>
+  <TextInputBox
+    label="Time (optional)"
+    placeholder="Select time"
+    value={form.time}
+    editable={false}        // makes it read-only
+    pointerEvents="none"    // ensures TouchableOpacity handles the press
+    style={styles.input}    // optional styling
+  />
+</TouchableOpacity>
+
 
       {showTimePicker && (
         <DateTimePicker
@@ -226,39 +232,44 @@ export default function ItineraryEntryForm({
         />
       )}
 
-      {/* Cost */}
-      <TextInput
-        label="Cost (optional)"
-        mode="outlined"
-        placeholder="e.g. 50"
-        value={form.cost}
-        onChangeText={text => setForm({ ...form, cost: text })}
-        keyboardType="numeric"
-        style={styles.input}
-      />
+{/* Cost */}
+<TextInputBox
+  label="Cost (optional)"
+  placeholder="e.g. 50"
+  value={form.cost}
+  onChangeText={text => setForm({ ...form, cost: text })}
+  keyboardType="numeric" // ensures numeric keyboard
+  style={styles.input}   // optional styling
+/>
 
-      {/* Notes */}
-      <TextInput
-        label="Notes (optional)"
-        mode="outlined"
-        placeholder="Notes..."
-        value={form.notes}
-        onChangeText={text => setForm({ ...form, notes: text })}
-        multiline
-        numberOfLines={3}
-        style={styles.modalNotes}
-      />
+
+{/* Notes */}
+<TextInputBox
+  label="Notes (optional)"
+  placeholder="Notes..."
+  value={form.notes}
+  onChangeText={text => setForm({ ...form, notes: text })}
+  multiline
+  numberOfLines={3}
+  style={styles.modalNotes} // optional styling
+/>
+
 
       <Button 
       mode="contained" 
       onPress={handleSave} 
-      style={styles.modalButton}>
+      style={styles.modalButton}
+      textColor={modalButtonText}
+      >
+      
         {isEditing ? 'Update Itinerary' : 'Save Itinerary'}
       </Button>
 
       <Button 
       mode="contained" 
-      onPress={resetForm} style={styles.modalButton}>
+      textColor={modalButtonText}
+      onPress={resetForm} 
+      style={styles.modalButton}>
         Cancel
       </Button>
     </View>

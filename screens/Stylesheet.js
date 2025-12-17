@@ -41,11 +41,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     margin: 20,},
-  modalTextInput: { 
+  /*modalTextInput: { 
     marginBottom: 12,
     backgroundColor: 'pink', 
     color: 'green', 
-    },
+    },*/
   modalTitle: { 
     fontSize: 18, 
     fontWeight: 'bold', 

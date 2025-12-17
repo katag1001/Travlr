@@ -17,6 +17,7 @@ import { getThemeFromTripName } from '../components/ThemeMapper';
 import TripSelectorCard from '../components/TripSelector';
 import ReusableFab from '../components/ReusableFab';
 import Background from '../components/Background';
+import TextInputBox from '../components/TextInputBox';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 export default function Home({ navigation }) {
@@ -187,19 +188,12 @@ export default function Home({ navigation }) {
                   contentContainerStyle={styles.modalContainer}
                 >
                   <ScrollView>
-                    <TextInput
-        label="Trip Name"
-        value={tripName}
-        onChangeText={setTripName}
-        mode="outlined"
-        style={styles.modalTextInput}
-        placeholder="Enter trip name"
-        placeholderTextColor="purple"
-        textColor="lime"
-        outlineColor="red"
-        activeOutlineColor="yellow"
-        selectionColor="yellow"
-      />
+                    <TextInputBox
+                      label="Trip Name"
+                      value={tripName}
+                      onChangeText={setTripName}
+                      placeholder="Enter trip name"
+                    />
 
                     <Button
                       mode="contained"

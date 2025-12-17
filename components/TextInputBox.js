@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
-const AppTextInput = ({ style, ...props }) => {
+const TextInputBox = ({ style, ...props }) => {
   return (
     <TextInput
       mode="outlined"
@@ -32,4 +32,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AppTextInput;
+export default TextInputBox;
