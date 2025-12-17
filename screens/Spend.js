@@ -7,9 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
-
-
-import styles from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
 
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
@@ -20,7 +18,7 @@ import { getSpendsForBudget, addSpend, updateSpend,deleteSpend, createSpend} fro
 
 import ViewCard from '../components/ViewCard';
 import BackgroundImage from '../assets/images/backgrounds/general.png';
-
+import TextInputBox from '../components/TextInputBox';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
@@ -153,7 +151,7 @@ export default function Spend({ budget, onBack }) {
         {editingSpend ? 'Edit Spend' : 'New Spend'}
       </Text>
 
-      <TextInput
+      <TextInputBox
         label="Spend Name"
         value={spendName}
         onChangeText={setSpendName}
@@ -161,7 +159,7 @@ export default function Spend({ budget, onBack }) {
         style={styles.modalTextInput}
       />
 
-      <TextInput
+      <TextInputBox
         label="Amount"
         value={spendAmount}
         onChangeText={setSpendAmount}
@@ -174,6 +172,7 @@ export default function Spend({ budget, onBack }) {
         icon="calendar"
         mode="contained"
         style={styles.dateButton}
+        textColor={modalDateButtonText} 
         onPress={() => setShowDatePicker(true)}
       >
         {spendDate.toLocaleDateString()}
@@ -193,6 +192,7 @@ export default function Spend({ budget, onBack }) {
         mode="contained"
         onPress={handleSaveSpend}
         style={styles.modalButton}
+        textColor={modalButtonText}
       >
         {editingSpend ? 'Update Spend' : 'Save Spend'}
       </Button>
@@ -202,6 +202,7 @@ export default function Spend({ budget, onBack }) {
           mode="contained"
           onPress={() => handleDeleteSpend(editingSpend.id)}
           style={styles.modalButton}
+          textColor={modalButtonText}
         >
           Delete
         </Button>
@@ -211,6 +212,7 @@ export default function Spend({ budget, onBack }) {
         mode="contained"
         onPress={hideDialog}
         style={styles.modalButton}
+        textColor={modalButtonText}
       >
         Cancel
       </Button>

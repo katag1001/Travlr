@@ -6,17 +6,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, TextInput, Dialog, Portal, IconButton, Modal} from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 
-import styles from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
 
 /* FUNCTION IMPORTS ----------------------------------------------------------------------------- */
 
-import {
-  getBudgets,
-  createBudget,
-  saveBudgets,
-  deleteBudget as removeBudget
-} from '../storage/budgetStorage';
-
+import {getBudgets,createBudget,saveBudgets,deleteBudget as removeBudget} from '../storage/budgetStorage';
 import SpendView from './Spend';
 
 /* COMPONENT IMPORTS ----------------------------------------------------------------------------- */
@@ -24,6 +18,7 @@ import SpendView from './Spend';
 import { useTrip } from '../components/TripContext';
 import BudgetCard from '../components/BudgetCard';
 import ReusableFab from '../components/ReusableFab';
+import TextInputBox from '../components/TextInputBox';
 
 import BackgroundImage from '../assets/images/backgrounds/general.png';
 
@@ -239,16 +234,16 @@ if (activeBudget) {
         {editingBudget ? 'Edit Budget' : 'New Budget'}
       </Text>
       
-      <TextInput
+      <TextInputBox
         label="Budget Name"
         value={budgetName}
         onChangeText={setBudgetName}
-        mode="outlined"
         style={styles.modalTextInput}
         disabled={editingBudget && isProtectedBudget(editingBudget)}
       />
 
-      <TextInput
+
+      <TextInputBox
         label="Total Amount"
         value={budgetTotal}
         onChangeText={setBudgetTotal}
@@ -265,6 +260,7 @@ if (activeBudget) {
         mode="contained"
         onPress={handleSaveBudget}
         style={styles.modalButton}
+        textColor={modalButtonText}
       >
         {editingBudget ? 'Update Budget' : 'Save Budget'}
       </Button>
@@ -273,6 +269,7 @@ if (activeBudget) {
         mode="contained"
         onPress={hideDialog}
         style={styles.modalButton}
+        textColor={modalButtonText}
       >
         Cancel
       </Button>

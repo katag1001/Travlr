@@ -11,11 +11,12 @@ import styles, { modalButtonText } from './Stylesheet';
 import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
 
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
+import BackgroundImage from '../assets/images/backgrounds/general.png';
 import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
+import TextInputBox from '../components/TextInputBox';
 
-import BackgroundImage from '../assets/images/backgrounds/general.png';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 export default function Packing({ navigation }) {
@@ -277,7 +278,7 @@ export default function Packing({ navigation }) {
                   <ScrollView>
                     <Text style={styles.modalHeading}>New Packing List</Text>
 
-                    <TextInput
+                    <TextInputBox
                       label="List Name"
                       value={newTypeName}
                       onChangeText={setNewTypeName}
@@ -319,7 +320,7 @@ export default function Packing({ navigation }) {
                   <ScrollView>
                     <Text style={styles.modalHeading}>Rename List</Text>
 
-                    <TextInput
+                    <TextInputBox
                       label="List Name"
                       value={newTypeName}
                       onChangeText={setNewTypeName}
@@ -360,7 +361,7 @@ export default function Packing({ navigation }) {
                   <ScrollView>
                     <Text style={styles.modalHeading}>New Item</Text>
 
-                    <TextInput
+                    <TextInputBox
                       label="Item Name"
                       value={newItemName}
                       onChangeText={setNewItemName}
@@ -376,6 +377,7 @@ export default function Packing({ navigation }) {
                       mode="contained"
                       onPress={handleAddItemToActive}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Save
                     </Button>
@@ -384,6 +386,7 @@ export default function Packing({ navigation }) {
                       mode="contained"
                       onPress={hideNewItemDialog}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Cancel
                     </Button>

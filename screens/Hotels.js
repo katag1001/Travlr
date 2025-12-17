@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextInput, Button, Modal,Portal,IconButton} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import styles from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
 
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
@@ -19,6 +19,7 @@ import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
 import BackgroundImage from '../assets/images/backgrounds/general.png';
+import TextInputBox from '../components/TextInputBox';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
@@ -259,7 +260,7 @@ export default function Hotels({ navigation }) {
         {isEditing ? 'Edit Hotel' : 'New Hotel'}
       </Text>
 
-      <TextInput
+      <TextInputBox
         label="Hotel Name"
         value={form.hotelName}
         onChangeText={(t) => setForm({ ...form, hotelName: t })}
@@ -267,9 +268,7 @@ export default function Hotels({ navigation }) {
         style={styles.modalTextInput}
       />
 
-
-
-      <TextInput
+      <TextInputBox
         label="Hotel Address (optional)"
         value={form.hotelAddress}
         onChangeText={(t) => setForm({ ...form, hotelAddress: t })}
@@ -277,7 +276,7 @@ export default function Hotels({ navigation }) {
         style={styles.modalTextInput}
       />
 
-      <TextInput
+      <TextInputBox
         label="Extra Details (optional)"
         value={form.hotelPlace}
         onChangeText={(t) => setForm({ ...form, hotelPlace: t })}
@@ -285,7 +284,7 @@ export default function Hotels({ navigation }) {
         style={styles.modalTextInput}
       />
 
-      <TextInput
+      <TextInputBox
         label="Cost"
         keyboardType="numeric"
         value={form.cost}
@@ -298,6 +297,7 @@ export default function Hotels({ navigation }) {
         mode="contained"
         icon="calendar"
         style={styles.dateButton}
+        textColor={modalDateButtonText}
         onPress={() => setShowStartPicker(true)}
         
       >
@@ -308,6 +308,7 @@ export default function Hotels({ navigation }) {
         mode="contained"
         icon="calendar"
         style={styles.dateButton}
+        textColor={modalDateButtonText}
         onPress={() => setShowEndPicker(true)}
         
       >
@@ -338,6 +339,7 @@ export default function Hotels({ navigation }) {
         mode="contained"
         onPress={handleSubmit}
         style={styles.modalButton}
+        textColor={modalButtonText}
       >
         {isEditing ? 'Update Hotel' : 'Save Hotel'}
       </Button>
@@ -346,6 +348,7 @@ export default function Hotels({ navigation }) {
         mode="contained"
         onPress={resetForm}
         style={styles.modalButton}
+        textColor={modalButtonText}
       >
         Cancel
       </Button>
