@@ -5,9 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {Text,Button,Card,TextInput,Checkbox,IconButton,Portal,Modal,} from 'react-native-paper';
 import { v4 as uuidv4 } from 'uuid';
 
-import styles from './Stylesheet';
+import styles, { modalButtonText } from './Stylesheet';
 
-/*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
+/*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
 
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
@@ -252,6 +252,7 @@ export default function Packing({ navigation }) {
                 <ReusableFab
                   icon="plus"
                   label="New List"
+                  mode="contained"
                   onPress={showDialog}
                 />
               )}
@@ -259,6 +260,7 @@ export default function Packing({ navigation }) {
               {selectedTripId && activeList && (
                 <ReusableFab
                   icon="plus"
+                  mode="contained"
                   label="New Item"
                   onPress={showNewItemDialog}
                 />
@@ -281,6 +283,7 @@ export default function Packing({ navigation }) {
                       onChangeText={setNewTypeName}
                       mode="outlined"
                       style={styles.modalTextInput}
+                  
                     />
 
                     {errorMsg ? (
@@ -291,6 +294,7 @@ export default function Packing({ navigation }) {
                       mode="contained"
                       onPress={handleCreateList}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Save
                     </Button>
@@ -299,6 +303,7 @@ export default function Packing({ navigation }) {
                       mode="contained"
                       onPress={hideDialog}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Cancel
                     </Button>
@@ -330,6 +335,7 @@ export default function Packing({ navigation }) {
                       mode="contained"
                       onPress={handleRenameList}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Save
                     </Button>
@@ -338,6 +344,7 @@ export default function Packing({ navigation }) {
                       mode="contained"
                       onPress={hideRenameDialog}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Cancel
                     </Button>

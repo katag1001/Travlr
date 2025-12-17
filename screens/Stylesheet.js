@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 
+
 const styles = StyleSheet.create({
 
 // ------------------ Universal ------------------
@@ -16,7 +17,10 @@ const styles = StyleSheet.create({
     color: 'black', 
     textAlign: 'center' },
   
-  internalBack: { marginBottom: 10 },
+  internalBack: { 
+    marginBottom: 10,
+    color: 'pink', 
+    backgroundColor: 'green'},
 
   pageSubtitle: { 
     fontSize: 20, 
@@ -25,8 +29,6 @@ const styles = StyleSheet.create({
     textAlign: 'center', 
     color: 'green'
   },
-
-  fab: { position: 'absolute', right: 20, bottom: 20 },
 
   // ------------------ Modal ------------------
 
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 10, 
     marginVertical: 10, 
     marginTop: 10, 
-    textColor: 'white' },
+    },
   modalHeading: { 
     fontSize: 18, 
     fontWeight: 'bold', 
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
     marginVertical: 8, 
     backgroundColor: '#263041', 
     borderRadius: 10, 
-    color: 'white'
+    
 },
 
   // ------------------ Home ------------------
@@ -116,3 +118,6 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+
+export const modalButtonText = 'green';
+
