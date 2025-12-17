@@ -10,7 +10,7 @@ export default function ReusableFab({ icon = "plus", label, onPress, disabled })
       label={label}
       onPress={onPress}
       disabled={disabled}
-      color="white"
+      color="pink"
       style={styles.fab}
     />
   );

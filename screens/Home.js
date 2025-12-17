@@ -177,6 +177,8 @@ export default function Home({ navigation }) {
                   setModalVisible(true);
                 }}
               />
+
+              
               {/* Popup Modal --------------------------------------------------------------- */}
               <Portal>
                 <Modal

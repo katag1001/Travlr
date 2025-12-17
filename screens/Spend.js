@@ -19,6 +19,7 @@ import { getSpendsForBudget, addSpend, updateSpend,deleteSpend, createSpend} fro
 import ViewCard from '../components/ViewCard';
 import BackgroundImage from '../assets/images/backgrounds/general.png';
 import TextInputBox from '../components/TextInputBox';
+import ReusableFab from '../components/ReusableFab';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/
 
@@ -138,7 +139,8 @@ export default function Spend({ budget, onBack }) {
       </View>
       )}
 
-      <FAB icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
+      <ReusableFab icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
+
 
       <Portal>
   <Modal
