@@ -188,13 +188,18 @@ export default function Home({ navigation }) {
                 >
                   <ScrollView>
                     <TextInput
-                      label="Trip Name"
-                      value={tripName}
-                      onChangeText={setTripName}
-                      mode="outlined"
-                      style={styles.modalTextInput}
-                      
-                    />
+        label="Trip Name"
+        value={tripName}
+        onChangeText={setTripName}
+        mode="outlined"
+        style={styles.modalTextInput}
+        placeholder="Enter trip name"
+        placeholderTextColor="purple"
+        textColor="lime"
+        outlineColor="red"
+        activeOutlineColor="yellow"
+        selectionColor="yellow"
+      />
 
                     <Button
                       mode="contained"

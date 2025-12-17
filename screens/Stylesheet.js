@@ -43,20 +43,24 @@ const styles = StyleSheet.create({
     margin: 20,},
   modalTextInput: { 
     marginBottom: 12,
-    color: 'green' },
+    backgroundColor: 'pink', 
+    color: 'green', 
+    },
   modalTitle: { 
-    fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    marginBottom: 12 },
   modalButton: { 
     backgroundColor: 'green', 
     borderRadius: 10, 
     marginVertical: 10, 
-    marginTop: 10, 
-    },
+    marginTop: 10, },
   modalHeading: { 
     fontSize: 18, 
     fontWeight: 'bold', 
     marginBottom: 15 },
-  modalNotes: { marginBottom: 10, 
+  modalNotes: { 
+    marginBottom: 10, 
     height: 80 },
   dateButton: { 
     marginVertical: 8, 
