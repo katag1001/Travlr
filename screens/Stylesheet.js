@@ -1,5 +1,9 @@
 import { StyleSheet } from 'react-native';
 
+export const modalButtonText = 'pink';
+export const modalDateButtonText = 'orange';
+export const fabButtonText = 'orange';
+export const navButtonText = 'pink';
 
 const styles = StyleSheet.create({
 
@@ -38,11 +42,12 @@ const styles = StyleSheet.create({
     padding: 20,
     margin: 20,},
   modalTextInput: { 
-    marginBottom: 12 },
+    marginBottom: 12,
+    color: 'green' },
   modalTitle: { 
     fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
   modalButton: { 
-    backgroundColor: 'pink', 
+    backgroundColor: 'green', 
     borderRadius: 10, 
     marginVertical: 10, 
     marginTop: 10, 
@@ -57,7 +62,6 @@ const styles = StyleSheet.create({
     marginVertical: 8, 
     backgroundColor: '#263041', 
     borderRadius: 10, 
-    
 },
 
   // ------------------ Home ------------------
@@ -119,5 +123,5 @@ const styles = StyleSheet.create({
 
 export default styles;
 
-export const modalButtonText = 'green';
+
 

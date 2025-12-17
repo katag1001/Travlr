@@ -6,7 +6,7 @@ import { Text, Button, Portal, Modal, TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
 
-import styles from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
 
 /*FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 import { useTrip } from '../components/TripContext';
@@ -193,6 +193,7 @@ export default function Home({ navigation }) {
                       onChangeText={setTripName}
                       mode="outlined"
                       style={styles.modalTextInput}
+                      
                     />
 
                     <Button
@@ -200,6 +201,7 @@ export default function Home({ navigation }) {
                       icon="calendar"
                       onPress={() => setShowStartPicker(true)}
                       style={styles.dateButton}
+                      textColor={modalDateButtonText}
                     >
                       {startDate ? `Start: ${startDate}` : 'Select Start Date'}
                     </Button>
@@ -220,6 +222,7 @@ export default function Home({ navigation }) {
                       icon="calendar"
                       onPress={() => setShowEndPicker(true)}
                       style={styles.dateButton}
+                      textColor={modalDateButtonText}
                     >
                       {endDate ? `End: ${endDate}` : 'Select End Date'}
                     </Button>
@@ -239,6 +242,7 @@ export default function Home({ navigation }) {
                       mode="contained"
                       onPress={handleSaveTrip}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       {editingTrip ? 'Update Trip' : 'Save Trip'}
                     </Button>
@@ -250,6 +254,7 @@ export default function Home({ navigation }) {
                         resetForm();
                       }}
                       style={styles.modalButton}
+                      textColor={modalButtonText}
                     >
                       Cancel
                     </Button>
