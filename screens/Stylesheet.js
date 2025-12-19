@@ -24,7 +24,9 @@ const styles = StyleSheet.create({
   internalBack: { 
     marginBottom: 10,
     backgroundColor: 'white',
-    borderRadius: 3,},
+    borderRadius: 3,
+    borderColor: '#263041',
+    borderWidth: 1,},
 
   pageSubtitle: { 
     fontSize: 20, 
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 3,
     padding: 20,
     margin: 20,},
   modalTitle: { 
@@ -47,7 +49,7 @@ const styles = StyleSheet.create({
     marginBottom: 12 },
   modalButton: { 
     backgroundColor: 'white', 
-    borderRadius: 10, 
+    borderRadius: 3, 
     marginVertical: 10, 
     marginTop: 10, 
     borderColor: '#263041',
@@ -62,13 +64,13 @@ const styles = StyleSheet.create({
   dateButton: { 
     marginVertical: 8, 
     backgroundColor: '#263041', 
-    borderRadius: 10, 
+    borderRadius: 3, 
 },
 
   // ------------------ Home ------------------
   button: { 
     backgroundColor: '#263041', 
-    borderRadius: 10, 
+    borderRadius: 3, 
     marginVertical: 10, 
     marginTop: 10, 
     color: 'white' },
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   navButton: {
     marginVertical: 10,
-    borderRadius: 10,
+    borderRadius: 3,
     paddingVertical: 8,
     backgroundColor: 'white',
     borderColor: '#263041',
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
 
   // ------------------ Itinerary ------------------
   calendar: { 
-    borderRadius: 10, 
+    borderRadius: 3, 
     elevation: 2,
     padding: 25,
     marginTop: 100,},

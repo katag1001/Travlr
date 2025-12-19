@@ -27,8 +27,8 @@ export default function BudgetCard({
       series = [{ value: 1, color: 'red' }];
     } else {
       series = [
-        { value: remaining, color: '#2fff00ff' },
-        { value: spent, color: '#00d9ffff' },
+        { value: remaining, color:  '#9cbef6ff'},
+        { value: spent, color:  '#263041' },
       ];
     }
 
@@ -54,8 +54,7 @@ export default function BudgetCard({
     const progress = Math.min(spent / total, 1);
     const percentSpent = ((spent / total) * 100).toFixed(1);
 
-    // Determine progress bar color
-    let progressColor = '#6200ee'; // default color
+    let progressColor = '#263041';
     if (isOverspent) {
       progressColor = 'red';
     } else if (percentSpent > 80) {
@@ -97,6 +96,8 @@ const styles = StyleSheet.create({
   totalCard: {
     marginHorizontal: 4,
     paddingVertical: 8,
+    borderColor: '#263041',
+    borderWidth: 1,
   },
   totalCardTitle: {
     fontSize: 25,
@@ -142,6 +143,8 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
     marginBottom: 8,
     paddingVertical: 4,
+    borderColor: '#263041',
+    borderWidth: 1,
   },
   subHeaderRow: {
     flexDirection: 'row',

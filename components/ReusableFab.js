@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderColor: '#263041',
     borderWidth: 1,
+    borderRadius: 3,
     //Text color goes inside the fab itself for some reason
   },
 });
