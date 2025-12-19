@@ -10,7 +10,7 @@ export default function ReusableFab({ icon = "plus", label, onPress, disabled })
       label={label}
       onPress={onPress}
       disabled={disabled}
-      color="pink"
+      color='#263041'
       style={styles.fab}
     />
   );
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     bottom: 25,
-    backgroundColor: 'green',
+    backgroundColor: 'white',
     //Text color goes inside the fab itself for some reason
   },
 });

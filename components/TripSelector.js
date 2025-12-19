@@ -148,15 +148,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'white',
     elevation: 2,
-    marginHorizontal: 4,
+    marginHorizontal: 2,
     paddingBottom: 8,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingTop: 4,
+    paddingTop: 14,
   },
   flex1: {
     flex: 1,
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
   },
   menuDropdown: {
     position: 'absolute',
-    top: 40,
+    top: 60,
     right: 8,
     backgroundColor: 'white',
     borderRadius: 6,
