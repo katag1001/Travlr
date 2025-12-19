@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native';
 
-export const modalButtonText = 'pink';
-export const modalDateButtonText = 'orange';
-export const navButtonText = 'pink';
-export const backButtonText = 'pink';
+export const modalButtonText = '#263041';
+export const modalDateButtonText = 'white';
+export const navButtonText = '#263041';
+export const backButtonText = '#263041';
 
 const styles = StyleSheet.create({
 
@@ -23,8 +23,7 @@ const styles = StyleSheet.create({
   
   internalBack: { 
     marginBottom: 10,
-    color: 'pink', 
-    backgroundColor: 'green',
+    backgroundColor: 'white',
     borderRadius: 3,},
 
   pageSubtitle: { 
@@ -42,20 +41,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     margin: 20,},
-  /*modalTextInput: { 
-    marginBottom: 12,
-    backgroundColor: 'pink', 
-    color: 'green', 
-    },*/
   modalTitle: { 
     fontSize: 18, 
     fontWeight: 'bold', 
     marginBottom: 12 },
   modalButton: { 
-    backgroundColor: 'green', 
+    backgroundColor: 'white', 
     borderRadius: 10, 
     marginVertical: 10, 
-    marginTop: 10, },
+    marginTop: 10, 
+    borderColor: '#263041',
+    borderWidth: 1,},
   modalHeading: { 
     fontSize: 18, 
     fontWeight: 'bold', 
@@ -82,7 +78,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 10,
     paddingVertical: 8,
-    backgroundColor: '#263041',
+    backgroundColor: 'white',
+    borderColor: '#263041',
+    borderWidth: 1,
   },
   
   

@@ -150,6 +150,8 @@ const styles = StyleSheet.create({
     elevation: 2,
     marginHorizontal: 2,
     paddingBottom: 8,
+    borderColor: '#263041',
+    borderWidth: 1,
   },
   cardHeader: {
     flexDirection: 'row',

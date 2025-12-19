@@ -6,18 +6,18 @@ const TextInputBox = ({ style, ...props }) => {
   return (
     <TextInput
       mode="outlined"
-      style={[styles.input, style]} // merge any extra style passed
-      placeholderTextColor="purple"
-      textColor="lime"
-      outlineColor="red"
-      activeOutlineColor="blue"
-      selectionColor="yellow"
+      style={[styles.input, style]}
+      placeholderTextColor='#263041'
+      textColor='#263041'
+      outlineColor='#263041'
+      activeOutlineColor='#263041'
+      selectionColor='#263041'
       theme={{
         colors: {
-          primary: 'orange', // focused label & border
-          background: 'pink', // input background
-          text: 'lime', // input text
-          placeholder: 'purple', // placeholder
+          primary: '#263041', 
+          background: 'white',
+          text: '#263041', 
+          placeholder: '#263041', 
         },
       }}
       {...props}
@@ -27,7 +27,7 @@ const TextInputBox = ({ style, ...props }) => {
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: 'pink',
+    backgroundColor: 'white',
     marginBottom: 12,
   },
 });

@@ -22,6 +22,8 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 25,
     backgroundColor: 'white',
+    borderColor: '#263041',
+    borderWidth: 1,
     //Text color goes inside the fab itself for some reason
   },
 });
