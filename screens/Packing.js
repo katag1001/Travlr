@@ -236,8 +236,10 @@ export default function Packing({ navigation }) {
                     {activeList.items.map((item) => (
                       <View key={item.id} style={styles.itemRow}>
                         <Checkbox
-                          status={item.checked ? 'checked' : 'unchecked'}
-                          onPress={() => toggleItemChecked(item.id)}
+                        status={item.checked ? 'checked' : 'unchecked'}
+                        onPress={() => toggleItemChecked(item.id)}
+                        color={item.checked ? '#263041' : undefined} 
+                        uncheckedColor='#263041'                    
                         />
                         <Text style={styles.itemText}>{item.item}</Text>
                         <IconButton

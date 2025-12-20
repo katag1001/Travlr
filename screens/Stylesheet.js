@@ -122,7 +122,10 @@ const styles = StyleSheet.create({
 
   // ------------------ Packing ------------------
   activeListHeader: { marginBottom: 10 },
-  itemRow: { flexDirection: 'row', alignItems: 'center' },
+  itemRow: { 
+    flexDirection: 'row',
+    marginLeft: 10, 
+    alignItems: 'center' },
   itemText: { flex: 1, fontSize: 16 },
   error: { color: 'red', marginTop: 4 },
   keyboardContainer: { flex: 1 },
