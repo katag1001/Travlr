@@ -9,10 +9,10 @@ const themeBackgroundMap = {
   'North America': require('../assets/images/backgrounds/north_america.png'),
   'Southeast Asia': require('../assets/images/backgrounds/sea.png'),
   'South America': require('../assets/images/backgrounds/south_america.png'),
-  'Travel': require('../assets/images/backgrounds/travel.png'),
+  'Travel': require('../assets/images/backgrounds/general.png'),
 };
 
-const defaultImage = require('../assets/images/backgrounds/travel.png');
+const defaultImage = require('../assets/images/backgrounds/general.png');
 
 export default function Background({ theme, children }) {
   const bg = themeBackgroundMap[theme] || defaultImage;

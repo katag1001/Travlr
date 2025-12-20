@@ -30,10 +30,11 @@ const styles = StyleSheet.create({
 
   pageSubtitle: { 
     fontSize: 20, 
-    fontWeight: 'bold', 
+    //fontWeight: 'bold',
+    marginTop: 15, 
     marginBottom: 15, 
     textAlign: 'center', 
-    color: 'green'
+    color: '#263041'
   },
 
   // ------------------ Modal ------------------
@@ -114,7 +115,9 @@ const styles = StyleSheet.create({
     borderRadius: 3, 
     elevation: 2,
     padding: 25,
-    marginTop: 100,},
+    marginTop: 80,},
+
+        //full coloring in Itinerary page 
     
 
   // ------------------ Packing ------------------
