@@ -3,6 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import { Card, Text, Button, ProgressBar } from 'react-native-paper';
 import PieChart from 'react-native-pie-chart';
 
+import { modalButtonText} from '../screens/Stylesheet';
+
 export default function BudgetCard({ 
   budget, 
   isTotal = false, 
@@ -67,14 +69,28 @@ export default function BudgetCard({
           <View style={styles.subHeaderRow}>
             <Text style={styles.subCardTitle}>{budget.budgetName}</Text>
             <View style={styles.subActionButtons}>
-              <Button compact onPress={onEdit}>Edit</Button>
+
+              <Button 
+              compact 
+              onPress={onEdit}
+              textColor={modalButtonText}
+              >
+                Edit
+              </Button>
+
               {budget.budgetName !== 'Accommodation' && budget.budgetName !== 'Flights' && (
-                <Button compact icon="delete" onPress={onDelete} />
+                <Button 
+                compact 
+                icon="delete" 
+                onPress={onDelete} 
+                textColor={modalButtonText}/>
               )}
+
+              
             </View>
           </View>
           <Text style={styles.subBudgetTotal}>£{total.toFixed(2)}</Text>
-          <Text style={styles.subTitle}>Spend: £{spent.toFixed(2)} ({percentSpent}%)</Text>
+          <Text style={styles.subTitle}>Spent: £{spent.toFixed(2)} ({percentSpent}%)</Text>
           <ProgressBar 
             progress={progress} 
             color={progressColor} 
@@ -98,6 +114,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderColor: '#263041',
     borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: 'white',
   },
   totalCardTitle: {
     fontSize: 25,
@@ -128,7 +146,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     marginTop: 4,
   },
   totalSubText: {
@@ -141,10 +159,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
     maxWidth: '100%',
-    marginBottom: 8,
-    paddingVertical: 4,
+    marginBottom: 10,
+    paddingVertical: 2,
     borderColor: '#263041',
     borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: 'white',
   },
   subHeaderRow: {
     flexDirection: 'row',

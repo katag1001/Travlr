@@ -166,8 +166,9 @@ if (activeBudget) {
             size={26}
             onPress={() => navigation.goBack()}
           />
-          <Text style={styles.pageTitle}>Budget</Text>
         </View>
+
+        <Text style={styles.pageSubtitle}>Your Budgets</Text>
 
         {/* TOTAL CARD (STATIC) */}
         {/* <View style={styles.totalCardContainer}>*/}
@@ -221,7 +222,6 @@ if (activeBudget) {
         {selectedTripId && (
           <ReusableFab
             icon="plus"
-            label="Add Budget"
             onPress={() => showDialog()}
           />
         )}

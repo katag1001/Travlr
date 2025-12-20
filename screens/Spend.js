@@ -141,7 +141,7 @@ export default function Spend({ budget, onBack }) {
       </View>
       )}
 
-      <ReusableFab icon="plus" style={styles.fab} onPress={() => showDialog()} label="Add Spend" />
+      <ReusableFab icon="plus" style={styles.fab} onPress={() => showDialog()} />
 
 
       <Portal>

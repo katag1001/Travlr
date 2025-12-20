@@ -184,8 +184,9 @@ export default function Packing({ navigation }) {
                   size={26}
                   onPress={() => navigation.goBack()}
                 />
-                <Text style={styles.pageTitle}>Packing</Text>
               </View>
+
+              <Text style={styles.pageSubtitle}>Your Packing</Text>
 
               <ScrollView style={styles.scrollArea}>
 
@@ -253,7 +254,6 @@ export default function Packing({ navigation }) {
               {selectedTripId && !activeList && (
                 <ReusableFab
                   icon="plus"
-                  label="New List"
                   mode="contained"
                   onPress={showDialog}
                 />
@@ -263,7 +263,6 @@ export default function Packing({ navigation }) {
                 <ReusableFab
                   icon="plus"
                   mode="contained"
-                  label="New Item"
                   onPress={showNewItemDialog}
                 />
               )}

@@ -175,7 +175,6 @@ export default function Home({ navigation }) {
 
               <ReusableFab
                 icon="plus"
-                label="New Trip"
                 onPress={() => {
                   resetForm();
                   setModalVisible(true);

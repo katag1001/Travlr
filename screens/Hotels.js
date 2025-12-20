@@ -204,18 +204,17 @@ export default function Hotels({ navigation }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
 
-            {/* Banner 
-            {selectedTrip && <Banner theme={selectedTrip.theme} />}*/}
 
-           
             <View style={styles.backRow}>
               <IconButton
                 icon="arrow-left"
                 size={26}
                 onPress={() => navigation.goBack()}
               />
-              <Text style={styles.pageTitle}>Hotels</Text>
+              
             </View>
+
+            <Text style={styles.pageSubtitle}>Your Hotels</Text>
 
             <ScrollView style={styles.scrollArea}>
               
@@ -243,7 +242,6 @@ export default function Hotels({ navigation }) {
             {selectedTripId && (
               <ReusableFab
                 icon="plus"
-                label="Add Hotel"
                 onPress={() => setShowForm(true)}
               />
             )}

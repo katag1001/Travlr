@@ -125,7 +125,6 @@ export default function Itinerary({ navigation }) {
                 size={26}
                 onPress={() => navigation.navigate('Home')}
               />
-              <Text style={styles.pageTitle}>Itinerary</Text>
             </View>
 
 
@@ -134,10 +133,7 @@ export default function Itinerary({ navigation }) {
             {viewMode === 'calendar' && (
   <View>
 
-  <Text 
-    style={styles.pageSubtitle}>
-    Select a date to view or add itinerary items.
-  </Text>
+  <Text style={styles.pageSubtitle}>Your Itinerary</Text>
   
   <Calendar
     current={
@@ -186,6 +182,8 @@ export default function Itinerary({ navigation }) {
                 Back to calendar
               </Button>
 
+              <Text style={styles.pageSubtitle}>Itinerary for {selectedDate}</Text>
+
                 {filteredItinerary.length === 0 ? (
                   <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>
@@ -216,7 +214,6 @@ export default function Itinerary({ navigation }) {
 {selectedTripId && viewMode === 'day' && (
   <ReusableFab
     icon="plus"
-    label="Add Item"
     onPress={() => {
       setEditingItem(null);
       setModalVisible(true);

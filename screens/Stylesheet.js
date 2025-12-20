@@ -29,10 +29,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,},
 
   pageSubtitle: { 
-    fontSize: 20, 
-    //fontWeight: 'bold',
-    marginTop: 15, 
-    marginBottom: 15, 
+    fontSize: 30, 
+   
+    marginBottom: 15,
+    marginLeft: 8, 
     textAlign: 'center', 
     color: '#263041'
   },
