@@ -194,7 +194,7 @@ export default function Packing({ navigation }) {
                 {packingLists.length === 0 ? (
                   <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>
-                      No lists yet.Tap + to add one!
+                      No lists yet. Tap + to add one!
                     </Text>
                   </View>
                 ) : !activeList ? (

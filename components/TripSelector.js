@@ -182,6 +182,8 @@ const styles = StyleSheet.create({
   tripName: {
     fontSize: 25,
     color: '#263041',
+    
+    fontWeight: 'bold',
   },
   dropdown: {
     borderTopWidth: 1,

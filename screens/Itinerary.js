@@ -52,6 +52,29 @@ export default function Itinerary({ navigation }) {
     return date ? date.toISOString().split('T')[0] : undefined;
   };
 
+  const formatItineraryDate = (dateString) => {
+  const [day, month, year] = dateString.split("/");
+
+  const date = new Date(year, month - 1, day);
+
+  const weekday = date.toLocaleString("en-US", { weekday: "long" });
+  const monthName = date.toLocaleString("en-US", { month: "short" });
+
+  const getOrdinal = (n) => {
+    if (n > 3 && n < 21) return "th";
+    switch (n % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
+
+  return `${weekday}, ${monthName} ${day}${getOrdinal(Number(day))}`;
+};
+
+
+
   const getMarkedRange = (startDate, endDate) => {
     const marked = {};
     let current = new Date(startDate);
@@ -180,7 +203,6 @@ export default function Itinerary({ navigation }) {
                         : undefined
                     }
 
-                    /* 🔹 ADDED */
                     markingType="period"
                     markedDates={
                       selectedTrip
@@ -220,7 +242,7 @@ export default function Itinerary({ navigation }) {
                   </Button>
 
                   <Text style={styles.pageSubtitle}>
-                    Itinerary for {selectedDate}
+                    Itinerary for {formatItineraryDate(selectedDate)}
                   </Text>
 
                   {filteredItinerary.length === 0 ? (

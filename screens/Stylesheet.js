@@ -115,7 +115,9 @@ const styles = StyleSheet.create({
     borderRadius: 3, 
     elevation: 2,
     padding: 25,
-    marginTop: 80,},
+    marginTop: 20,
+    borderColor: '#263041',
+    borderWidth: 1,},
 
         //full coloring in Itinerary page 
     
