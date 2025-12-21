@@ -13,57 +13,126 @@ export default function ViewCard({
   deleteItem = null, 
 }) {
   const iconKeywordMap = {
-    hotel: 'bed',
-    accommodation: 'bed',
-    dinner: 'silverware-fork-knife',
-    meal: 'silverware-fork-knife',
-    flight: 'airplane',
-    airport: 'airplane',
-    car: 'car',
-    rental: 'car',
-    activity: 'map-marker',
-    tour: 'map-marker',
-    train: 'train',
-    bus: 'bus',
-    boat: 'ferry',
-    ferry: 'ferry',
-    event: 'calendar',
-    conference: 'account-group',
-    meeting: 'account-tie',
-    museum: 'palette',
-    restaurant: 'silverware',
-    breakfast: 'food-croissant',
-    beach: 'beach',
-    hiking: 'hiking',
-    mountain: 'terrain',
-    park: 'tree',
-    shopping: 'shopping',
-    spa: 'spa',
-    bar: 'glass-cocktail',
-    nightlife: 'music',
-    wifi: 'wifi',
-    luggage: 'briefcase',
-    passport: 'passport',
-    weather: 'weather-partly-cloudy',
-    map: 'map',
-    guide: 'account-voice',
-    ticket: 'ticket-confirmation',
-    gallery: 'palette',
-    landmark: 'office-building',
-    camping: 'tent',
-    swimming: 'pool',
-    taxi: 'taxi',
-  };
+  // Accommodation & transport
+  hotel: 'bed',
+  accommodation: 'bed',
+  hostel: 'bed-bunk',
+  apartment: 'home-city',
+  flight: 'airplane',
+  airport: 'airplane',
+  airline: 'airplane',
+  train: 'train',
+  bus: 'bus',
+  subway: 'subway-variant',
+  metro: 'subway-variant',
+  tram: 'tram',
+  boat: 'ferry',
+  ferry: 'ferry',
+  car: 'car',
+  rental: 'car',
+  taxi: 'taxi',
+  rideshare: 'car-hatchback',
+  parking: 'parking',
+
+  // Food & dining
+  dinner: 'silverware-fork-knife',
+  meal: 'silverware-fork-knife',
+  restaurant: 'silverware',
+  breakfast: 'food-croissant',
+  lunch: 'food',
+  cafe: 'coffee',
+  coffee: 'coffee',
+  bar: 'glass-cocktail',
+  nightlife: 'music',
+
+  // Activities & places
+  activity: 'map-marker',
+  tour: 'map-marker',
+  event: 'calendar',
+  conference: 'account-group',
+  meeting: 'account-tie',
+  museum: 'palette',
+  gallery: 'palette',
+  landmark: 'office-building',
+  park: 'tree',
+  beach: 'beach',
+  hiking: 'hiking',
+  mountain: 'terrain',
+  camping: 'tent',
+  swimming: 'pool',
+  snorkeling: 'diving-snorkel',
+  diving: 'diving-scuba',
+  shopping: 'shopping',
+  spa: 'spa',
+  gym: 'dumbbell',
+
+  // Travel essentials
+  luggage: 'briefcase',
+  suitcase: 'bag-suitcase',
+  backpack: 'bag-personal',
+  passport: 'passport',
+  visa: 'card-account-details',
+  ticket: 'ticket-confirmation',
+  boardingpass: 'ticket',
+  insurance: 'shield-check',
+  wallet: 'wallet',
+  money: 'cash',
+  currency: 'currency-usd',
+  map: 'map',
+  guide: 'account-voice',
+  wifi: 'wifi',
+  sim: 'sim',
+  charger: 'battery-charging',
+  adapter: 'power-plug',
+
+  // Packing list – toiletries
+  toiletries: 'toothbrush-paste',
+  toothbrush: 'toothbrush',
+  toothpaste: 'toothbrush-paste',
+  shampoo: 'bottle-tonic',
+  conditioner: 'bottle-tonic-outline',
+  soap: 'soap',
+  deodorant: 'spray',
+  razor: 'razor-double-edge',
+  sunscreen: 'weather-sunny',
+  skincare: 'face-man',
+
+  // Packing list – clothing
+  clothes: 'tshirt-crew',
+  shirt: 'tshirt-crew',
+  pants: 'tshirt-v',
+  jeans: 'tshirt-v',
+  jacket: 'jacket',
+  coat: 'coat-rack',
+  shoes: 'shoe-sneaker',
+  sandals: 'shoe-sandal',
+  socks: 'socks',
+  underwear: 'hanger',
+  pajamas: 'sleep',
+  swimsuit: 'swim',
+  hat: 'hat-fedora',
+  scarf: 'scarf',
+  gloves: 'gloves',
+
+  // Weather & timing
+  weather: 'weather-partly-cloudy',
+  rain: 'weather-rainy',
+  snow: 'weather-snowy',
+  sunny: 'weather-sunny',
+  time: 'clock-outline',
+  calendar: 'calendar',
+};
+
 
   const getAutoIconFromTitle = (title) => {
-    if (!title) return 'passport';
+    if (!title) return 'briefcase';
     const lower = title.toLowerCase();
     for (const keyword in iconKeywordMap) {
       if (lower.includes(keyword)) {
         return iconKeywordMap[keyword];
       }
     }
-    return 'passport';
+    return 'briefcase';
   };
 
   return (
@@ -141,7 +210,7 @@ const styles = StyleSheet.create({
     padding: 18,
     position: 'relative',
   },
-  avatarBackground: { backgroundColor: '#9cbef6ff' },
+  avatarBackground: { backgroundColor: '#ccdffeff' },
   textContainer: { flex: 1, marginLeft: 12,  paddingRight: 60 },
   titleRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
   titleText: { fontWeight: '650', fontSize: 16, color: '#263041', marginRight: 8 },

@@ -136,7 +136,7 @@ export default function Spend({ budget, onBack }) {
         />
       ) : (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No spends yet.</Text>
+        <Text style={styles.emptyText}>No spends yet. Tap + to add one!</Text>
       </View>
       )}
 

@@ -194,14 +194,14 @@ export default function Packing({ navigation }) {
                 {packingLists.length === 0 ? (
                   <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>
-                      No lists yet — tap to add one!
+                      No lists yet.Tap + to add one!
                     </Text>
                   </View>
                 ) : !activeList ? (
                   <ViewCard
                     data={packingLists}
                     onPressItem={(item) => setActiveList(item)}
-                    getIcon={() => 'briefcase'}
+                    getIcon={() => null}
                     getTitle={(pl) => pl.type}
                     getSubtitle={() => ''}
                     getDetail={(pl) => `${pl.items.length} items`}

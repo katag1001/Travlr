@@ -24,12 +24,12 @@ export default function BudgetCard({
 
     let series;
     if (isEmpty) {
-      series = [{ value: 1, color: 'white' }];
+      series = [{ value: 1, color: '#ccdffeff' }];
     } else if (isOverspent) {
       series = [{ value: 1, color: 'red' }];
     } else {
       series = [
-        { value: remaining, color:  '#9cbef6ff'},
+        { value: remaining, color:  '#ccdffeff'},
         { value: spent, color:  '#263041' },
       ];
     }
@@ -94,7 +94,10 @@ export default function BudgetCard({
           <ProgressBar 
             progress={progress} 
             color={progressColor} 
-            style={styles.subProgressBar} 
+            style={[
+            styles.subProgressBar,
+            { backgroundColor: '#ccdffeff'  }  
+              ]} 
           />
         </Card.Content>
       </Card>

@@ -220,7 +220,7 @@ export default function Hotels({ navigation }) {
               {hotels.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Text style={styles.emptyText}>
-                    No hotels yet — tap to add one!
+                    No hotels yet. Tap + to add one!
                   </Text>
                 </View>
               ) : (

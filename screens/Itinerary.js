@@ -60,7 +60,7 @@ export default function Itinerary({ navigation }) {
     while (current <= last) {
       const dateString = current.toISOString().split('T')[0];
       marked[dateString] = {
-        color: '#9cbef6ff',
+        color: '#ccdffeff',
         textColor: 'white',
       };
       current.setDate(current.getDate() + 1);
@@ -68,13 +68,13 @@ export default function Itinerary({ navigation }) {
 
     marked[startDate] = {
       startingDay: true,
-      color: '#9cbef6ff',
+      color: '#ccdffeff',
       textColor: 'white',
     };
 
     marked[endDate] = {
       endingDay: true,
-      color: '#9cbef6ff',
+      color: '#ccdffeff',
       textColor: 'white',
     };
 
@@ -195,8 +195,8 @@ export default function Itinerary({ navigation }) {
                     theme={{
                       backgroundColor: 'white',
                       calendarBackground: 'white',
-                      todayTextColor: '#9cbef6ff',
-                      dayTextColor: '#9cbef6ff',
+                      todayTextColor: '#ccdffeff',
+                      dayTextColor: '#ccdffeff',
                       textDisabledColor: '#263041',
                       arrowColor: '#263041',
                       textDayFontSize: 16,
@@ -226,7 +226,7 @@ export default function Itinerary({ navigation }) {
                   {filteredItinerary.length === 0 ? (
                     <View style={styles.emptyContainer}>
                       <Text style={styles.emptyText}>
-                        No entries for this day.
+                        No entries for this day. Tap + to add one!
                       </Text>
                     </View>
                   ) : (

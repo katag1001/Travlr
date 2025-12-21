@@ -185,12 +185,12 @@ if (activeBudget) {
         )}
         {/* </View>*/}
 
-        {/* SCROLLING BUDGET LIST */}
+        {/* BUDGET LIST */}
         <ScrollView style={styles.scrollArea}>
           {budgets.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
-                No budgets yet — tap "+" to add one!
+                No budgets yet. Tap + to add one!
               </Text>
             </View>
           ) : (
