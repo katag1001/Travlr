@@ -20,7 +20,7 @@ import BudgetCard from '../components/BudgetCard';
 import ReusableFab from '../components/ReusableFab';
 import TextInputBox from '../components/TextInputBox';
 
-import BackgroundImage from '../assets/images/backgrounds/general.png';
+import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 
 /* MAIN FUNCTION ----------------------------------------------------------------------------- */
 

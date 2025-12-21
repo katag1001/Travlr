@@ -34,6 +34,16 @@ const themeKeywords = {
     'paraguay', 'venezuela', 'bolivia', 'guyana', 'suriname', 'french guiana', 
     'south america', 'rio de janeiro', 'sao paulo', 'buenos aires', 'santiago', 
     'lima', 'caracas', 'quito'
+  ],
+  'East Asia': [
+    'china', 'japan', 'south korea', 'taiwan', 'hong kong', 'macau', 'east asia',
+    'beijing', 'shanghai', 'tokyo', 'osaka', 'seoul', 'taipei', 'hongkong', 
+    'kyoto', 'nanjing', 'guangzhou', 'dalian', 'fukuoka', 'nagoya', 'incheon'
+  ],
+  'Indian Subcontinent': [
+    'india', 'pakistan', 'bangladesh', 'sri lanka', 'nepal', 'bhutan', 'maldives',
+    'delhi', 'mumbai', 'karachi', 'dhaka', 'colombo', 'kathmandu', 'islamabad',
+    'chennai', 'hyderabad', 'pune', 'jaipur', 'goa', 'trivandrum'
   ]
 };
 

@@ -20,10 +20,7 @@ import styles, { backButtonText } from './Stylesheet';
 
 /* FUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
-import {
-  getItineraryForTrip,
-  deleteItineraryEntry,
-} from '../storage/itineraryStorage';
+import {getItineraryForTrip,deleteItineraryEntry,} from '../storage/itineraryStorage';
 
 /* COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
 
@@ -31,7 +28,7 @@ import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import ItineraryEntryForm from './ItineraryEntry';
 import ReusableFab from '../components/ReusableFab';
-import BackgroundImage from '../assets/images/backgrounds/general.png';
+import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 
 /* MAIN FUNCTION -----------------------------------------------------------------------------*/
 
@@ -55,7 +52,6 @@ export default function Itinerary({ navigation }) {
     return date ? date.toISOString().split('T')[0] : undefined;
   };
 
-  /* 🔹 ADDED: build marked date range */
   const getMarkedRange = (startDate, endDate) => {
     const marked = {};
     let current = new Date(startDate);

@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, TextInput, Button, Modal,Portal,IconButton} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
+import styles, { modalButtonText, modalDateButtonText, } from './Stylesheet';
 
 /*fUNCTION IMPORTS -----------------------------------------------------------------------------*/
 
@@ -15,10 +15,9 @@ import { getHotelsForTrip, addHotel, updateHotel, deleteHotel, } from '../storag
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
 
 import { useTrip } from '../components/TripContext';
-/* import Banner from '../components/Banner';*/
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
-import BackgroundImage from '../assets/images/backgrounds/general.png';
+import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 import TextInputBox from '../components/TextInputBox';
 
 /*MAIN FUNCTION -----------------------------------------------------------------------------*/

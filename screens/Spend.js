@@ -17,7 +17,7 @@ import { getSpendsForBudget, addSpend, updateSpend,deleteSpend, createSpend} fro
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
 
 import ViewCard from '../components/ViewCard';
-import BackgroundImage from '../assets/images/backgrounds/general.png';
+import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 import TextInputBox from '../components/TextInputBox';
 import ReusableFab from '../components/ReusableFab';
 
@@ -113,7 +113,6 @@ export default function Spend({ budget, onBack }) {
             size={26}
             onPress={() => navigation.navigate('Home')}
           />
-          <Text style={styles.pageTitle}>Budget</Text>
         </View>
 
 

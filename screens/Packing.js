@@ -11,7 +11,7 @@ import styles, { modalButtonText, backButtonText } from './Stylesheet';
 import {getPackingListsForTrip,addPackingList,updatePackingList,deletePackingList,} from '../storage/packingStorage';
 
 /*COMPONENTS IMPORTS -----------------------------------------------------------------------------*/
-import BackgroundImage from '../assets/images/backgrounds/general.png';
+import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 import { useTrip } from '../components/TripContext';
 import ViewCard from '../components/ViewCard';
 import ReusableFab from '../components/ReusableFab';
