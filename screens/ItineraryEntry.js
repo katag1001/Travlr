@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Alert, TouchableOpacity, StyleSheet } from 'react-native';
-import { Text, TextInput, Button, Menu, Divider } from 'react-native-paper';
+import { Text, TextInput, Button, Menu, Portal, Modal } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
@@ -171,44 +171,58 @@ export default function ItineraryEntryForm({
 />
 
 
-      {/* Budget Selector */}
-      <View>
-        <Menu
-          visible={showBudgetMenu}
-          onDismiss={() => setShowBudgetMenu(false)}
-          anchor={
-            <Button 
-              mode="contained" 
-              onPress={() => setShowBudgetMenu(true)} 
-              style={styles.modalButton}
-              textColor={modalButtonText}
-                >
-              {selectedBudgetId
-                ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
-                : 'Select Budget (optional)'}
-            </Button>
-          }
+      {/* Budget Selector (as Modal) */}
+<View style={{ marginBottom: 10 }}>
+  <Button
+    mode="contained"
+    style={styles.modalButton}
+    textColor={modalButtonText}
+    onPress={() => setShowBudgetMenu(true)}
+  >
+    {selectedBudgetId
+      ? `Budget: ${budgets.find(b => b.id === selectedBudgetId)?.budgetName}`
+      : 'Select Budget (optional)'}
+  </Button>
+
+  {/* Mini modal acting as dropdown */}
+  <Portal>
+    <Modal
+      visible={showBudgetMenu}
+      onDismiss={() => setShowBudgetMenu(false)}
+      contentContainerStyle={styles.typeModalContainer} // reuse Transport modal styles
+    >
+      {budgets.map(b => (
+        <Button
+          key={b.id}
+          mode="text"
+          onPress={() => {
+            setForm({ ...form }); // keep form as is
+            setSelectedBudgetId(b.id);
+            setShowBudgetMenu(false);
+          }}
+          style={styles.typeModalButton}
+          textColor={modalButtonText}
         >
-          {budgets.map(b => (
-            <Menu.Item
-              key={b.id}
-              onPress={() => {
-                setShowBudgetMenu(false);
-                setTimeout(() => setSelectedBudgetId(b.id), 100);
-              }}
-              title={b.budgetName}
-            />
-          ))}
-          <Divider />
-          <Menu.Item
-            onPress={() => {
-              setShowBudgetMenu(false);
-              setTimeout(() => setSelectedBudgetId(''), 100);
-            }}
-            title="No Budget"
-          />
-        </Menu>
-      </View>
+          {b.budgetName}
+        </Button>
+      ))}
+
+      {/* Option to clear budget */}
+      <Button
+        mode="text"
+        onPress={() => {
+          setSelectedBudgetId('');
+          setShowBudgetMenu(false);
+        }}
+        style={styles.typeModalButton}
+        textColor={modalButtonText}
+      >
+        No Budget
+      </Button>
+    </Modal>
+  </Portal>
+</View>
+
 
 {/* Time Picker Button */}
 <Button
