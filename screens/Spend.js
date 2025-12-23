@@ -1,38 +1,49 @@
 /* REACT IMPORTS ----------------------------------------------------------------------------- */
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Platform, ImageBackground, ScrollView } from 'react-native';
+import { View, ScrollView, FlatList, TouchableOpacity, ImageBackground, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Portal, Modal, IconButton } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
+/* STYLE IMPORTS ----------------------------------------------------------------------------- */
 import styles, { modalButtonText, backButtonText, modalDateButtonText } from './Stylesheet';
 
 /* FUNCTION IMPORTS ----------------------------------------------------------------------------- */
-import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend } from '../storage/budgetStorage';
+import { getSpendsForBudget, addSpend, updateSpend, deleteSpend, createSpend, getBudgets, saveBudgets } from '../storage/budgetStorage';
 
-/* COMPONENTS IMPORTS ----------------------------------------------------------------------------- */
+/* COMPONENT IMPORTS ----------------------------------------------------------------------------- */
 import ViewCard from '../components/ViewCard';
-import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
-import TextInputBox from '../components/TextInputBox';
-import ReusableFab from '../components/ReusableFab';
 import TotalBudgetCard from '../components/TotalBudgetCard';
+import ReusableFab from '../components/ReusableFab';
+import TextInputBox from '../components/TextInputBox';
+import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 
 /* MAIN FUNCTION ----------------------------------------------------------------------------- */
 export default function Spend({ budget, onBack }) {
   const navigation = useNavigation();
+  const { id: budgetId, tripId } = budget;
 
-  const { id: budgetId, budgetName, total, tripId } = budget;
+  const PROTECTED_BUDGET_NAMES = ['Flights', 'Accommodation'];
+  const isProtectedBudget = (b) => PROTECTED_BUDGET_NAMES.includes(b.budgetName);
 
+  const [currentBudget, setCurrentBudget] = useState({ ...budget });
   const [spends, setSpends] = useState([]);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [editingSpend, setEditingSpend] = useState(null);
 
+  const [spendDialogVisible, setSpendDialogVisible] = useState(false);
+  const [editingSpend, setEditingSpend] = useState(null);
   const [spendName, setSpendName] = useState('');
   const [spendAmount, setSpendAmount] = useState('');
   const [spendDate, setSpendDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const [budgetDialogVisible, setBudgetDialogVisible] = useState(false);
+  const [budgetName, setBudgetName] = useState('');
+  const [budgetTotal, setBudgetTotal] = useState('');
+  const [editingBudget, setEditingBudget] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  /* --- Load Spends --- */
   const loadSpends = async () => {
     const loaded = await getSpendsForBudget(budgetId);
     setSpends(loaded);
@@ -44,7 +55,8 @@ export default function Spend({ budget, onBack }) {
 
   const totalSpent = spends.reduce((sum, s) => sum + (s.spend || 0), 0);
 
-  const showDialog = (spend = null) => {
+  /* --- SPEND MODAL --- */
+  const showSpendDialog = (spend = null) => {
     setEditingSpend(spend);
     if (spend) {
       setSpendName(spend.spendName);
@@ -55,11 +67,11 @@ export default function Spend({ budget, onBack }) {
       setSpendAmount('');
       setSpendDate(new Date());
     }
-    setDialogVisible(true);
+    setSpendDialogVisible(true);
   };
 
-  const hideDialog = () => {
-    setDialogVisible(false);
+  const hideSpendDialog = () => {
+    setSpendDialogVisible(false);
     setEditingSpend(null);
     setSpendName('');
     setSpendAmount('');
@@ -79,13 +91,12 @@ export default function Spend({ budget, onBack }) {
       await addSpend(newSpend);
     }
 
-    hideDialog();
+    hideSpendDialog();
     loadSpends();
   };
 
   const handleDeleteSpend = async (id) => {
     await deleteSpend(id);
-    hideDialog();
     loadSpends();
   };
 
@@ -94,128 +105,151 @@ export default function Spend({ budget, onBack }) {
     if (selectedDate) setSpendDate(selectedDate);
   };
 
+  /* --- BUDGET MODAL (matches Budget page functionality) --- */
+  const showBudgetDialog = () => {
+    setEditingBudget(currentBudget);
+    setBudgetName(currentBudget.budgetName);
+    setBudgetTotal(String(currentBudget.total));
+    setErrorMsg('');
+    setBudgetDialogVisible(true);
+  };
+
+  const hideBudgetDialog = () => {
+    setBudgetDialogVisible(false);
+    setEditingBudget(null);
+    setBudgetName('');
+    setBudgetTotal('');
+    setErrorMsg('');
+  };
+
+  const handleSaveBudgetFromSpend = async () => {
+    const total = parseFloat(budgetTotal);
+    if (!budgetName.trim()) {
+      setErrorMsg('Budget name is required.');
+      return;
+    }
+    if (isNaN(total) || total <= 0) {
+      setErrorMsg('Total amount must be positive.');
+      return;
+    }
+
+    const allBudgets = await getBudgets();
+    const updatedBudgets = allBudgets.map((b) => {
+      if (b.id !== currentBudget.id) return b;
+      if (isProtectedBudget(b)) return { ...b, total };
+      return { ...b, budgetName, total };
+    });
+
+    await saveBudgets(updatedBudgets);
+    setCurrentBudget({ ...currentBudget, budgetName, total });
+    hideBudgetDialog();
+  };
+
   return (
     <ImageBackground source={BackgroundImage} style={styles.backgroundImage} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
 
-          {/* HEADER */}
+          {/* MAIN BACK BUTTON */}
           <View style={styles.backRow}>
             <IconButton
               icon="arrow-left"
               size={26}
-              onPress={() => navigation.navigate('Home')}
+              onPress={() => navigation.goBack()}
             />
           </View>
+          <Button onPress={onBack} mode="contained" style={styles.internalBack} textColor={backButtonText} > Back to Budgets </Button>
 
-          <Button
-            onPress={onBack}
-            mode="contained"
-            style={styles.internalBack}
-            textColor={backButtonText}
-          >
-            Back to Budgets
-          </Button>
+          <Text style={styles.pageSubtitle}>Spends for {currentBudget.budgetName}</Text>
 
-          <Text style={styles.pageSubtitle}>Spends for {budgetName}</Text>
-
-          {/* PIE CHART AT TOP */}
-          <TotalBudgetCard 
-          title={`${budgetName} Budget`}
-           total={total} 
-           spent={totalSpent} />
+          {/* TOTAL BUDGET CARD (clickable) */}
+          <TouchableOpacity onPress={showBudgetDialog}>
+            <TotalBudgetCard
+              title={`${currentBudget.budgetName} Budget`}
+              total={currentBudget.total}
+              spent={totalSpent}
+            />
+          </TouchableOpacity>
 
           {/* SPENDS LIST */}
-          {spends.length > 0 ? (
-            <ViewCard
-              data={spends}
-              onPressItem={showDialog}
-              getTitle={s => s.spendName}
-              getSubtitle={s => new Date(s.date).toLocaleDateString()}
-              getRight={s => `£${s.spend.toFixed(2)}`}
-            />
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No spends yet. Tap + to add one!</Text>
-            </View>
-          )}
+          <ScrollView style={styles.scrollArea}>
+            {spends.length > 0 ? (
+              <ViewCard
+                data={spends}
+                onPressItem={showSpendDialog}
+                getTitle={s => s.spendName}
+                getSubtitle={s => new Date(s.date).toLocaleDateString()}
+                getRight={s => `£${s.spend.toFixed(2)}`}
+                deleteItem={(s) => handleDeleteSpend(s.id)} // delete icon on card
+              />
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No spends yet. Tap + to add one!</Text>
+              </View>
+            )}
+          </ScrollView>
 
-          <ReusableFab icon="plus" style={styles.fab} onPress={() => showDialog()} />
+          {/* ADD SPEND BUTTON */}
+          <ReusableFab icon="plus" onPress={() => showSpendDialog()} />
 
-          {/* MODAL */}
+          {/* --- SPEND MODAL --- */}
           <Portal>
-            <Modal
-              visible={dialogVisible}
-              onDismiss={hideDialog}
-              contentContainerStyle={styles.modalContainer}
-            >
+            <Modal visible={spendDialogVisible} onDismiss={hideSpendDialog} contentContainerStyle={styles.modalContainer}>
               <ScrollView>
-                <Text style={styles.modalHeading}>
-                  {editingSpend ? 'Edit Spend' : 'New Spend'}
-                </Text>
+                <Text style={styles.modalHeading}>{editingSpend ? 'Edit Spend' : 'New Spend'}</Text>
+
+                <TextInputBox label="Spend Name" value={spendName} onChangeText={setSpendName} mode="outlined" style={styles.modalTextInput} />
+                <TextInputBox label="Amount" value={spendAmount} onChangeText={setSpendAmount} keyboardType="numeric" mode="outlined" style={styles.modalTextInput} />
+
+                <Button icon="calendar" mode="contained" style={styles.dateButton} textColor={modalDateButtonText} onPress={() => setShowDatePicker(true)}>
+                  {spendDate.toLocaleDateString()}
+                </Button>
+
+                {showDatePicker && (
+                  <DateTimePicker value={spendDate} mode="date" display="default" onChange={onDateChange} />
+                )}
+
+                <Button mode="contained" onPress={handleSaveSpend} style={styles.modalButton} textColor={modalButtonText}>
+                  {editingSpend ? 'Update Spend' : 'Save Spend'}
+                </Button>
+
+                <Button mode="contained" onPress={hideSpendDialog} style={styles.modalButton} textColor={modalButtonText}>
+                  Cancel
+                </Button>
+              </ScrollView>
+            </Modal>
+          </Portal>
+
+          {/* --- BUDGET MODAL --- */}
+          <Portal>
+            <Modal visible={budgetDialogVisible} onDismiss={hideBudgetDialog} contentContainerStyle={styles.modalContainer}>
+              <ScrollView>
+                <Text style={styles.modalHeading}>{editingBudget ? 'Edit Budget' : 'New Budget'}</Text>
 
                 <TextInputBox
-                  label="Spend Name"
-                  value={spendName}
-                  onChangeText={setSpendName}
-                  mode="outlined"
+                  label="Budget Name"
+                  value={budgetName}
+                  onChangeText={setBudgetName}
                   style={styles.modalTextInput}
+                  disabled={editingBudget && isProtectedBudget(editingBudget)}
                 />
 
                 <TextInputBox
-                  label="Amount"
-                  value={spendAmount}
-                  onChangeText={setSpendAmount}
+                  label="Total Amount"
+                  value={budgetTotal}
+                  onChangeText={setBudgetTotal}
                   keyboardType="numeric"
                   mode="outlined"
                   style={styles.modalTextInput}
                 />
 
-                <Button
-                  icon="calendar"
-                  mode="contained"
-                  style={styles.dateButton}
-                  textColor={modalDateButtonText}
-                  onPress={() => setShowDatePicker(true)}
-                >
-                  {spendDate.toLocaleDateString()}
+                {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
+
+                <Button mode="contained" onPress={handleSaveBudgetFromSpend} style={styles.modalButton} textColor={modalButtonText}>
+                  {editingBudget ? 'Update Budget' : 'Save Budget'}
                 </Button>
 
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={spendDate}
-                    mode="date"
-                    display="default"
-                    onChange={onDateChange}
-                  />
-                )}
-
-                <Button
-                  mode="contained"
-                  onPress={handleSaveSpend}
-                  style={styles.modalButton}
-                  textColor={modalButtonText}
-                >
-                  {editingSpend ? 'Update Spend' : 'Save Spend'}
-                </Button>
-
-                {editingSpend && (
-                  <Button
-                    mode="contained"
-                    onPress={() => handleDeleteSpend(editingSpend.id)}
-                    style={styles.modalButton}
-                    textColor={modalButtonText}
-                  >
-                    Delete
-                  </Button>
-                )}
-
-                <Button
-                  mode="contained"
-                  onPress={hideDialog}
-                  style={styles.modalButton}
-                  textColor={modalButtonText}
-                >
+                <Button mode="contained" onPress={hideBudgetDialog} style={styles.modalButton} textColor={modalButtonText}>
                   Cancel
                 </Button>
               </ScrollView>
