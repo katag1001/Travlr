@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import {ImageBackground, View,StyleSheet,ScrollView,TouchableWithoutFeedback,Keyboard,KeyboardAvoidingView,Platform,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Portal, Modal, TextInput } from 'react-native-paper';
+import { Text, Button, Portal, Modal, TextInput,} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -159,6 +159,15 @@ export default function Home({ navigation }) {
                       onPress={() => navigation.navigate('Hotels')}
                     >
                       Hotels
+                    </Button>
+                    <Button
+                      mode="contained"
+                      style={styles.navButton}
+                      textColor={navButtonText}
+                      disabled={!selectedTripId}
+                      onPress={() => navigation.navigate('Transport')}
+                    >
+                      Transport
                     </Button>
                     <Button
                       mode="contained"

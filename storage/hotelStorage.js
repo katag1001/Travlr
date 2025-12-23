@@ -89,9 +89,6 @@ export const addHotel = async (Hotel) => {
   }
 };
 
-
-
-
 export const updateHotel = async (Hotel) => {
   const all = await getHotels();
   const newAll = all.map(pl => pl.id === Hotel.id ? Hotel : pl);

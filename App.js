@@ -11,6 +11,7 @@ import Packing from './screens/Packing';
 import Budget from './screens/Budget';
 import Hotels from './screens/Hotels';
 import Itinerary from './screens/Itinerary';
+import Transport from './screens/Transport';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,7 @@ export default function App() {
             <Stack.Screen name="Budget" component={Budget} />
             <Stack.Screen name="Hotels" component={Hotels} />
             <Stack.Screen name="Itinerary" component={Itinerary} />
+            <Stack.Screen name="Transport" component={Transport} />
           </Stack.Navigator>
         </NavigationContainer>
       </TripProvider>

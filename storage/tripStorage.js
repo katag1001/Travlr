@@ -21,7 +21,7 @@ export const addTrip = async (trip) => {
 
   const newBudgets = [
     createBudget('Accommodation', 0, trip.id),
-    createBudget('Flights', 0, trip.id),
+    createBudget('Transport', 0, trip.id),
   ];
 
   const combinedBudgets = [...existingBudgets, ...newBudgets];

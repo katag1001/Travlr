@@ -210,17 +210,16 @@ export default function ItineraryEntryForm({
         </Menu>
       </View>
 
-{/* Time Picker */}
-<TouchableOpacity onPress={() => setShowTimePicker(true)}>
-  <TextInputBox
-    label="Time (optional)"
-    placeholder="Select time"
-    value={form.time}
-    editable={false}        // makes it read-only
-    pointerEvents="none"    // ensures TouchableOpacity handles the press
-    style={styles.input}    // optional styling
-  />
-</TouchableOpacity>
+{/* Time Picker Button */}
+<Button
+  mode="contained"
+  icon="clock-outline"
+  style={styles.dateButton}
+  textColor={modalDateButtonText}
+  onPress={() => setShowTimePicker(true)}
+>
+  {form.time ? `Time: ${form.time}` : 'Select Time (optional)'}
+</Button>
 
 
       {showTimePicker && (
@@ -238,8 +237,8 @@ export default function ItineraryEntryForm({
   placeholder="e.g. 50"
   value={form.cost}
   onChangeText={text => setForm({ ...form, cost: text })}
-  keyboardType="numeric" // ensures numeric keyboard
-  style={styles.input}   // optional styling
+  keyboardType="numeric"
+  style={styles.input} 
 />
 
 
@@ -251,7 +250,7 @@ export default function ItineraryEntryForm({
   onChangeText={text => setForm({ ...form, notes: text })}
   multiline
   numberOfLines={3}
-  style={styles.modalNotes} // optional styling
+  style={styles.modalNotes}
 />
 
 

@@ -78,7 +78,7 @@ export default function BudgetCard({
                 Edit
               </Button>
 
-              {budget.budgetName !== 'Accommodation' && budget.budgetName !== 'Flights' && (
+              {budget.budgetName !== 'Accommodation' && budget.budgetName !== 'Transport' && (
                 <Button 
                 compact 
                 icon="delete" 

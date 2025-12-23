@@ -105,8 +105,7 @@ const styles = StyleSheet.create({
 
 
   // ------------------ Hotels ------------------
-  
-  input: { marginBottom: 10 },
+
   submitButton: { marginVertical: 10 },
   keyboardAvoiding: { flex: 1 },
 
@@ -134,6 +133,22 @@ const styles = StyleSheet.create({
   divider: { marginVertical: 10 },
   activeListContainer: { flex: 1 },
 
+   // ------------------ Transport ------------------
+
+  typeModalButton: {
+  justifyContent: 'flex-start',
+  paddingVertical: 8,
+},
+
+typeModalContainer: {
+  backgroundColor: 'white',
+  marginHorizontal: 40,
+  borderRadius: 3,
+  paddingVertical: 10,
+  borderColor: '#263041',
+    borderWidth: 1,
+  
+}
 
 });
 
