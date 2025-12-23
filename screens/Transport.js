@@ -96,7 +96,7 @@ export default function Transport({ navigation }) {
   const handleSubmit = async () => {
     const { type, to, startDate } = form;
     if (!type || !to || !startDate) {
-      Alert.alert('Type, To, and Date are required.');
+      Alert.alert('Type, To, From, and Date are required.');
       return;
     }
 

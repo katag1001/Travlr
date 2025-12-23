@@ -4,6 +4,7 @@ import { addItineraryEntries, getItineraries, updateItineraryEntry } from './iti
 import { getPackingLists, updatePackingList } from './packingStorage';
 import { createBudget, getBudgets, saveBudgets, getSpends, } from './budgetStorage';
 import { getHotels } from './hotelStorage';
+import { getTransport } from './transportStorage';
 import { v4 as uuidv4 } from 'uuid';
 
 const STORAGE_KEY = 'TRIPS';
@@ -67,6 +68,12 @@ export const deleteTrip = async (tripId) => {
   await AsyncStorage.setItem('HOTELS', JSON.stringify(remainingHotels));
   console.log("hotels deleted")
 
+    // Delete associated transport
+  const allTransport = await getTransport();
+  const remainingTransport = allTransport.filter(tr => tr.tripId !== tripId);
+  await AsyncStorage.setItem('TRANSPORT', JSON.stringify(remainingTransport));
+  console.log("transport deleted")
+
 
   // Delete associated BUDGET
   const allBudgets = await getBudgets();
@@ -74,9 +81,9 @@ export const deleteTrip = async (tripId) => {
   await AsyncStorage.setItem('BUDGETS', JSON.stringify(remainingBudgets));
   console.log("budget deleted")
 
-  // Delete associated BUDGET
+  // Delete associated Spend
   const allSpends = await getSpends();
-  const remainingSpends = allSpends.filter(b => b.tripId !== tripId);
+  const remainingSpends = allSpends.filter(s => s.tripId !== tripId);
   await AsyncStorage.setItem('SPENDS', JSON.stringify(remainingSpends));
   console.log("spends deleted")
 

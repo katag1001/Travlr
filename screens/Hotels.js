@@ -120,7 +120,6 @@ export default function Hotels({ navigation }) {
   };
 
   console.log(
-    isEditing ? '✏️ Updating hotel' : '➕ Adding hotel',
     newHotel.id
   );
 
