@@ -1,29 +1,26 @@
 /* REACT IMPORTS ----------------------------------------------------------------------------- */
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, FlatList, ScrollView, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, TextInput, Dialog, Portal, IconButton, Modal} from 'react-native-paper';
+import { Text, Button, Portal, IconButton, Modal } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 
-import styles, { modalButtonText, modalDateButtonText, fabButtonText, navButtonText} from './Stylesheet';
+import styles, { modalButtonText } from './Stylesheet';
 
 /* FUNCTION IMPORTS ----------------------------------------------------------------------------- */
-
-import {getBudgets,createBudget,saveBudgets,deleteBudget as removeBudget} from '../storage/budgetStorage';
+import { getBudgets, createBudget, saveBudgets, deleteBudget as removeBudget } from '../storage/budgetStorage';
 import SpendView from './Spend';
 
 /* COMPONENT IMPORTS ----------------------------------------------------------------------------- */
-
 import { useTrip } from '../components/TripContext';
-import BudgetCard from '../components/BudgetCard';
+import SubBudgetCard from '../components/SubBudgetCard';
+import TotalBudgetCard from '../components/TotalBudgetCard';
 import ReusableFab from '../components/ReusableFab';
 import TextInputBox from '../components/TextInputBox';
 
 import BackgroundImage from '../assets/images/backgrounds/general2.jpg';
 
 /* MAIN FUNCTION ----------------------------------------------------------------------------- */
-
 export default function Budget({ navigation }) {
   const [budgets, setBudgets] = useState([]);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -35,34 +32,24 @@ export default function Budget({ navigation }) {
 
   const { selectedTripId } = useTrip();
 
-
   const PROTECTED_BUDGET_NAMES = ['Flights', 'Accommodation'];
-
-  const isProtectedBudget = (budget) =>
-  PROTECTED_BUDGET_NAMES.includes(budget?.budgetName);
-
+  const isProtectedBudget = (budget) => PROTECTED_BUDGET_NAMES.includes(budget?.budgetName);
 
   const loadBudgets = async () => {
     const all = await getBudgets();
-    const filtered = selectedTripId
-      ? all.filter(b => b.tripId === selectedTripId)
-      : [];
+    const filtered = selectedTripId ? all.filter((b) => b.tripId === selectedTripId) : [];
     setBudgets(filtered);
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (selectedTripId) {
-        loadBudgets();
-      }
+      if (selectedTripId) loadBudgets();
     }, [selectedTripId])
   );
 
-  
   useEffect(() => {
     if (selectedTripId) loadBudgets();
   }, [selectedTripId]);
-
 
   const showDialog = (budget = null) => {
     setEditingBudget(budget);
@@ -85,208 +72,124 @@ export default function Budget({ navigation }) {
     setErrorMsg('');
   };
 
-  /* SAVE / DELETE ----------------------------------------------------------------------------- */
-
   const handleSaveBudget = async () => {
-  const total = parseFloat(budgetTotal);
+    const total = parseFloat(budgetTotal);
+    if (!budgetName.trim()) {
+      setErrorMsg('Budget name is required.');
+      return;
+    }
+    if (isNaN(total) || total <= 0) {
+      setErrorMsg('Total amount must be positive.');
+      return;
+    }
 
-  if (!budgetName.trim()) {
-    setErrorMsg('Budget name is required.');
-    return;
-  }
-  if (isNaN(total) || total <= 0) {
-    setErrorMsg('Total amount must be positive.');
-    return;
-  }
+    if (editingBudget) {
+      const updated = budgets.map((b) => {
+        if (b.id !== editingBudget.id) return b;
+        if (isProtectedBudget(b)) {
+          return { ...b, total };
+        }
+        return { ...b, budgetName, total };
+      });
+      await saveBudgets(updated);
+    } else {
+      const newBudget = createBudget(budgetName, total, selectedTripId);
+      await saveBudgets([...budgets, newBudget]);
+    }
 
-  if (editingBudget) {
-    const updated = budgets.map(b => {
-      if (b.id !== editingBudget.id) return b;
-
-      // 🔒 Protect name for Flights & Accommodation
-      if (isProtectedBudget(b)) {
-        return { ...b, total };
-      }
-
-      return { ...b, budgetName, total };
-    });
-
-    await saveBudgets(updated);
-  } else {
-    const newBudget = createBudget(budgetName, total, selectedTripId);
-    await saveBudgets([...budgets, newBudget]);
-  }
-
-  hideDialog();
-  loadBudgets();
-};
-
+    hideDialog();
+    loadBudgets();
+  };
 
   const handleDeleteBudget = async (id) => {
-  const budget = budgets.find(b => b.id === id);
+    const budget = budgets.find((b) => b.id === id);
+    if (isProtectedBudget(budget)) return;
+    await removeBudget(id);
+    loadBudgets();
+  };
 
-  if (isProtectedBudget(budget)) {
-    return;
+  if (activeBudget) {
+    return <SpendView budget={activeBudget} onBack={() => { setActiveBudget(null); loadBudgets(); }} />;
   }
 
-  await removeBudget(id);
-  loadBudgets();
-};
-
-
-  /* SPEND VIEW ----------------------------------------------------------------------------- */
-
-if (activeBudget) {
   return (
-    <SpendView
-      budget={activeBudget}
-      onBack={() => {
-        setActiveBudget(null);
-        loadBudgets(); // 
-      }}
-    />
-  );
-}
+    <ImageBackground source={BackgroundImage} style={styles.backgroundImage} resizeMode="cover">
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.backRow}>
+            <IconButton icon="arrow-left" size={26} onPress={() => navigation.goBack()} />
+          </View>
 
-  /* Main view ----------------------------------------------------------------------------- */
+          <Text style={styles.pageSubtitle}>Your Budgets</Text>
 
-  return (
-  <ImageBackground
-    source={BackgroundImage}
-    style={styles.backgroundImage}
-    resizeMode="cover"
-  >
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-
-        {/* HEADER */}
-        <View style={styles.backRow}>
-          <IconButton
-            icon="arrow-left"
-            size={26}
-            onPress={() => navigation.goBack()}
-          />
-        </View>
-
-        <Text style={styles.pageSubtitle}>Your Budgets</Text>
-
-        {/* TOTAL CARD (STATIC) */}
-        {/* <View style={styles.totalCardContainer}>*/}
-        {budgets.length > 0 && (
-        
-          <BudgetCard
-            budget={{
-              total: budgets.reduce((sum, b) => sum + b.total, 0),
-              spent: budgets.reduce((sum, b) => sum + (b.spent || 0), 0),
-            }}
-            isTotal
-          />
-          
-        )}
-        {/* </View>*/}
-
-        {/* BUDGET LIST */}
-        <ScrollView style={styles.scrollArea}>
-          {budgets.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                No budgets yet. Tap + to add one!
-              </Text>
-            </View>
-          ) : (
-            <FlatList
-              data={budgets}
-              keyExtractor={item => item.id}
-              renderItem={({ item }) => {
-                const protectedBudget = isProtectedBudget(item);
-
-                return (
-                  <BudgetCard
-                    budget={item}
-                    onEdit={() => showDialog(item)}
-                    onDelete={
-                      protectedBudget
-                        ? undefined
-                        : () => handleDeleteBudget(item.id)
-                    }
-                    onPress={() => setActiveBudget(item)}
-                  />
-                );
-              }}
-              scrollEnabled={false}
+          {budgets.length > 0 && (
+            <TotalBudgetCard
+              title="Total Budget"
+              total={budgets.reduce((sum, b) => sum + b.total, 0)}
+              spent={budgets.reduce((sum, b) => sum + (b.spent || 0), 0)}
             />
           )}
-        </ScrollView>
 
-        {/* FAB */}
-        {selectedTripId && (
-          <ReusableFab
-            icon="plus"
-            onPress={() => showDialog()}
-          />
-        )}
+          <ScrollView style={styles.scrollArea}>
+            {budgets.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No budgets yet. Tap + to add one!</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={budgets}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <SubBudgetCard
+                    budget={item}
+                    onEdit={() => showDialog(item)}
+                    onDelete={() => handleDeleteBudget(item.id)}
+                    onPress={() => setActiveBudget(item)}
+                  />
+                )}
+                scrollEnabled={false}
+              />
+            )}
+          </ScrollView>
 
-        {/* DIALOG */}
-        <Portal>
-  <Modal
-    visible={dialogVisible}
-    onDismiss={hideDialog}
-    contentContainerStyle={styles.modalContainer}
-  >
-    <ScrollView>
-      <Text style={styles.modalHeading}>
-        {editingBudget ? 'Edit Budget' : 'New Budget'}
-      </Text>
-      
-      <TextInputBox
-        label="Budget Name"
-        value={budgetName}
-        onChangeText={setBudgetName}
-        style={styles.modalTextInput}
-        disabled={editingBudget && isProtectedBudget(editingBudget)}
-      />
+          {selectedTripId && <ReusableFab icon="plus" onPress={() => showDialog()} />}
 
+          <Portal>
+            <Modal visible={dialogVisible} onDismiss={hideDialog} contentContainerStyle={styles.modalContainer}>
+              <ScrollView>
+                <Text style={styles.modalHeading}>{editingBudget ? 'Edit Budget' : 'New Budget'}</Text>
 
-      <TextInputBox
-        label="Total Amount"
-        value={budgetTotal}
-        onChangeText={setBudgetTotal}
-        keyboardType="numeric"
-        mode="outlined"
-        style={styles.modalTextInput}
-      />
+                <TextInputBox
+                  label="Budget Name"
+                  value={budgetName}
+                  onChangeText={setBudgetName}
+                  style={styles.modalTextInput}
+                  disabled={editingBudget && isProtectedBudget(editingBudget)}
+                />
 
-      {errorMsg ? (
-        <Text style={styles.errorText}>{errorMsg}</Text>
-      ) : null}
+                <TextInputBox
+                  label="Total Amount"
+                  value={budgetTotal}
+                  onChangeText={setBudgetTotal}
+                  keyboardType="numeric"
+                  mode="outlined"
+                  style={styles.modalTextInput}
+                />
 
-      <Button
-        mode="contained"
-        onPress={handleSaveBudget}
-        style={styles.modalButton}
-        textColor={modalButtonText}
-      >
-        {editingBudget ? 'Update Budget' : 'Save Budget'}
-      </Button>
+                {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 
-      <Button
-        mode="contained"
-        onPress={hideDialog}
-        style={styles.modalButton}
-        textColor={modalButtonText}
-      >
-        Cancel
-      </Button>
-    </ScrollView>
-  </Modal>
-</Portal>
+                <Button mode="contained" onPress={handleSaveBudget} style={styles.modalButton} textColor={modalButtonText}>
+                  {editingBudget ? 'Update Budget' : 'Save Budget'}
+                </Button>
 
-
-      </View>
-    </SafeAreaView>
-  </ImageBackground>
-);
-
+                <Button mode="contained" onPress={hideDialog} style={styles.modalButton} textColor={modalButtonText}>
+                  Cancel
+                </Button>
+              </ScrollView>
+            </Modal>
+          </Portal>
+        </View>
+      </SafeAreaView>
+    </ImageBackground>
+  );
 }
-
-
