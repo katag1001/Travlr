@@ -93,13 +93,13 @@ export default function Home({ navigation }) {
 
     if (editingTrip) {
       await updateTrip(newTrip);
-      selectTrip(newTrip); // update selected trip immediately
+      selectTrip(newTrip); 
     } else {
       await addTrip(newTrip);
       selectTrip(newTrip);
     }
 
-    await loadTrips(); // refresh trips list
+    await loadTrips(); 
     setModalVisible(false);
     resetForm();
   };
@@ -122,7 +122,7 @@ export default function Home({ navigation }) {
                 {trips.length === 0 ? (
                   <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>
-                      No trips yet! Add a new trip to get started.
+                      No trips yet! Tap + to get started.
                     </Text>
                   </View>
                 ) : (

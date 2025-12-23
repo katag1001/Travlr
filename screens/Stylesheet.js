@@ -18,20 +18,25 @@ const styles = StyleSheet.create({
   },
   emptyText: { 
     fontSize: 25, 
-    color: 'black', 
-    textAlign: 'center' },
+    backgroundColor: 'white',
+    color: '#263041', 
+    padding: 30,
+    textAlign: 'center',
+    borderColor: '#263041',
+    borderWidth: 1,},
   
   internalBack: { 
     marginBottom: 10,
     backgroundColor: 'white',
-    borderRadius: 3,
+    //borderRadius: 3,
     borderColor: '#263041',
-    borderWidth: 1,},
+    borderWidth: 1,
+    },
 
   pageSubtitle: { 
     fontSize: 30, 
-   
     marginBottom: 15,
+    marginTop: 10,
     marginLeft: 8, 
     textAlign: 'center', 
     color: '#263041'
