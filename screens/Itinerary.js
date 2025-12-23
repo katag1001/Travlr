@@ -238,11 +238,11 @@ export default function Itinerary({ navigation }) {
                     style={styles.internalBack}
                     textColor={backButtonText}
                   >
-                    Back to calendar
+                    Back to Calendar
                   </Button>
 
                   <Text style={styles.pageSubtitle}>
-                    Itinerary for {formatItineraryDate(selectedDate)}
+                    Itinerary for{"\n"} {formatItineraryDate(selectedDate)}
                   </Text>
 
                   {filteredItinerary.length === 0 ? (

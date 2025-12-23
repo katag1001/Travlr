@@ -121,7 +121,7 @@ export default function Spend({ budget, onBack }) {
       style={styles.internalBack}
       textColor={backButtonText}
       >
-        Back to budgets
+        Back to Budgets
       </Button>
 
       <Text style={styles.pageSubtitle}>Spends for {budgetName}</Text>

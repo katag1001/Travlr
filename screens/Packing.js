@@ -217,7 +217,7 @@ export default function Packing({ navigation }) {
                       style={styles.internalBack}
                       textColor={backButtonText}
                       onPress={() => setActiveList(null)}>
-                        Back to lists
+                        Back to Lists
                       </Button>
                     </View>
 

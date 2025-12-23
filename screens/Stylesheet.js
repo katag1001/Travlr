@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
 
   pageSubtitle: { 
     fontSize: 30, 
+    fontWeight: 'bold',
     marginBottom: 15,
     marginTop: 10,
     marginLeft: 8, 
