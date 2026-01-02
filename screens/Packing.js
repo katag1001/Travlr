@@ -84,7 +84,7 @@ export default function Packing({ navigation }) {
     loadPackingLists(selectedTripId);
   };
 
-  /*----------------------------------- Item Handlers -----------------------------------*/
+
   const handleAddItemToActive = async () => {
     if (!activeList || !newItemName.trim()) return;
 
@@ -126,7 +126,7 @@ export default function Packing({ navigation }) {
     loadPackingLists(selectedTripId);
   };
 
-  /*----------------------------------- Dialog Helpers -----------------------------------*/
+
   const showDialog = () => {
     setNewTypeName('');
     setErrorMsg('');
@@ -213,39 +213,35 @@ export default function Packing({ navigation }) {
                     {/* Back Button above the Card */}
                     <View>
                       <Button 
-                      mode="contained" 
-                      style={styles.internalBack}
-                      textColor={backButtonText}
-                      onPress={() => setActiveList(null)}>
+                        mode="contained" 
+                        style={styles.internalBack}
+                        textColor={backButtonText}
+                        onPress={() => setActiveList(null)}>
                         Back to Lists
                       </Button>
                     </View>
 
-                    {/* Active List using ViewCard */}
+                    {/* List Title Card (clickable to rename) */}
                     <ViewCard
                       data={[activeList]}
-                      onPressItem={() => {}}
+                      onPressItem={() => showRenameDialog()} // <<< clickable to rename
                       getIcon={() => 'briefcase'}
                       getTitle={(pl) => pl.type}
                       getSubtitle={() => ''}
                       getDetail={(pl) => `${pl.items.length} items`}
                       getRight={() => ''}
-                      deleteItem={() => {}}
                     />
 
+                    {/* Items in the active list */}
                     {activeList.items.map((item) => (
                       <View key={item.id} style={styles.itemRow}>
                         <Checkbox
-                        status={item.checked ? 'checked' : 'unchecked'}
-                        onPress={() => toggleItemChecked(item.id)}
-                        color={item.checked ? '#263041' : undefined} 
-                        uncheckedColor='#263041'                    
+                          status={item.checked ? 'checked' : 'unchecked'}
+                          onPress={() => toggleItemChecked(item.id)}
+                          color={item.checked ? '#263041' : undefined} 
+                          uncheckedColor='#263041'                    
                         />
                         <Text style={styles.itemText}>{item.item}</Text>
-                        <IconButton
-                          icon="delete"
-                          onPress={() => handleDeleteItem(item.id)}
-                        />
                       </View>
                     ))}
                   </View>
@@ -286,7 +282,6 @@ export default function Packing({ navigation }) {
                       onChangeText={setNewTypeName}
                       mode="outlined"
                       style={styles.modalTextInput}
-                  
                     />
 
                     {errorMsg ? (
