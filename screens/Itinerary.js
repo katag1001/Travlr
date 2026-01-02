@@ -176,7 +176,7 @@ export default function Itinerary({ navigation }) {
                 <IconButton
                   icon="arrow-left"
                   size={26}
-                  onPress={() => navigation.navigate('Home')}
+                  onPress={() => navigation.goBack()}
                 />
               </View>
 

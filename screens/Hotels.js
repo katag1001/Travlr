@@ -106,7 +106,7 @@ export default function Hotels({ navigation }) {
   const start = parseDate(startDate);
   const end = parseDate(endDate);
 
-  // Check if end date is after start date
+
   if (end <= start) {
     Alert.alert('End date must be after start date.');
     return;
