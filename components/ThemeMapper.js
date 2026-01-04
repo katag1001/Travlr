@@ -1,6 +1,6 @@
 const themeKeywords = {
   'Africa': [
-    'egypt', 'kenya', 'south africa', 'morocco', 'nigeria', 'ghana', 'ethiopia', 
+    'egypt', 'nairobi','kenya', 'south africa', 'morocco', 'nigeria', 'ghana', 'ethiopia', 
     'tanzania', 'uganda', 'algeria', 'senegal', 'ivory coast', 'zambia', 'zimbabwe', 
     'botswana', 'cameroon', 'libya', 'sudan', 'angola', 'africa', 'casablanca', 'cairo', 'nairobi', 'cape town'
   ],
