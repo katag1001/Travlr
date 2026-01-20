@@ -186,7 +186,7 @@ export default function Packing({ navigation }) {
                 />
               </View>
 
-              <Text style={styles.pageSubtitle}>Your Packing</Text>
+              <Text style={styles.pageSubtitle}>Your Packing Lists</Text>
 
               <ScrollView style={styles.scrollArea}>
 
@@ -221,10 +221,10 @@ export default function Packing({ navigation }) {
                       </Button>
                     </View>
 
-                    {/* List Title Card (clickable to rename) */}
+                    {/* List Title Card  */}
                     <ViewCard
                       data={[activeList]}
-                      onPressItem={() => showRenameDialog()} // <<< clickable to rename
+                      onPressItem={() => showRenameDialog()} 
                       getIcon={() => 'briefcase'}
                       getTitle={(pl) => pl.type}
                       getSubtitle={() => ''}
@@ -232,23 +232,31 @@ export default function Packing({ navigation }) {
                       getRight={() => ''}
                     />
 
-                    {/* Items in the active list */}
+                    {/* Items in the list */}
                     {activeList.items.map((item) => (
-                      <View key={item.id} style={styles.itemRow}>
-                        <Checkbox
-                          status={item.checked ? 'checked' : 'unchecked'}
-                          onPress={() => toggleItemChecked(item.id)}
-                          color={item.checked ? '#263041' : undefined} 
-                          uncheckedColor='#263041'                    
-                        />
-                        <Text style={styles.itemText}>{item.item}</Text>
-                      </View>
-                    ))}
+  <View key={item.id} style={styles.itemRow}>
+    <Checkbox
+      status={item.checked ? 'checked' : 'unchecked'}
+      onPress={() => toggleItemChecked(item.id)}
+      color={item.checked ? '#263041' : undefined} 
+      uncheckedColor='#263041'                    
+    />
+    <Text style={styles.itemText}>{item.item}</Text>
+    <IconButton
+      icon="delete"
+      size={20}
+      onPress={() => handleDeleteItem(item.id)}
+      style={{ marginLeft: 'auto' }}
+      iconColor='#263041'
+    />
+  </View>
+))}
+
                   </View>
                 )}
               </ScrollView>
 
-              {/* Shared FAB */}
+              {/* Add button */}
               {selectedTripId && !activeList && (
                 <ReusableFab
                   icon="plus"
@@ -265,7 +273,7 @@ export default function Packing({ navigation }) {
                 />
               )}
 
-              {/* Dialogs */}
+              {/* -------------------------------------------------------------- */}
               <Portal>
                 {/* New Packing List Modal */}
                 <Modal
@@ -308,7 +316,7 @@ export default function Packing({ navigation }) {
                   </ScrollView>
                 </Modal>
 
-                {/* Rename List Modal */}
+                {/* Rename List --------------------------------------------*/}
                 <Modal
                   visible={renameDialogVisible}
                   onDismiss={hideRenameDialog}
@@ -349,7 +357,7 @@ export default function Packing({ navigation }) {
                   </ScrollView>
                 </Modal>
 
-                {/* New Item Modal */}
+                {/* New item popup*/}
                 <Modal
                   visible={newItemDialogVisible}
                   onDismiss={hideNewItemDialog}
