@@ -173,12 +173,14 @@ export default function Itinerary({ navigation }) {
             <View style={styles.container}>
               {/* Back row */}
               <View style={styles.backRow}>
-                <IconButton
-                  icon="arrow-left"
-                  size={26}
-                  onPress={() => navigation.goBack()}
-                />
-              </View>
+  <IconButton
+    icon="arrow-left"
+    size={26}
+    onPress={() => viewMode === 'day' ? handleBackToCalendar() : navigation.goBack()}
+  />
+  {viewMode === 'day' && <Text style={styles.backTitle}>Back to calendar</Text>}
+</View>
+
 
               {/* CALENDAR VIEW */}
               {viewMode === 'calendar' && (
@@ -232,14 +234,7 @@ export default function Itinerary({ navigation }) {
               {/* DAY VIEW */}
               {viewMode === 'day' && (
                 <>
-                  <Button
-                    onPress={handleBackToCalendar}
-                    mode="contained"
-                    style={styles.internalBack}
-                    textColor={backButtonText}
-                  >
-                    Back to Calendar
-                  </Button>
+                  
 
                   <Text style={styles.pageSubtitle}>
                     Itinerary for{"\n"} {formatItineraryDate(selectedDate)}

@@ -33,6 +33,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     },
 
+    backTitle: {
+  fontSize: 16,
+  alignSelf: 'center',
+  marginLeft: 8,
+  color: '#263041',
+  fontWeight: '500',
+},
+
+
   pageSubtitle: { 
     fontSize: 30, 
     fontWeight: 'bold',

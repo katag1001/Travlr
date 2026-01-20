@@ -152,14 +152,16 @@ export default function Spend({ budget, onBack }) {
 
           {/* MAIN BACK BUTTON */}
           <View style={styles.backRow}>
-            <IconButton
-              icon="arrow-left"
-              size={26}
-              onPress={() => navigation.goBack()}
-            />
-          </View>
-          <Button onPress={onBack} mode="contained" style={styles.internalBack} textColor={backButtonText} > Back to Budgets </Button>
+  <IconButton
+    icon="arrow-left"
+    size={26}
+    onPress={onBack} // go back to budgets
+  />
+  <Text style={styles.backTitle}>Back to budgets</Text>
+</View>
 
+
+       
           <Text style={styles.pageSubtitle}>Spends for {currentBudget.budgetName}</Text>
 
           {/* TOTAL BUDGET CARD (clickable) */}

@@ -177,14 +177,17 @@ export default function Packing({ navigation }) {
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-              {/* Back Row with Page Title */}
+              {/* Back Row  */}
+
               <View style={styles.backRow}>
-                <IconButton
-                  icon="arrow-left"
-                  size={26}
-                  onPress={() => navigation.goBack()}
-                />
-              </View>
+  <IconButton
+    icon="arrow-left"
+    size={26}
+    onPress={() => activeList ? setActiveList(null) : navigation.goBack()}
+  />
+  {activeList && <Text style={styles.backTitle}>Back to lists</Text>}
+</View>
+
 
               <Text style={styles.pageSubtitle}>Your Packing Lists</Text>
 
@@ -210,16 +213,8 @@ export default function Packing({ navigation }) {
                   />
                 ) : (
                   <View style={styles.activeListContainer}>
-                    {/* Back Button above the Card */}
-                    <View>
-                      <Button 
-                        mode="contained" 
-                        style={styles.internalBack}
-                        textColor={backButtonText}
-                        onPress={() => setActiveList(null)}>
-                        Back to Lists
-                      </Button>
-                    </View>
+
+                 
 
                     {/* List Title Card  */}
                     <ViewCard
