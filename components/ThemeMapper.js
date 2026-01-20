@@ -1,51 +1,62 @@
 const themeKeywords = {
   'Africa': [
-    'egypt', 'nairobi','kenya', 'south africa', 'morocco', 'nigeria', 'ghana', 'ethiopia', 
-    'tanzania', 'uganda', 'algeria', 'senegal', 'ivory coast', 'zambia', 'zimbabwe', 
-    'botswana', 'cameroon', 'libya', 'sudan', 'angola', 'africa', 'casablanca', 'cairo', 'nairobi', 'cape town'
+    'africa', 'algeria', 'angola', 'benin', 'botswana', 'burkina faso', 'burundi',
+    'cameroon', 'cape verde', 'central african republic', 'chad', 'comoros', 
+    'congo', 'dr congo', 'djibouti', 'egypt', 'equatorial guinea', 'eritrea', 
+    'ethiopia', 'gabon', 'gambia', 'ghana', 'guinea', 'guinea-bissau', 'ivory coast', 
+    'kenya', 'lesotho', 'liberia', 'libya', 'madagascar', 'malawi', 'mali', 'mauritania', 
+    'mauritius', 'morocco', 'mozambique', 'namibia', 'niger', 'nigeria', 'rwanda', 
+    'senegal', 'seychelles', 'sierra leone', 'somalia', 'south africa', 'south sudan', 
+    'sudan', 'tanzania', 'togo', 'tunisia', 'uganda', 'zambia', 'zimbabwe',
+    'cairo', 'lagos', 'nairobi', 'alexandria', 'kinshasa', 'johannesburg', 'casablanca', 'addis ababa'
   ],
   'Central Asia': [
-    'kazakhstan', 'uzbekistan', 'turkmenistan', 'tajikistan', 'kyrgyzstan', 'central asia',
-    'ashgabat', 'tashkent', 'almaty', 'bishkek', 'dushanbe', 'samarkand', 'bukhara', 
-    'mongolia', 'karaganda', 'urumqi', 'aktau', 'ferghana', 'termez', 'kazakhstan city'
+    'central asia', 'kazakhstan', 'kyrgyzstan', 'tajikistan', 'turkmenistan', 'uzbekistan',
+    'afghanistan', 'kazakhstan', 'tajikistan', 'uzbekistan', 'turkmenistan', 'kyrgyzstan',
+    'astana', 'almaty', 'bishkek', 'dushanbe', 'ashgabat', 'tashkent'
   ],
   'Middle East': [
-    'dubai', 'uae', 'iran', 'israel', 'qatar', 'kuwait', 'saudi arabia', 'iraq', 
-    'oman', 'bahrain', 'middle east', 'jerusalem', 'doha', 'riyadh', 'tehran', 
-    'baghdad', 'muscat', 'jordan', 'abudhabi', 'abu dhabi', 'beirut', 'amman'
+    'middle east', 'bahrain', 'cyprus', 'egypt', 'iran', 'iraq', 'israel', 'jordan', 
+    'kuwait', 'lebanon', 'oman', 'qatar', 'saudi arabia', 'syria', 'united arab emirates', 'yemen',
+    'riyadh', 'dubai', 'doha', 'jerusalem', 'tehran', 'baghdad', 'amman', 'beirut', 'muscat', 'kuwait city'
   ],
   'Europe': [
-    'france', 'germany', 'italy', 'spain', 'uk', 'portugal', 'netherlands', 
-    'belgium', 'switzerland', 'sweden', 'norway', 'denmark', 'finland', 'austria', 
-    'ireland', 'greece', 'europe', 'paris', 'rome', 'berlin', 'madrid', 'london', 'amsterdam', 'vienna'
+    'europe', 'albania', 'andorra', 'austria', 'belarus', 'belgium', 'bosnia & herzegovina',
+    'bulgaria', 'croatia', 'czech republic', 'czechia', 'denmark', 'estonia', 'finland', 'france',
+    'germany', 'greece', 'hungary', 'iceland', 'ireland', 'italy', 'latvia', 'lithuania',
+    'luxembourg', 'malta', 'moldova', 'monaco', 'montenegro', 'netherlands', 'north macedonia',
+    'norway', 'poland', 'portugal', 'romania', 'russia', 'san marino', 'serbia', 'slovakia',
+    'slovenia', 'spain', 'sweden', 'switzerland', 'ukraine', 'united kingdom',
+    'london', 'paris', 'berlin', 'madrid', 'rome', 'amsterdam', 'vienna', 'barcelona', 'moscow', 'athens'
   ],
   'North America': [
-    'usa', 'canada', 'mexico', 'america', 'north', 'new york', 'los angeles', 
-    'toronto', 'vancouver', 'mexico city', 'chicago', 'houston', 'miami', 
-    'montreal', 'calgary', 'atlanta', 'washington', 'boston', 'dallas', 'san francisco'
+    'north america', 'canada', 'usa', 'mexico', 'greenland', 'bahamas', 'cuba',
+
+    'new york', 'los angeles', 'chicago', 'houston', 'miami', 'toronto', 'vancouver', 
+    'montreal', 'mexico city', 'boston', 'san francisco', 'washington dc'
   ],
   'Southeast Asia': [
-    'thailand', 'vietnam', 'indonesia', 'malaysia', 'southeast asia', 'bali', 'laos',
-    'singapore', 'philippines', 'cambodia', 'myanmar', 'brunei', 'jakarta', 'bangkok', 
-    'ho chi minh', 'hanoi', 'kuala lumpur', 'phnom penh', 'yangon', 'manila', 'denpasar'
+    'southeast asia', 'brunei', 'cambodia', 'laos', 'malaysia', 'myanmar', 'philippines',
+    'singapore', 'thailand', 'vietnam', 'indonesia', 'east timor', 'bangkok', 
+    'jakarta', 'manila', 'kuala lumpur', 'singapore city', 'ho chi minh', 'hanoi', 
+    'phnom penh', 'yangon', 'denpasar'
   ],
   'South America': [
-    'brazil', 'argentina', 'chile', 'colombia', 'peru', 'ecuador', 'uruguay', 
-    'paraguay', 'venezuela', 'bolivia', 'guyana', 'suriname', 'french guiana', 
-    'south america', 'rio de janeiro', 'sao paulo', 'buenos aires', 'santiago', 
-    'lima', 'caracas', 'quito'
+    'south america', 'argentina', 'bolivia', 'brazil', 'chile', 'colombia', 'ecuador',
+    'guyana', 'paraguay', 'peru', 'suriname', 'uruguay', 'venezuela', 'jamaica', 'haiti', 'dominican republic', 'guatemala', 'belize', 'el salvador',
+    'honduras', 'nicaragua', 'costa rica', 'panama', 'buenos aires', 'rio de janeiro', 
+    'sao paulo', 'santiago', 'lima', 'bogota', 'caracas', 'quito'
   ],
   'East Asia': [
-    'china', 'japan', 'south korea', 'taiwan', 'hong kong', 'macau', 'east asia',
-    'beijing', 'shanghai', 'tokyo', 'osaka', 'seoul', 'taipei', 'hongkong', 
-    'kyoto', 'nanjing', 'guangzhou', 'dalian', 'fukuoka', 'nagoya', 'incheon'
+    'east asia', 'china', 'japan', 'south korea', 'north korea', 'taiwan', 'hong kong', 'macau',
+    'beijing', 'shanghai', 'tokyo', 'osaka', 'seoul', 'taipei', 'hong kong', 'kyoto', 'nagoya', 'incheon'
   ],
   'Indian Subcontinent': [
-    'india', 'pakistan', 'bangladesh', 'sri lanka', 'nepal', 'bhutan', 'maldives',
-    'delhi', 'mumbai', 'karachi', 'dhaka', 'colombo', 'kathmandu', 'islamabad',
-    'chennai', 'hyderabad', 'pune', 'jaipur', 'goa', 'trivandrum'
+    'indian subcontinent', 'india', 'pakistan', 'bangladesh', 'nepal', 'bhutan', 'sri lanka', 'maldives',
+    'delhi', 'mumbai', 'kolkata', 'chennai', 'bangalore', 'karachi', 'lahore', 'dhaka', 'colombo', 'kathmandu'
   ]
 };
+
 
 
 export function getThemeFromTripName(tripName) {

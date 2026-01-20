@@ -15,7 +15,7 @@ export const getHotelsForTrip = async (tripId) => {
   return all.filter(pl => pl.tripId === tripId);
 };
 
-//Helper function because of the god damn date argghghhghgh
+//Helper function because the date is stored as dd/mm/yyyy string
 const fixDate = (ddmmyyyy) => {
   try {
     const parsed = parse(ddmmyyyy, 'dd/MM/yyyy', new Date());

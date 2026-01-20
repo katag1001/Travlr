@@ -8,7 +8,10 @@ export const backButtonText = '#263041';
 const styles = StyleSheet.create({
 
 // ------------------ Universal ------------------
-    pageTitle: { fontSize: 22, fontWeight: 'bold', marginLeft: 8 },
+    pageTitle: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginLeft: 8 },
 
     emptyContainer: {
     marginTop: 50,
