@@ -70,8 +70,10 @@ export default function Itinerary({ navigation }) {
     }
   };
 
-  return `${weekday}, ${monthName} ${day}${getOrdinal(Number(day))}`;
+  const numericDay = Number(day); // convert to number to remove leading zero
+  return `${weekday} ${monthName} ${numericDay}${getOrdinal(numericDay)}`;
 };
+
 
 
 
