@@ -18,12 +18,11 @@ const styles = StyleSheet.create({
   },
   emptyText: { 
     fontSize: 25, 
-    backgroundColor: 'white',
+
     color: '#263041', 
-    padding: 30,
+    padding: 20,
     textAlign: 'center',
-    borderColor: '#263041',
-    borderWidth: 1,},
+  },
   
   internalBack: { 
     marginBottom: 10,
