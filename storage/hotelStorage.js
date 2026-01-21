@@ -72,7 +72,7 @@ export const addHotel = async (Hotel) => {
         const itineraryItem = {
           id: Date.now().toString() + Math.random(),
           tripId: Hotel.tripId,
-          hotelId: Hotel.id,          // ✅ LINK TO HOTEL
+          hotelId: Hotel.id,        
           title: `Accommodation: ${Hotel.hotelName}`,
           date,
           time: '',
@@ -94,10 +94,63 @@ export const addHotel = async (Hotel) => {
 };
 
 export const updateHotel = async (Hotel) => {
-  const all = await getHotels();
-  const newAll = all.map(pl => pl.id === Hotel.id ? Hotel : pl);
-  await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(newAll));
+  try {
+    console.log('--- updateHotel START ---');
+    console.log('Hotel data received:', Hotel);
+
+    // 1️⃣ Update hotel in storage
+    const all = await getHotels();
+    const newAll = all.map(h => h.id === Hotel.id ? Hotel : h);
+    await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(newAll));
+
+    // 2️⃣ Delete old itinerary entries for this hotel
+    console.log(`Deleting old itinerary entries for hotelId: ${Hotel.id}`);
+    await deleteItineraryEntriesByHotelId(Hotel.id);
+    console.log('Old itinerary entries deleted.');
+
+    // 3️⃣ Get budget ID for accommodation (if it exists)
+    const budgetId = await getBudgetIdByName('Accommodation', Hotel.tripId);
+
+    // 4️⃣ Fix dates and calculate cost per night
+    const start = fixDate(Hotel.startDate);
+    const end = fixDate(Hotel.endDate);
+    const costPerNight = getCostPerNight(Hotel.cost, start, end);
+    const dates = getDatesBetween(start, end);
+
+    console.log('Dates for new itinerary:', dates);
+    console.log('Cost per night:', costPerNight);
+
+    // 5️⃣ Create new itinerary items
+    const newItineraryItems = dates.map(date => ({
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+      tripId: Hotel.tripId,
+      hotelId: Hotel.id,
+      transportId: null,
+      title: `Accommodation: ${Hotel.hotelName}`,
+      date,
+      time: '',
+      notes: '',
+      cost: costPerNight.toFixed(2),
+      budgetId: budgetId || null,
+      spendId: null,
+    }));
+
+    console.log('New itinerary items to add:', newItineraryItems);
+
+    // 6️⃣ Add new itinerary items
+    for (const item of newItineraryItems) {
+      console.log(`Adding itinerary item for date: ${item.date}`);
+      await addItineraryEntry(item);
+    }
+
+    console.log('All new itinerary entries added successfully.');
+    console.log('--- updateHotel END ---');
+  } catch (err) {
+    console.error('💥 Error updating hotel:', err);
+  }
 };
+
+
 
 export const deleteHotel = async (hotelId) => {
   const all = await getHotels();
