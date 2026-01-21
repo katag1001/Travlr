@@ -75,34 +75,44 @@ export default function Home({ navigation }) {
     setModalVisible(true);
   };
 
-  const handleSaveTrip = async () => {
-    if (!tripName || !startDate || !endDate) {
-      alert('All fields are required.');
-      return;
-    }
+ const handleSaveTrip = async () => {
+  if (!tripName || !startDate || !endDate) {
+    alert('All fields are required.');
+    return;
+  }
 
-    const autoTheme = getThemeFromTripName(tripName);
+  // Parse the dates for comparison
+  const start = new Date(startDate.split('/').reverse().join('-')); // "dd/mm/yyyy" -> "yyyy-mm-dd"
+  const end = new Date(endDate.split('/').reverse().join('-'));
 
-    const newTrip = {
-      id: editingTrip?.id || uuidv4(),
-      tripName,
-      theme: autoTheme,
-      startDate,
-      endDate,
-    };
+  if (start > end) {
+    alert('Start date cannot be after end date.');
+    return;
+  }
 
-    if (editingTrip) {
-      await updateTrip(newTrip);
-      selectTrip(newTrip); 
-    } else {
-      await addTrip(newTrip);
-      selectTrip(newTrip);
-    }
+  const autoTheme = getThemeFromTripName(tripName);
 
-    await loadTrips(); 
-    setModalVisible(false);
-    resetForm();
+  const newTrip = {
+    id: editingTrip?.id || uuidv4(),
+    tripName,
+    theme: autoTheme,
+    startDate,
+    endDate,
   };
+
+  if (editingTrip) {
+    await updateTrip(newTrip);
+    selectTrip(newTrip); 
+  } else {
+    await addTrip(newTrip);
+    selectTrip(newTrip);
+  }
+
+  await loadTrips(); 
+  setModalVisible(false);
+  resetForm();
+};
+
 
   const handleTripsUpdated = (updatedTrips) => {
     setTrips(updatedTrips);
