@@ -102,17 +102,19 @@ export default function ItineraryEntryForm({
       return;
     }
 
-    const newItem = {
-      id: id || Date.now().toString(),
-      tripId,
-      title: title.trim(),
-      date: date.trim(),
-      time: time.trim(),
-      notes: notes.trim(),
-      cost: cost.trim(),
-      budgetId: selectedBudgetId || null,
-      spendId: spendId || null,
-    };
+const newItem = {
+  id: id || Date.now().toString(),
+  tripId,
+  hotelId: null, 
+  title: title.trim(),
+  date: date.trim(),
+  time: time.trim(),
+  notes: notes.trim(),
+  cost: cost.trim(),
+  budgetId: selectedBudgetId || null,
+  spendId: spendId || null,
+};
+
 
     try {
       if (selectedBudgetId && parsedCost > 0) {

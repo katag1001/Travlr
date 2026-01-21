@@ -26,9 +26,15 @@ export const updateItineraryEntry = async (entry) => {
   await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(newAll));
 };
 
-// ✅ NEW: Delete an itinerary entry by ID
 export const deleteItineraryEntry = async (id) => {
   const all = await getItineraries();
   const filtered = all.filter(entry => entry.id !== id);
   await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(filtered));
 };
+
+export const deleteItineraryEntriesByHotelId = async (hotelId) => {
+  const all = await getItineraries();
+  const filtered = all.filter(entry => entry.hotelId !== hotelId);
+  await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(filtered));
+};
+

@@ -31,7 +31,6 @@ const themeKeywords = {
   ],
   'North America': [
     'north america', 'canada', 'usa', 'mexico', 'greenland', 'bahamas', 'cuba',
-
     'new york', 'los angeles', 'chicago', 'houston', 'miami', 'toronto', 'vancouver', 
     'montreal', 'mexico city', 'boston', 'san francisco', 'washington dc'
   ],

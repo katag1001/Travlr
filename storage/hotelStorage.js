@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createSpend, addSpend, getBudgetIdByName} from './budgetStorage';
 import { parse } from 'date-fns';
 import { addItineraryEntry, getItineraries } from './itineraryStorage';
+import { deleteItineraryEntriesByHotelId } from './itineraryStorage';
+
 
 const STORAGE_KEY_HOTEL = 'HOTELS';
 
@@ -67,17 +69,19 @@ export const addHotel = async (Hotel) => {
     const dates = getDatesBetween(start, end);
 
     for (const date of dates) {
-      const itineraryItem = {
-        id: Date.now().toString() + Math.random(),
-        tripId: Hotel.tripId,
-        title: `Accommodation: ${Hotel.hotelName}`,
-        date, 
-        time: '',
-        notes: '',
-        cost: costPerNight.toFixed(2),
-        budgetId: budgetId || null,
-        spendId: null,
-      };
+        const itineraryItem = {
+          id: Date.now().toString() + Math.random(),
+          tripId: Hotel.tripId,
+          hotelId: Hotel.id,          // ✅ LINK TO HOTEL
+          title: `Accommodation: ${Hotel.hotelName}`,
+          date,
+          time: '',
+          notes: '',
+          cost: costPerNight.toFixed(2),
+          budgetId: budgetId || null,
+          spendId: null,
+        };
+
 
       await addItineraryEntry(itineraryItem);
       console.log('✅ Added itinerary item:', itineraryItem);
@@ -95,11 +99,12 @@ export const updateHotel = async (Hotel) => {
   await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(newAll));
 };
 
-export const deleteHotel = async (listId) => {
+export const deleteHotel = async (hotelId) => {
   const all = await getHotels();
-  const filtered = all.filter(pl => pl.id !== listId);
+  const filtered = all.filter(h => h.id !== hotelId);
   await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(filtered));
-  
+
+  await deleteItineraryEntriesByHotelId(hotelId);
 };
 
 
