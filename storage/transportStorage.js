@@ -3,6 +3,7 @@ import { createSpend, addSpend, getBudgetIdByName } from './budgetStorage';
 import { addItineraryEntry } from './itineraryStorage';
 import { parse } from 'date-fns';
 import { deleteItineraryEntryByTransportId } from './itineraryStorage';
+import { updateItineraryEntryByTransportId } from './itineraryStorage';
 
 const STORAGE_KEY_TRANSPORT = 'TRANSPORT';
 
@@ -76,8 +77,16 @@ const itineraryItem = {
 
 export const updateTransport = async (transport) => {
   const all = await getTransport();
-  const newAll = all.map(t => t.id === transport.id ? transport : t);
-  await AsyncStorage.setItem(STORAGE_KEY_TRANSPORT, JSON.stringify(newAll));
+  const newAll = all.map(t =>
+    t.id === transport.id ? transport : t
+  );
+
+  await AsyncStorage.setItem(
+    STORAGE_KEY_TRANSPORT,
+    JSON.stringify(newAll)
+  );
+
+  await updateItineraryEntryByTransportId(transport);
 };
 
 export const deleteTransport = async (transportId) => {

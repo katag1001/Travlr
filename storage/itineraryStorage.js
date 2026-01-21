@@ -32,7 +32,7 @@ export const deleteItineraryEntry = async (id) => {
   await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(filtered));
 };
 
-// Extra functions for deleting by linked IDs
+// Extra functions for deleting and updating by linked IDs
 
 export const deleteItineraryEntriesByHotelId = async (hotelId) => {
   const all = await getItineraries();
@@ -50,5 +50,28 @@ export const deleteItineraryEntryByTransportId = async (transportId) => {
     JSON.stringify(filtered)
   );
 };
+
+export const updateItineraryEntryByTransportId = async (transport) => {
+  const all = await getItineraries();
+
+  const updated = all.map(entry => {
+    if (entry.transportId === transport.id) {
+      return {
+        ...entry,
+        title: `${transport.type} to ${transport.to}`,
+        date: transport.startDate,
+        time: transport.time || '',
+        cost: transport.cost || 0,
+      };
+    }
+    return entry;
+  });
+
+  await AsyncStorage.setItem(
+    STORAGE_KEY_ITINERARY,
+    JSON.stringify(updated)
+  );
+};
+
 
 
