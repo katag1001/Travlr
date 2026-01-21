@@ -32,9 +32,23 @@ export const deleteItineraryEntry = async (id) => {
   await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(filtered));
 };
 
+// Extra functions for deleting by linked IDs
+
 export const deleteItineraryEntriesByHotelId = async (hotelId) => {
   const all = await getItineraries();
   const filtered = all.filter(entry => entry.hotelId !== hotelId);
   await AsyncStorage.setItem(STORAGE_KEY_ITINERARY, JSON.stringify(filtered));
 };
+
+export const deleteItineraryEntryByTransportId = async (transportId) => {
+  const all = await getItineraries();
+  const filtered = all.filter(
+    entry => entry.transportId !== transportId
+  );
+  await AsyncStorage.setItem(
+    STORAGE_KEY_ITINERARY,
+    JSON.stringify(filtered)
+  );
+};
+
 

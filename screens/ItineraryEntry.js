@@ -106,6 +106,7 @@ const newItem = {
   id: id || Date.now().toString(),
   tripId,
   hotelId: null, 
+  transportId: null,
   title: title.trim(),
   date: date.trim(),
   time: time.trim(),

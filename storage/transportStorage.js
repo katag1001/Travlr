@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSpend, addSpend, getBudgetIdByName } from './budgetStorage';
 import { addItineraryEntry } from './itineraryStorage';
 import { parse } from 'date-fns';
+import { deleteItineraryEntryByTransportId } from './itineraryStorage';
 
 const STORAGE_KEY_TRANSPORT = 'TRANSPORT';
 
@@ -53,17 +54,19 @@ export const addTransport = async (transport) => {
     }
 
     // Itinerary (single item)
-    const itineraryItem = {
-      id: Date.now().toString() + Math.random(),
-      tripId: transport.tripId,
-      title: `${transport.type} to ${transport.to}`,
-      date: transport.startDate,
-      time: transport.time || '',
-      notes: '',
-      cost: transport.cost || 0,
-      budgetId: budgetId || null,
-      spendId: null,
-    };
+const itineraryItem = {
+  id: Date.now().toString() + Math.random(),
+  tripId: transport.tripId,
+  transportId: transport.id,    
+  title: `${transport.type} to ${transport.to}`,
+  date: transport.startDate,
+  time: transport.time || '',
+  notes: '',
+  cost: transport.cost || 0,
+  budgetId: budgetId || null,
+  spendId: null,
+};
+
     await addItineraryEntry(itineraryItem);
 
   } catch (error) {
@@ -77,8 +80,14 @@ export const updateTransport = async (transport) => {
   await AsyncStorage.setItem(STORAGE_KEY_TRANSPORT, JSON.stringify(newAll));
 };
 
-export const deleteTransport = async (id) => {
+export const deleteTransport = async (transportId) => {
   const all = await getTransport();
-  const filtered = all.filter(t => t.id !== id);
-  await AsyncStorage.setItem(STORAGE_KEY_TRANSPORT, JSON.stringify(filtered));
+  const filtered = all.filter(t => t.id !== transportId);
+  await AsyncStorage.setItem(
+    STORAGE_KEY_TRANSPORT,
+    JSON.stringify(filtered)
+  );
+
+
+  await deleteItineraryEntryByTransportId(transportId);
 };
