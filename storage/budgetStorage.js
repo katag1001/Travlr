@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
+import { getHotels, fixDate } from './hotelStorage'; 
 
 const BUDGETS_KEY = 'BUDGETS';
 const SPENDS_KEY = 'SPENDS';
@@ -16,7 +17,14 @@ export const createBudget = (budgetName, total, tripId) => {
   };
 };
 
-export const createSpend = (budgetId, spendName, date, spend, tripId) => {
+export const createSpend = (
+  budgetId,
+  spendName,
+  date,
+  spend,
+  tripId,
+  hotelId = null
+) => {
   return {
     id: UUID.v4(),
     tripId,
@@ -24,8 +32,10 @@ export const createSpend = (budgetId, spendName, date, spend, tripId) => {
     spendName,
     date: date instanceof Date ? date.toISOString() : date,
     spend: spend || 0,
+    hotelId, // 👈 always present
   };
 };
+
 
 
 // BUDGET FUNCTIONS -----------------------------------------------------------------------------------------
@@ -134,4 +144,42 @@ export const getBudgetIdByName = async (budgetName, tripId) => {
   console.log('DEBUG found budget:', budget);
   return budget ? budget.id : null;
 };
+
+// Extra functions for deleting spends by linked IDs ---------------------------------
+
+export const deleteSpendByHotelId = async (hotelId) => {
+  const spends = await getSpends();
+
+  const hotelSpends = spends.filter(
+    s => s.hotelId === hotelId
+  );
+
+  for (const spend of hotelSpends) {
+    await deleteSpend(spend.id);
+  }
+};
+
+export const updateSpendByHotelId = async (hotelId) => {
+  const hotels = await getHotels();
+  const hotel = hotels.find(h => h.id === hotelId);
+  if (!hotel) return;
+
+  const spends = await getSpends();
+  const spend = spends.find(s => s.hotelId === hotelId);
+  if (!spend) return;
+
+  const isoDate = fixDate(hotel.startDate);
+
+  const updatedSpend = {
+    ...spend,
+    spendName: `Accommodation: ${hotel.hotelName}`,
+    date: isoDate,
+    spend: hotel.cost || 0,
+  };
+
+  await updateSpend(updatedSpend);
+};
+
+
+
 

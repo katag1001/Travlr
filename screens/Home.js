@@ -81,8 +81,7 @@ export default function Home({ navigation }) {
     return;
   }
 
-  // Parse the dates for comparison
-  const start = new Date(startDate.split('/').reverse().join('-')); // "dd/mm/yyyy" -> "yyyy-mm-dd"
+  const start = new Date(startDate.split('/').reverse().join('-'));
   const end = new Date(endDate.split('/').reverse().join('-'));
 
   if (start > end) {

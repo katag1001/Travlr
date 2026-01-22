@@ -3,6 +3,7 @@ import {createSpend, addSpend, getBudgetIdByName} from './budgetStorage';
 import { parse } from 'date-fns';
 import { addItineraryEntry, getItineraries } from './itineraryStorage';
 import { deleteItineraryEntriesByHotelId } from './itineraryStorage';
+import { deleteSpendByHotelId, updateSpendByHotelId } from './budgetStorage';
 
 
 const STORAGE_KEY_HOTEL = 'HOTELS';
@@ -17,15 +18,6 @@ export const getHotelsForTrip = async (tripId) => {
   return all.filter(pl => pl.tripId === tripId);
 };
 
-//Helper function because the date is stored as dd/mm/yyyy string
-const fixDate = (ddmmyyyy) => {
-  try {
-    const parsed = parse(ddmmyyyy, 'dd/MM/yyyy', new Date());
-    return parsed.toISOString();
-  } catch (e) {
-    return new Date().toISOString();
-  }
-};
 
 export const addHotel = async (Hotel) => {
 
@@ -54,7 +46,8 @@ export const addHotel = async (Hotel) => {
         hotelTitle,
         isoDate,
         Hotel.cost,
-        Hotel.tripId
+        Hotel.tripId,
+        Hotel.id 
       );
       await addSpend(newSpend);
       console.log('✅ Added spend for hotel:', newSpend);
@@ -98,20 +91,19 @@ export const updateHotel = async (Hotel) => {
     console.log('--- updateHotel START ---');
     console.log('Hotel data received:', Hotel);
 
-    // 1️⃣ Update hotel in storage
     const all = await getHotels();
     const newAll = all.map(h => h.id === Hotel.id ? Hotel : h);
     await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(newAll));
 
-    // 2️⃣ Delete old itinerary entries for this hotel
     console.log(`Deleting old itinerary entries for hotelId: ${Hotel.id}`);
     await deleteItineraryEntriesByHotelId(Hotel.id);
     console.log('Old itinerary entries deleted.');
 
-    // 3️⃣ Get budget ID for accommodation (if it exists)
     const budgetId = await getBudgetIdByName('Accommodation', Hotel.tripId);
 
-    // 4️⃣ Fix dates and calculate cost per night
+    await updateSpendByHotelId(Hotel.id);
+    console.log('✅ Updated spend for hotelId:', Hotel.id);
+
     const start = fixDate(Hotel.startDate);
     const end = fixDate(Hotel.endDate);
     const costPerNight = getCostPerNight(Hotel.cost, start, end);
@@ -120,7 +112,6 @@ export const updateHotel = async (Hotel) => {
     console.log('Dates for new itinerary:', dates);
     console.log('Cost per night:', costPerNight);
 
-    // 5️⃣ Create new itinerary items
     const newItineraryItems = dates.map(date => ({
       id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
       tripId: Hotel.tripId,
@@ -137,16 +128,20 @@ export const updateHotel = async (Hotel) => {
 
     console.log('New itinerary items to add:', newItineraryItems);
 
-    // 6️⃣ Add new itinerary items
     for (const item of newItineraryItems) {
       console.log(`Adding itinerary item for date: ${item.date}`);
       await addItineraryEntry(item);
     }
 
     console.log('All new itinerary entries added successfully.');
+
+
+
     console.log('--- updateHotel END ---');
   } catch (err) {
     console.error('💥 Error updating hotel:', err);
+
+
   }
 };
 
@@ -158,6 +153,8 @@ export const deleteHotel = async (hotelId) => {
   await AsyncStorage.setItem(STORAGE_KEY_HOTEL, JSON.stringify(filtered));
 
   await deleteItineraryEntriesByHotelId(hotelId);
+
+  await deleteSpendByHotelId(hotelId);
 };
 
 
@@ -185,5 +182,18 @@ export const getCostPerNight = (totalCost, startDate, endDate) => {
   const end = new Date(endDate);
   const nights = Math.max(Math.round((end - start) / (1000 * 60 * 60 * 24)), 1);
   return totalCost / nights;
+};
+
+
+
+
+//Helper function because the date is stored as dd/mm/yyyy string
+export const fixDate = (ddmmyyyy) => {
+  try {
+    const parsed = parse(ddmmyyyy, 'dd/MM/yyyy', new Date());
+    return parsed.toISOString();
+  } catch (e) {
+    return new Date().toISOString();
+  }
 };
 

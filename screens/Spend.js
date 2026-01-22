@@ -87,7 +87,8 @@ export default function Spend({ budget, onBack }) {
       const updated = { ...editingSpend, spendName, spend: amount, date: dateValue };
       await updateSpend(updated);
     } else {
-      const newSpend = createSpend(budgetId, spendName, dateValue, amount, tripId);
+      const newSpend = createSpend(budgetId, spendName, dateValue, amount, tripId, null);
+
       await addSpend(newSpend);
     }
 

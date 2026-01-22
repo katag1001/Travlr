@@ -34,6 +34,7 @@ export const deleteItineraryEntry = async (id) => {
 
 // Extra functions for deleting and updating by linked IDs
 
+
 export const deleteItineraryEntriesByHotelId = async (hotelId) => {
   const all = await getItineraries();
   const filtered = all.filter(entry => entry.hotelId !== hotelId);
