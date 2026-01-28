@@ -4,7 +4,7 @@
     "slug": "my-react-native-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/backgrounds/icon.JPG",
+    "icon": "./assets/images/backgrounds/icon.jpg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -16,7 +16,7 @@
       "supportsTablet": true
     },
     "web": {
-      "favicon": "./assets/images/backgrounds/icon.JPG"
+      "favicon": "./assets/images/backgrounds/icon.jpg"
     }
   }
 }
