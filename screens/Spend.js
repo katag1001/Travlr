@@ -106,7 +106,6 @@ export default function Spend({ budget, onBack }) {
     if (selectedDate) setSpendDate(selectedDate);
   };
 
-  /* --- BUDGET MODAL (matches Budget page functionality) --- */
   const showBudgetDialog = () => {
     setEditingBudget(currentBudget);
     setBudgetName(currentBudget.budgetName);

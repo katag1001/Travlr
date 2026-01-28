@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
 import { getHotels, fixDate } from './hotelStorage'; 
+import { getTransport } from './transportStorage';
 
 const BUDGETS_KEY = 'BUDGETS';
 const SPENDS_KEY = 'SPENDS';
@@ -23,7 +24,10 @@ export const createSpend = (
   date,
   spend,
   tripId,
-  hotelId = null
+  {
+    hotelId = null,
+    transportId = null,
+  } = {}
 ) => {
   return {
     id: UUID.v4(),
@@ -32,9 +36,11 @@ export const createSpend = (
     spendName,
     date: date instanceof Date ? date.toISOString() : date,
     spend: spend || 0,
-    hotelId, // 👈 always present
+    hotelId,
+    transportId,
   };
 };
+
 
 
 
@@ -92,10 +98,19 @@ export const addSpend = async (newSpend) => {
       budgets[idx].spent = (budgets[idx].spent || 0) + newSpend.spend;
       await saveBudgets(budgets);
     }
+
+    console.log('🧾 Saving spend with links:', {
+  spendId: newSpend.id,
+  hotelId: newSpend.hotelId,
+  transportId: newSpend.transportId,
+});
   } catch (err) {
     console.error('💥 Error in addSpend:', err);
-    throw err; // re-throw so the caller knows something went wrong
+    throw err; 
   }
+
+
+  
 };
 
 
@@ -179,6 +194,40 @@ export const updateSpendByHotelId = async (hotelId) => {
 
   await updateSpend(updatedSpend);
 };
+
+export const deleteSpendByTransportId = async (transportId) => {
+  const spends = await getSpends();
+
+  const transportSpends = spends.filter(
+    s => s.transportId === transportId
+  );
+
+  for (const spend of transportSpends) {
+    await deleteSpend(spend.id);
+  }
+};
+
+export const updateSpendByTransportId = async (transportId) => {
+  const transports = await getTransport();
+  const transport = transports.find(t => t.id === transportId);
+  if (!transport) return;
+
+  const spends = await getSpends();
+  const spend = spends.find(s => s.transportId === transportId);
+  if (!spend) return;
+
+  const isoDate = fixDate(transport.startDate);
+
+  const updatedSpend = {
+    ...spend,
+    spendName: `${transport.type} to ${transport.to}`,
+    date: isoDate,
+    spend: transport.cost || 0,
+  };
+
+  await updateSpend(updatedSpend);
+};
+
 
 
 

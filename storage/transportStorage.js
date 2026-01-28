@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSpend, addSpend, getBudgetIdByName } from './budgetStorage';
 import { addItineraryEntry } from './itineraryStorage';
 import { parse } from 'date-fns';
-import { deleteItineraryEntryByTransportId } from './itineraryStorage';
-import { updateItineraryEntryByTransportId } from './itineraryStorage';
+import { deleteItineraryEntryByTransportId, updateItineraryEntryByTransportId } from './itineraryStorage';
+import { deleteSpendByTransportId, updateSpendByTransportId } from './budgetStorage';
 
 const STORAGE_KEY_TRANSPORT = 'TRANSPORT';
 
@@ -49,12 +49,14 @@ export const addTransport = async (transport) => {
         spendTitle,
         isoDate,
         transport.cost,
-        transport.tripId
+        transport.tripId,
+        { transportId: transport.id }
       );
       await addSpend(newSpend);
     }
+    console.log('✅ Added spend for transport:', transport.id);
 
-    // Itinerary (single item)
+    // Itinerary --------------------------------------------------
 const itineraryItem = {
   id: Date.now().toString() + Math.random(),
   tripId: transport.tripId,
@@ -87,6 +89,9 @@ export const updateTransport = async (transport) => {
   );
 
   await updateItineraryEntryByTransportId(transport);
+
+  await updateSpendByTransportId(transport.id);
+
 };
 
 export const deleteTransport = async (transportId) => {
@@ -99,4 +104,6 @@ export const deleteTransport = async (transportId) => {
 
 
   await deleteItineraryEntryByTransportId(transportId);
+
+  await deleteSpendByTransportId(transportId);
 };

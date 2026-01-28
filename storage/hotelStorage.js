@@ -146,7 +146,6 @@ export const updateHotel = async (Hotel) => {
 };
 
 
-
 export const deleteHotel = async (hotelId) => {
   const all = await getHotels();
   const filtered = all.filter(h => h.id !== hotelId);
